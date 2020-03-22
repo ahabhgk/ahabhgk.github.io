@@ -1,0 +1,83 @@
+---
+title: 读《JavaScript 设计模式与开发实践》- 适配器模式
+date: 2019-07-15
+description: 《JavaScript 设计模式与开发实践》读书笔记
+tags:
+  - Note
+  - 《JavaScript 设计模式与开发实践》
+---
+
+适配器模式别名叫包装器，作用是解决两个软件实体间的接口不兼容的问题。使用适配器模式之后，原本由于接口不兼容而不能工作的两个软件实体可以一起工作
+
+## 通过适配器适配接口
+
+假设我们正在编写一个渲染地图的页面。目前从第三方资源里获得了城市以及它们所对应的 ID，并且成功地渲染到页面中
+
+```js
+const getCity = async function () {
+  const res = [
+    {
+      name: '深圳',
+      id: 0,
+    },
+    {
+      name: '广州',
+      id: 1,
+    },
+  ]
+  return res
+}
+
+const render = function (fn) {
+  info.innerText = JSON.stringify(fn())
+}
+
+render(getCity())
+```
+
+之后由于更换接口，数据中城市的 ID 不一样了，我们用适配器进行适配：
+
+```js
+const getCity = async function () {
+  const res = [
+    {
+      name: '深圳',
+      id: 0,
+    },
+    {
+      name: '广州',
+      id: 1,
+    },
+  ]
+  return res
+}
+
+// 新数据
+const newCityData = {
+  '深圳': 9,
+  '广州': 8,
+}
+
+const dataAdapter = function (fn) {
+  const data = fn()
+  data.forEach(city => {
+    const { name } = city
+    city.id = newCityData[name]
+  })
+  return data
+}
+
+const render = function (fn) {
+  info.innerText = JSON.stringify(fn())
+}
+
+render(dataAdapter(getCity))
+```
+
+## 与其他类似模式区别
+
+* 适配器模式主要用来解决两个已有接口之间不匹配的问题，它不考虑这些接口是怎样实现的，也不考虑它们将来可能会如何演化。适配器模式不需要改变已有的接口，就能够使它们协同作用
+
+* 装饰者模式和代理模式也不会改变原有对象的接口，但装饰者模式的作用是为了给对象增加功能。装饰者模式常常形成一条长的装饰链，而适配器模式通常只包装一次。代理模式是为了控制对对象的访问，通常也只包装一次
+
+* 外观模式的作用倒是和适配器比较相似，有人把外观模式看成一组对象的适配器，但外观模式最显著的特点是定义了一个新的接口

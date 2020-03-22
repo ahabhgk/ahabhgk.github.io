@@ -1,0 +1,162 @@
+---
+title: 读《JavaScript 设计模式与开发实践》- 迭代器模式
+date: 2019-07-05
+description: 《JavaScript 设计模式与开发实践》读书笔记
+tags:
+  - Note
+  - 《JavaScript 设计模式与开发实践》
+---
+
+迭代器模式是指提供一种方法顺序访问一个聚合对象中的各个元素，而又不需要暴露该对象的内部表示。
+
+迭代器模式可以把迭代的过程从业务逻辑中分离出来，在使用迭代器模式之后，即使不关心对象的内部构造，也可以按顺序访问其中的每个元素。
+
+## 内部迭代器
+
+forEach, map, reduce...
+
+## 外部迭代器
+
+必须显式地请求迭代下一个元素
+
+增加了调用的复杂度，但也增强了灵活性，可以手动控制迭代地过程或顺序
+
+```js
+const Iterator = function (array) {
+  const current = 0
+
+  const next = function () {
+    current += 1
+  }
+
+  const isDone = function () {
+    return current >= array.length
+  }
+
+  const getCurrentItem = function () {
+    return array[current]
+  }
+
+  return {
+    next,
+    isDone,
+    getCurrentItem,
+  }
+}
+```
+
+两个数组的 compare
+
+```js
+const compare = function (iterator1, iterator2) {
+  while (!iterator1.isDone() && !iterator2.isDone()) {
+    if (iterator1.getCurrentItem() !== iterator2.getCurrentItem()) {
+      throw new Error('iterator1 和 iterator2 不相等')
+    }
+    iterator1.next()
+    iterator2.next()
+  }
+
+  console.log('iterator1 和 iterator2 相等')
+}
+```
+
+简化成 ES6 常见的模拟：
+
+```js
+const makeIterator = function (array) {
+  let index = 0
+  return {
+    next() {
+      return index < array.length
+        ? { value: array[index++], done: false }
+        : { value: undefined, done: true }
+    }
+  }
+}
+```
+
+由上面 Iterator 代码可以看出一个**生成器生成一个迭代器对象**，迭代器的 next 方法进行迭代（流程控制），next 返回 value 和 done
+
+## ES6 迭代器
+
+ES6 中的 Iterator 的作用有三个：
+
+1. 为各种数据结构，提供一个统一的、简便的访问接口
+
+2. 使得数据结构的成员能够按某种次序排列
+
+3. ES6 创造了一种新的遍历命令for...of循环，Iterator 接口主要供for...of消费。
+
+ES6 规定，默认的 Iterator 接口部署在数据结构的Symbol.iterator属性，或者说，一个数据结构只要具有Symbol.iterator属性，就可以认为是“可遍历的”（iterable）。Symbol.iterator属性本身是一个函数，就是当前数据结构默认的遍历器生成函数。执行这个函数，就会返回一个遍历器。
+
+ES6 的有些数据结构原生具备 Iterator 接口（比如数组），即不用任何处理，就可以被for...of循环遍历。原因在于，这些数据结构原生部署了Symbol.iterator属性（详见下文），另外一些数据结构没有（比如对象）。凡是部署了Symbol.iterator属性的数据结构，就称为部署了遍历器接口。调用这个接口，就会返回一个遍历器对象。
+
+原生具备 Iterator 接口的数据结构如下：
+
+* Array
+
+* Map
+
+* Set
+
+* String
+
+* TypedArray
+
+* 函数的 arguments 对象
+
+* NodeList 对象
+
+### 对象实现 for-of
+
+```js
+const iterableObj = {
+  name: 'ahab',
+  age: 18,
+  key: 'value',
+  [Symbol.iterator]() {
+    let index = 0
+    const that = this // 缓存 this
+    const keys = Object.keys(that)
+    return {
+      next() { // 也可以用箭头函数，但这种情况下 that 更常见
+        return { value: that[keys[index++]], done: index > keys.length }
+      }
+    }
+  },
+}
+
+for (const value of iterableObj) { console.log(value) }
+```
+
+用 generator 优化：
+
+```js
+const iterableObj = {
+  name: 'ahab',
+  age: 18,
+  key: 'value',
+  * [Symbol.iterator]() {
+    let index = 0
+    const keys = Object.keys(this)
+    while (index < keys.length) yield this[keys[index++]]
+  },
+}
+
+for (const value of iterableObj) { console.log(value) }
+```
+
+其实对象本来就是无序的，完全没必要用 for-of，实现 for-of 遍历只是为了学习，更推荐用：
+
+* Object.keys()
+
+* Object.entries()
+
+* for-in（可能会遍历到原型链上，更推荐前两个）
+
+## 流程控制
+
+[Generator 函数的异步应用](http://es6.ruanyifeng.com/#docs/generator-async)
+
+[async 函数](http://es6.ruanyifeng.com/#docs/async)

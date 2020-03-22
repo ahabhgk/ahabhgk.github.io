@@ -1,0 +1,180 @@
+---
+title: 读《JavaScript 设计模式与开发实践》- 命令模式
+date: 2019-07-07
+description: 《JavaScript 设计模式与开发实践》读书笔记
+tags:
+  - Note
+  - 《JavaScript 设计模式与开发实践》
+---
+
+命令模式是最简单和优雅的模式之一，命令模式中的命令（command）指的是一个执行某些特定事情的指令。
+
+命令模式最常见的应用场景是：有时候需要向某些对象发送请求，但是并不知道请求的接收者是谁，也不知道被请求的操作是什么。此时希望用一种松耦合的方式来设计程序，使得请求发送者和请求接收者能够消除彼此之间的耦合关系。
+
+## 菜单程序
+
+```js
+const button1 = document.querySelector('#button1')
+const button2 = document.querySelector('#button2')
+const button3 = document.querySelector('#button3')
+
+const setCommand = function (button, command) {
+  button.onclick = function () {
+    command.execute()
+  }
+}
+
+const MenuBar = {
+  refresh() {
+    //
+  },
+}
+
+const SubMenu = {
+  add() {
+    //
+  },
+  del() {
+    //
+  },
+}
+
+class RefreshMenuBarCommand {
+  constructor(receiver) {
+    this.receiver = receiver
+  }
+
+  execute() {
+    this.receiver.refresh()
+  }
+}
+
+
+class AddSubMenuCommand {
+  constructor(receiver) {
+    this.receiver = receiver
+  }
+
+  execute() {
+    this.receiver.add()
+  }
+}
+
+class DelSubMenuCommand {
+  constructor(receiver) {
+    this.receiver = receiver
+  }
+
+  execute() {
+    this.receiver.del()
+  }
+}
+
+const refreshMenuBarCommand = new RefreshMenuBarCommand(MenuBar)
+const addSubMenuCommand = new AddSubMenuCommand(SubMenu)
+const delSubMenuCommand = new DelSubMenuCommand(SubMenu)
+
+setCommand(button1, refreshMenuBarCommand)
+setCommand(button2, addSubMenuCommand)
+setCommand(button3, delSubMenuCommand)
+```
+
+## JavaScript 中的命令模式
+
+传统 OOP 语言中，命令模式的由来，其实是回调（callback）函数的一个面向对象的替代品
+
+JavaScript 作为将函数作为一等对象的语言，跟策略模式一样，命令模式也早已融入到了 JavaScript 语言之中。运算块不一定要封装在 command.execute 方法中，也可以封装在普通函数中。函数作为一等对象，本身就可以被四处传递。即使我们依然需要请求“接收者”，那也未必使用面向对象的方式，闭包可以完成同样的功能。
+
+```js
+const bindClick = function(button, func) {
+  button.onclick = func
+}
+
+const MenuBar = {
+  refresh() {
+    console.log('刷新菜单界面')
+  }
+}
+
+const SubMenu = {
+  add() {
+    console.log('增加子菜单')
+  },
+  del() {
+    console.log('删除子菜单')
+  }
+}
+
+bindClick(button1, MenuBar.refresh.bind(this))
+bindClick(button2, SubMenu.add.bind(this))
+bindClick(button3, SubMenu.del.bind(this))
+```
+
+## 撤销与重做
+
+撤销：增加一个储存状态信息的栈，比如小球移动，就要有一个储存位置的栈，撤销时就是调用移动方法把小球移动到原来的位置
+
+重做：如果状态信息比较复杂，比如 Canvas 画图，可以用一个 command 栈储存命令，每次撤销就是去掉最后的命令，把栈中的命令重新执行一遍，当然性能消耗较大
+
+## 命令队列
+
+当一个命令执行需要一定时间，需要命令队列
+
+* 事件循环中的事件队列
+
+* 浏览器的 UI 队列
+
+当一个事件结束时，该如何通知队列，进行下一个任务，通常是使用异步，还可以使用发布订阅模式
+
+## 宏命令
+
+宏命令是一组命令的集合，通过执行宏命令的方式，可以一次执行一批命令
+
+有点像组合模式
+
+## 事件循环的命令模式
+
+事件队列 - 命令队列
+
+宏任务 - 宏命令
+
+微任务 - 命令
+
+不由得又让人想到了 Promise 🤣
+
+Promise 中的 executor 中的任务是同步任务就同步执行，是异步就异步执行，源码就是 executor(resolve, reject) 没什么可说的，这里说一下他的微任务（then）的实现：
+
+```js
+const p = new Promise(resolve => {
+  console.log(1)
+  setTimeout(() => {
+    resolve(2)
+  }, 1000)
+}).then(r => {
+  console.log(r)
+  return 3
+}).then(r => {
+  console.log(r)
+})
+console.log(4)
+
+// 输出：1 4 2 3
+```
+
+熟悉事件循环的都可以看出它的执行顺序：
+
+1. new Promise(cb)
+
+2. console.log(1) // 同时 setTimeout 在浏览器的定时器线程挂起
+
+3. 两个 then 方法把 cb **加入** onFulfilledCallbacks
+
+4. console.log(4)
+
+5. 距步骤 2 一秒后 setTimeout 把 cb 加入执行队列
+
+6. 执行队列为空，执行 cb，resolve(2)
+
+7. resolve 时 onFulfilledCallbacks 中的 cb 依次执行
+
+关键就是第 7 步中的 onFulfilledCallbacks.forEach(cb => cb(self.value)) 是在 resolve 时依次全部执行了，由此实现的微任务

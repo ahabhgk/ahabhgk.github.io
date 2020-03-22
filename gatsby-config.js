@@ -4,7 +4,14 @@ require(`dotenv`).config({
 
 module.exports = {
   siteMetadata: {
-    siteTitleAlt: `Minimal Blog - Gatsby Theme`,
+    siteTitle: 'AHABHGK',
+    author: 'ahabhgk <ahabhgk@gmail.com>',
+    siteTitleAlt: `ahabhgk's blog`,
+    siteLanguage: 'zh',
+    siteDescription: `ahabhgk's blog, for code, for love, for life.`,
+    siteHeadline: 'for code, for love, for life.',
+    siteUrl: 'https://ahabhgk.github.io',
+    siteImage: 'https://avatars0.githubusercontent.com/u/42857895?s=460&v=4',
   },
   plugins: [
     {
@@ -12,8 +19,12 @@ module.exports = {
       options: {
         navigation: [
           {
-            title: `Blog`,
-            slug: `/blog`,
+            title: `Blogs`,
+            slug: `/blogs`,
+          },
+          {
+            title: `Projects`,
+            slug: `/projects`,
           },
           {
             title: `About`,
@@ -22,14 +33,23 @@ module.exports = {
         ],
         externalLinks: [
           {
-            name: `Twitter`,
-            url: `https://twitter.com/lekoarts_de`,
+            name: `GitHub`,
+            url: `https://github.com/ahabhgk`,
           },
           {
-            name: `Instagram`,
-            url: `https://www.instagram.com/lekoarts.de/`,
+            name: `Twitter`,
+            url: `https://twitter.com/ahabhgk`,
+          },
+          {
+            name: `知乎`,
+            url: `https://www.zhihu.com/people/he-geng-kun-86`,
+          },
+          {
+            name: `Mail`,
+            url: `mailto:ahabhgk@gmail.com`,
           },
         ],
+        blogPath: '/blogs',
       },
     },
     {
@@ -42,9 +62,9 @@ module.exports = {
     {
       resolve: `gatsby-plugin-manifest`,
       options: {
-        name: `minimal-blog - @lekoarts/gatsby-theme-minimal-blog`,
-        short_name: `minimal-blog`,
-        description: `Typography driven, feature-rich blogging theme with minimal aesthetics. Includes tags/categories support and extensive features for code blocks such as live preview, line numbers, and code highlighting.`,
+        name: `ahabhgk's bolg / minimal-blog`,
+        short_name: `ahabhgk's blog`,
+        description: `ahabhgk's blog, for code, for love, for life.`,
         start_url: `/`,
         background_color: `#fff`,
         theme_color: `#6B46C1`,
@@ -65,6 +85,7 @@ module.exports = {
     },
     `gatsby-plugin-offline`,
     `gatsby-plugin-netlify`,
+    "gatsby-theme-waves",
     // `gatsby-plugin-webpack-bundle-analyser-v2`,
   ],
 }

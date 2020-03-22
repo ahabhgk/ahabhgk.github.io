@@ -1,0 +1,145 @@
+---
+title: 读《JavaScript 设计模式与开发实践》- 组合模式
+date: 2019-07-08
+description: 《JavaScript 设计模式与开发实践》读书笔记
+tags:
+  - Note
+  - 《JavaScript 设计模式与开发实践》
+---
+
+在程序设计中，有一些和“事物是由相似的子事物构成”类似的思想。组合模式就是用小的子对象来构建更大的对象，而这些小的子对象本身也许是由更小的“孙对象”构成的。
+
+## 组合宏命令
+
+```js
+const MacroCommand = function () {
+  return {
+    commandList: [],
+    add(command) {
+      this.commandList.push(command)
+      return this
+    },
+    execute(e) {
+      this.commandList.forEach(command => command.execute(e))
+      return this
+    },
+  }
+}
+
+const MicroCommand = function (fn) {
+  return {
+    add() {
+      throw new Error('微命令（叶对象）不能添加子命令（子节点）')
+    },
+    execute(e) {
+      fn(e)
+    },
+  }
+}
+
+const openAcCommand = MicroCommand(function (e) {
+  console.log('打开空调')
+})
+
+const openTvCommand = MicroCommand(function (e) {
+  console.log('打开电视')
+})
+
+const closeWindowCommand = MicroCommand(function (e) {
+  console.log('关窗')
+})
+
+const closeDoorCommand = MicroCommand(function (e) {
+  console.log('关门')
+})
+
+const setCommand = function (button, command) {
+  button.onclick = (e) => {
+    command.execute(e)
+  }
+}
+
+const openCommand = MacroCommand().add(openAcCommand).add(openTvCommand)
+const closeCommand = MacroCommand().add(closeWindowCommand).add(closeDoorCommand)
+const allCommand = MacroCommand().add(openCommand).add(closeCommand)
+
+setCommand(document.querySelector('#btn'), allCommand)
+```
+
+基本对象可以被组合成更复杂的组合对象，组合对象又可以被组合，这样不断递归下去，这棵树的结构可以支持任意多的复杂度。在树最终被构造完成之后，让整颗树最终运转起来的步骤非常简单，只需要调用最上层对象的 execute 方法。每当对最上层的对象进行一次请求时，实际上是在对整个树进行深度优先的搜索，而创建组合对象的程序员并不关心这些内在的细节，往这棵树里面添加一些新的节点对象是非常容易的事情。
+
+组合模式最大的优点在于可以一致地对待组合对象和基本对象。
+
+客户不需要知道当前处理的是宏命令还是普通命令，只要它是一个命令，并且有execute方法，这个命令就可以被添加到树中。
+
+## 组合模式例子——扫描文件夹
+
+扫描部分的代码很简单，跟上面的很像，这里只看删除文件夹或文件的部分
+
+当我们删除文件（夹）时，实际上是在它的上层文件夹中删除的，这时就需要子节点保存父节点的引用
+
+```js
+class Folder {
+  constructor(name) {
+    this.name = name
+    this.parent = null // 父节点
+    this.files = []
+  }
+
+  add(file) {
+    file.parent = this // 子节点保存父节点引用
+    this.files.push(file)
+  }
+
+  remove() {
+    if (!this.parent) return
+    this.parent.filter(file => file !== this)
+  }
+}
+
+class File {
+  constructor(name) {
+    this.name = name
+    this.parent = null
+  }
+
+  add() {
+    throw new Error('不能在文件中添加')
+  }
+
+  remove() {
+    if (!this.parent) return
+    this.parent.filter(file => file !== this)
+  }
+}
+```
+
+很容易让人联想到 Vue 中的组件
+
+## 注意点
+
+* 组合模式并不是父子关系：组合模式是一种 HAS-A（聚合）的关系，而不是 IS-A。组合对象包含一组叶对象，但 Leaf 并不是 Composite 的子类。组合对象把请求委托给它所包含的所有叶对象，它们能够合作的关键是拥有相同的接口。
+
+* 对叶对象操作的一致性：组合模式除了要求组合对象和叶对象拥有相同的接口之外，还有一个必要条件，就是对一组叶对象的操作必须具有一致性。
+
+* 双向映射关系：有些复杂的情况我们必须给父节点和子节点创建双向映射关系，但有时这种相互间的引用相当复杂，而且对象之间产生了过多的耦合性，修改或者删除一个对象都变得困难，此时我们可以引入中介者模式来管理这些对象。
+
+* 用职责链模式提高组合模式性能：在组合模式中，如果树的结构比较复杂，节点数量很多，在遍历树的过程中，性能方面也许表现得不够理想。有时候我们确实可以借助一些技巧，在实际操作中避免遍历整棵树，有一种现成的方案是借助职责链模式。
+
+## 何时使用
+
+* 表示对象的部分-整体层次结构：组合模式可以方便地构造一棵树来表示对象的部分-整体结构。特别是我们在开发期间不确定这棵树到底存在多少层次的时“候。在树的构造最终完成之后，只需要通过请求树的最顶层对象，便能对整棵树做统一的操作。在组合模式中增加和删除树的节点非常方便，并且符合开放-封闭原则。
+
+* 客户希望统一对待树中的所有对象：组合模式使客户可以忽略组合对象和叶对象的区别，客户在面对这棵树的时候，不用关心当前正在处理的对象是组合对象还是叶对象，也就不用写一堆if、else语句来分别处理它们。组合对象和叶对象会各自做自己正确的事情，这是组合模式最重要的能力。
+
+## 优缺点
+
+优点：
+
+* 组合模式可以让我们使用树形方式创建对象的结构。我们可以把相同的操作应用在组合对象和单个对象上。在大多数情况下，我们都可以忽略掉组合对象和单个对象之间的差别，从而用一致的方式来处理它们。
+
+缺点：
+
+* 它可能会产生一个这样的系统：系统中的每个对象看起来都与其他对象差不多。它们的区别只有在运行的时候会才会显现出来，这会使代码难以理解。
+
+* 如果通过组合模式创建了过多对象，可能会让系统负担不起
