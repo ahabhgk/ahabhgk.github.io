@@ -27,10 +27,6 @@
 - SEO (Sitemap, OpenGraph tags, Twitter tags)
 - Offline Support & WebApp Manifest
 
-```:title=your-title
-// code goes here
-```
-
 ## examples
 
 **Frontmatter reference:**
