@@ -1,10 +1,10 @@
 <p align="center">
-  <a href="https://minimal-blog.lekoarts.de">
-    <img alt="LekoArts" src="https://img.lekoarts.de/gatsby/gatsby-site-illustration.png" />
+  <a href="https://ahabhgk.github.io">
+    <img alt="ahabhgk" src="https://avatars0.githubusercontent.com/u/42857895?s=460&v=4" />
   </a>
 </p>
 <h1 align="center">
-  Gatsby Starter: Minimal Blog
+  ahabhgk's blog
 </h1>
 
 <p align="center">
@@ -12,16 +12,7 @@
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="Minimal Blog is released under the MIT license." />
   </a>
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome!" />
-  <a href="https://twitter.com/intent/follow?screen_name=lekoarts_de">
-    <img src="https://img.shields.io/twitter/follow/lekoarts_de.svg?label=Follow%20@lekoarts_de" alt="Follow @lekoarts_de" />
-  </a>
 </p>
-
-Typography driven, feature-rich blogging theme with minimal aesthetics. Includes tags/categories support and extensive features for code blocks such as live preview, line numbers, and line highlighting. Using the Gatsby Theme [`@lekoarts/gatsby-theme-minimal-blog`](https://github.com/LekoArts/gatsby-themes/tree/master/themes/gatsby-theme-minimal-blog).
-
-[**Demo Website**](https://minimal-blog.lekoarts.de)
-
-Also be sure to checkout other [Free & Open Source Gatsby Themes](https://themes.lekoarts.de)
 
 ## ✨ Features
 
@@ -36,119 +27,11 @@ Also be sure to checkout other [Free & Open Source Gatsby Themes](https://themes
 - SEO (Sitemap, OpenGraph tags, Twitter tags)
 - Offline Support & WebApp Manifest
 
-## 🚀 Getting Started
-
-1. **Create a Gatsby site.**
-
-Use the Gatsby CLI to create a new site, specifying this project
-
-```sh
-gatsby new project-name https://github.com/LekoArts/gatsby-starter-minimal-blog
-```
-
-2. **Start developing.**
-
-Navigate into your new site's directory and start it up.
-
-```sh
-cd project-name
-gatsby develop
-```
-
-3. **Open the code and start customizing!**
-
-Your site is now running at `http://localhost:8000`!
-
-If you want to learn more about how you can use a Gatsby starter that is configured with a Gatsby theme, you can checkout this [shorter](https://www.gatsbyjs.org/docs/themes/using-a-gatsby-theme/) or [longer](https://www.gatsbyjs.org/tutorial/using-a-theme/) tutorial. The tutorials don't exactly apply to this starter however the concepts are the same.
-
-## 📝 Using and modifying this starter
-
-**Important Note:** Please read the guide [Shadowing in Gatsby Themes](https://www.gatsbyjs.org/docs/themes/shadowing/) to understand how to customize the underlying theme!
-
-This starter creates a new Gatsby site that installs and configures the theme [`@lekoarts/gatsby-theme-minimal-blog`](https://github.com/LekoArts/gatsby-themes/tree/master/themes/gatsby-theme-minimal-blog).
-
-Have a look at the theme's README and files to see what options are available and how you can shadow the various components including Theme UI. Generally speaking you will want to place your files into `src/@lekoarts/gatsby-theme-minimal-blog/` to shadow/override files. The Theme UI config can be configured by shadowing its files in `src/gatsby-plugin-theme-ui/`.
-
-### Code Highlighting
-
-Since the underlying theme ships with [prism-react-renderer](https://github.com/FormidableLabs/prism-react-renderer) and [react-live](https://github.com/FormidableLabs/react-live) certain additional features were added to code blocks. You can find an overview / usage example in the [example repository](https://github.com/LekoArts/gatsby-themes/tree/master/examples/minimal-blog/content/posts/fantastic-beasts-and-where-to-find-them/index.mdx)! If you want to change certain code styles or add additional language tabs, you need to shadow the file `src/@lekoarts/gatsby-theme-minimal-blog/styles/code.js`.
-
-**Language tabs:**
-
-When you add a language (such as e.g. `js` or `javascript`) to the code block, a little tab will appear at the top left corner.
-
-````
-```js
-// code goes here
-```
-````
-
-**Code titles:**
-
-You can display a title (e.g. the file path) above the code block.
-
-````
-```jsx:title=your-title
-// code goes here
-```
-````
-
-Or without a specific language:
-
-````
 ```:title=your-title
 // code goes here
 ```
-````
 
-**Line highlighting:**
-
-You can highlight single or multiple (or both) lines in a code block. You need to add a language.
-
-````
-```js {2,4-5}
-const test = 3
-const foo = 'bar'
-const harry = 'potter'
-const hermione = 'granger'
-const ron = 'weasley'
-```
-````
-
-**Hide line numbers:**
-
-If you want to hide line numbers you can either globally disable them (see Theme options) or on a block-by-block basis. You can also combine that with the other attributes.
-
-````
-```noLineNumbers
-// code goes here
-```
-````
-
-**react-live:**
-
-Add `react-live` to the code block (and render the component) to see a preview below it.
-
-````
-```js react-live
-const onClick = () => {
-  alert("You opened me");
-};
-render(<button onClick={onClick}>Alohomora!</button>);
-```
-````
-
-### Adding content
-
-#### Adding a new blog post
-
-New blog posts will be shown on the index page (the three most recent ones) of this theme and on the blog overview page. They can be added by creating MDX files inside `content/posts`. General setup:
-
-1. Create a new folder inside `content/posts`
-1. Create a new `index.mdx` file, and add the frontmatter
-1. Add images to the created folder (from step 1) you want to reference in your blog post
-1. Reference an image as your `banner` in the frontmatter
-1. Write your content below the frontmatter
+## examples
 
 **Frontmatter reference:**
 
@@ -168,216 +51,62 @@ banner: ./defence-against-the-dark-arts.jpg
 
 The `date` field has to be written in the format `YYYY-MM-DD`!
 
-#### Adding a new page
+**highlights**
 
-Additional pages can be created by placing MDX files inside `contents/pages`, e.g. an "About" or "Contact" page. You'll manually need to link to those pages, for example by adding them to the navigation (in `navigation` option of the theme). General instructions:
-
-1. Create a new folder inside `content/pages`
-1. Create a new `index.mdx` file, and add the frontmatter
-1. Write your content below the frontmatter
-1. Optionally add files/images to the folder you want to reference from the page
-
-**Frontmatter reference:**
-
-```md
----
-title: About
-slug: "/about"
----
+````
+```js {2,4-5}
+const test = 3
+const foo = 'bar'
+const harry = 'potter'
+const hermione = 'granger'
+const ron = 'weasley'
 ```
+````
 
-#### Changing the "Hero" text
+**Hide line numbers:**
 
-To edit the hero text ("Hi, I'm Lupin...), create a file at `src/@lekoarts/gatsby-theme-minimal-blog/texts/hero.mdx` to edit the text.
+````
+```text noLineNumbers
+Harry Potter and the Chamber of Secrets
+```
+````
 
-#### Changing the "Projects" part
+**react-live:**
 
-To edit the projects part below "Latest posts", create a file at `src/@lekoarts/gatsby-theme-minimal-blog/texts/bottom.mdx` to edit the contents.
-
-### Change your `static` folder
-
-The `static` folder contains the icons, social media images and robots.txt. Don't forget to change these files, too!
-
-## 🤔 Questions or problems?
-
-Please open up an issue on the main repository: [LekoArts/gatsby-themes](https://github.com/LekoArts/gatsby-themes). Thanks!
-
-## 🎓 Learning Gatsby
-
-Looking for more guidance? Full documentation for Gatsby lives [on Gatsby's website](https://www.gatsbyjs.org/).
-
-### Themes
-
-- To learn more about Gatsby themes specifically, we recommend checking out the [theme docs](https://www.gatsbyjs.org/docs/themes/).
-
-### General
-
-- **For most developers, I recommend starting with the [in-depth tutorial for creating a site with Gatsby](https://www.gatsbyjs.org/tutorial/).** It starts with zero assumptions about your level of ability and walks through every step of the process.
-
-- **To dive straight into code samples, head [to Gatsby's documentation](https://www.gatsbyjs.org/docs/).** In particular, check out the _Reference Guides_ and _Gatsby API_ sections in the sidebar.
-
-## 🌟 Supporting me
-
-Thanks for using this project! I'm always interested in seeing what people do with my projects, so don't hesitate to tag me on [Twitter](https://twitter.com/lekoarts_de) and share the project with me.
-
-Please star this project, share it on Social Media or consider supporting me on [Patreon](https://www.patreon.com/lekoarts)!
-
-If you want to hire me for **contract/freelance work**, you can do so! [Get in touch with me!](https://www.lekoarts.de/en/contact)
-
-import SpotifyPlayer from "./SpotifyPlayer";
-
-Here will a React component go:
-
-<SpotifyPlayer
-  uri="spotify:user:bbcamerica:playlist:3w18u69NplCpXVG4fQG726"
-  size="large"
-  theme="black"
-  view="list"
-/>
-
-Here will a live code example go:
-
+````
 ```js react-live
 const onClick = () => {
   alert("You opened me");
 };
 render(<button onClick={onClick}>Alohomora!</button>);
 ```
+````
 
-Here will a normal code block go:
+**code with title**
 
-```js
-(function() {
-
-var cache = {};
-var form = $('form');
-var minified = true;
-
-var dependencies = {};
-
-var treeURL = 'https://api.github.com/repos/PrismJS/prism/git/trees/gh-pages?recursive=1';
-var treePromise = new Promise(function(resolve) {
-	$u.xhr({
-		url: treeURL,
-		callback: function(xhr) {
-			if (xhr.status < 400) {
-				resolve(JSON.parse(xhr.responseText).tree);
-			}
-		}
-	});
-});
-```
-
-Code block with code highlighting:
-
+````
 ```jsx:title=src/components/post.jsx {5-7,10}
-import React from "react";
+import React from "react"
 
 const Post = ({ data: { post } }) => (
   <Layout>
     <Heading variant="h2" as="h2">
       {post.title}
     </Heading>
-    <p
-      sx={{
-        color: `secondary`,
-        mt: 3,
-        a: { color: `secondary` },
-        fontSize: [1, 1, 2]
-      }}
-    >
-      <span>{post.date}</span>
-      {post.tags && (
-        <React.Fragment>
-          {` — `}
-          <ItemTags tags={post.tags} />
-        </React.Fragment>
-      )}
-    </p>
-    <section
-      sx={{
-        ...CodeStyles,
-        my: 5,
-        ".gatsby-resp-image-wrapper": { my: 5, boxShadow: `lg` }
-      }}
-    >
+    <section>
       <MDXRenderer>{post.body}</MDXRenderer>
     </section>
   </Layout>
-);
+)
 
-export default Post;
+export default Post
 ```
+````
 
-Code block without title:
+**Code block with only the title**
 
-```
-Harry Potter and the Philosopher's Stone
-```
-
-Code block without lineNumbers (but lang):
-
-```text noLineNumbers
-Harry Potter and the Chamber of Secrets
-```
-
-Code block without lineNumbers (and without lang):
-
-```noLineNumbers
-Harry Potter and the Chamber of Secrets
-```
-
-Code block with only the title:
-
+````
 ```:title=src/utils/scream.js
 const scream = (input) => window.alert(input)
 ```
-
-Code block with only the title but without lineNumbers:
-
-```:title=src/utils/scream.js noLineNumbers
-const scream = (input) => window.alert(input)
-```
-
-Line highlighting without code title:
-
-```js {2,4-5}
-const test = 3;
-const foo = "bar";
-const harry = "potter";
-const hermione = "granger";
-const ron = "weasley";
-```
-
-Here will `inline code` go, just inside the text. Wow!
-
-Code block without line numbers but with highlighting, language, and title:
-
-```tsx:title=src/components/blog.tsx {7-9,16} noLineNumbers
-import React from "react";
-
-const Blog = ({ posts }: PostsProps) => {
-  const { tagsPath, basePath } = useSiteMetadata();
-
-  return (
-    <Layout>
-      <Flex sx={{ alignItems: `center`, justifyContent: `space-between` }}>
-        <Heading variant="h2" as="h2">
-          Blog
-        </Heading>
-        <Styled.a
-          as={Link}
-          sx={{ variant: `links.secondary` }}
-          to={`/${basePath}/${tagsPath}`.replace(/\/\/+/g, `/`)}
-        >
-          View all tags
-        </Styled.a>
-      </Flex>
-      <Listing posts={posts} sx={{ mt: [4, 5] }} />
-    </Layout>
-  );
-};
-
-export default Blog;
-```
-
+````
