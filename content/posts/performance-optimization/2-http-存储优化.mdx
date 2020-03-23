@@ -45,7 +45,7 @@ Service Worker 是一种独立于主线程之外的 Javascript 线程。它脱�
 
 强缓存中，当请求再次发出时，浏览器会根据其中的 expires 和 cache-control 判断目标资源是否“命中”强缓存，若命中则直接从缓存中获取资源，**不会再与服务端发生通信**
 
-![strong-cache](./strong-cache.png)
+![strong-cache](./images/strong-cache.png)
 
 ##### expires（http1.0）
 
@@ -69,7 +69,7 @@ s-maxage 优先级高于 max-age，在依赖各种代理的大型架构中，我
 
 如果我们为资源设置了 public，那么它既可以被浏览器缓存，也可以被代理服务器缓存；如果我们设置了 private，则该资源只能被浏览器缓存。private 为默认值。但多数情况下，public 并不需要我们手动设置，比如有很多线上网站的 cache-control 是这样的：
 
-![header](./header.png)
+![header](./images/header.png)
 
 设置了 s-maxage，没设置 public，那么 CDN 还可以缓存这个资源吗？答案是肯定的。因为明确的缓存信息（例如“max-age”）已表示响应是可以缓存的。
 
@@ -85,7 +85,7 @@ no-store 比较绝情，顾名思义就是不使用任何缓存策略。在 no-c
 
 如果服务端提示缓存资源未改动（Not Modified），资源会被重定向到浏览器缓存，这种情况下网络请求对应的状态码是 304（如下图）。
 
-![304](./304.png)
+![304](./images/304.png)
 
 ##### Last-Modified
 
@@ -129,11 +129,11 @@ If-None-Match: W/"2a3b-1602480f459"
 
 Etag 的生成过程需要服务器额外付出开销，会影响服务端的性能，这是它的弊端。因此启用 Etag 需要我们审时度势。正如我们刚刚所提到的——Etag 并不能替代 Last-Modified，它只能作为 Last-Modified 的补充和强化存在。
 
-![Etag](./Etag.png)
+![Etag](./images/Etag.png)
 
 #### 指南
 
-![http-cache-guide](./http-cache-guide.png)
+![http-cache-guide](./images/http-cache-guide.png)
 
 当我们的资源内容不可复用时，直接为 Cache-Control 设置 no-store，拒绝一切形式的缓存；否则考虑是否每次都需要向服务器进行缓存有效确认，如果需要，那么设 Cache-Control 的值为 no-cache；否则考虑该资源是否可以被代理服务器缓存，根据其结果决定是设置为 private 还是 public；然后考虑该资源的过期时间，设置对应的 max-age 和 s-maxage 值；最后，配置协商缓存需要用到的 Etag、Last-Modified 等参数。
 
@@ -159,7 +159,7 @@ Cookie 的本职工作并非本地存储，而是“维持状态”。
 
 Cookie 说白了就是一个存储在浏览器里的一个小小的文本文件，它附着在 HTTP 请求上，在浏览器和服务器之间“飞来飞去”。它可以携带用户信息，当服务器检查 Cookie 的时候，便可以获取到客户端的状态。
 
-![cookie](./cookie.png)
+![cookie](./images/cookie.png)
 
 #### 安全
 

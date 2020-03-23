@@ -33,11 +33,11 @@ tags:
 
 MVC（backbone.js...）由于当应用变得很大时，会有多个 View 和多个 Model，（双向的）数据流就会变的非常混乱
 
-![MVC-bad](./MVC-bad.png)
+![MVC-bad](./images/MVC-bad.png)
 
 所以出现了 Flux，以单向数据流管理状态，React 推崇的核心也是单向数据流，Flux 中单向数据流可以看作是在其整体架构上的延伸，Redux 是也不是 Flux，它遵循了 Flux 的单向数据流的理念，同时简化了 Flux
 
-![different](./different.jpeg)
+![different](./images/different.jpeg)
 
 Flux/Redux 这种以单向数据流管理状态更像是一种设计模式
 
@@ -59,7 +59,7 @@ Mobx 也认为数据的一致性很重要，但是它认为解决问题的根本
 
 3. 状态修改均有纯函数完成
 
-![redux-flow](redux-flow.png)
+![redux-flow](./images/redux-flow.png)
 
 相比 Flux 可以看出，Redux 没有 Dispatcher，Store 是单一的，Store 通过 Reducers 纯函数获取新的 State，使得状态的修改变得简单、纯粹、可测试，并且可以追踪每次变化，实现了时间旅行
 

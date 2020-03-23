@@ -14,6 +14,10 @@
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome!" />
 </p>
 
+## 📝 Dev
+
+Since this repository is a `.github.io` repository, you can only send the display page to the master branch. When writing blogs or developing new features, you need to work on the dev branch. After you push it to the remote dev branch, CI will automatically upload the display page to the master branch and release it.
+
 ## ✨ Features
 
 - MDX
@@ -27,7 +31,7 @@
 - SEO (Sitemap, OpenGraph tags, Twitter tags)
 - Offline Support & WebApp Manifest
 
-## examples
+## 🐤 Examples
 
 **Frontmatter reference:**
 
