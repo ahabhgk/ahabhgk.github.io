@@ -1,0 +1,76 @@
+---
+title: 读《7 周 7 语言》- Scala
+date: 2020-02-27
+description: 《7 周 7 语言》读书笔记
+tags:
+  - Note
+  - 《7 周 7 语言》
+---
+
+连接 Java 和 FP
+
+> 强类型，类型推断
+>
+> FP
+>
+> immutable
+>
+> 分层
+
+FP 与并发：并发问题在于可变状态，定义后可被多次赋值，两个线程可以在同一时间改变相同数据，很难保证数据始终处于有效状态，测试难，数据库通过事务和锁解决，Java 提供控制访问共享数据的工具
+
+除少数例外，Scala 中一切皆对象
+
+```scala
+> 5.+(4.*(3)) // 这里 .+ 表示对象 5 上面的 + 方法
+Int = 17
+> 1 + 0.8
+Double = 1.8
+> "abc" + 4
+String = abc4
+> "abc".size
+Int = 3
+```
+
+Nil 是个空列表，Nil 和数字都不能转换为 Boolean
+
+```scala
+> if (0) {println("hello")}
+error
+> if (Nil) {println("hello")}
+error
+```
+
+> 强类型，会检查两种类型是否兼容 Java、Ruby；弱类型 C、汇编
+>
+> 静态类型判断鸭子根据基因，动态类型判断鸭子根据叫声和走姿
+
+Range 类型
+
+```scala
+val range = 0 until 10
+val r = (0 to 10) by 5
+r.start // 0
+r.end // 10
+r.step // 5
+r.size // 3
+
+val r2 = (0 until 10 by 5)
+r.start // 0
+r.end // 10
+r.step // 5
+r.size // 2
+
+(1 to 10) // 1 是默认 step
+(10 until 0) by -1 // 根据 step 改变方向
+```
+
+元组
+
+```scala
+val person = ("ahab", 18) // person: (String, Int) = (ahab,18)
+person._1 // "ahab"
+person._2 // 18
+
+val (a, b) = (1, 2)
+```
