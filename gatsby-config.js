@@ -15,6 +15,13 @@ module.exports = {
   },
   plugins: [
     {
+      resolve: `gatsby-plugin-google-analytics`,
+      options: {
+        trackingId: process.env.GOOGLE_ANALYTICS_ID,
+        head: true,
+      },
+    },
+    {
       resolve: `@lekoarts/gatsby-theme-minimal-blog`,
       options: {
         navigation: [
@@ -50,12 +57,6 @@ module.exports = {
           },
         ],
         blogPath: '/blogs',
-      },
-    },
-    {
-      resolve: `gatsby-plugin-google-analytics`,
-      options: {
-        trackingId: process.env.GOOGLE_ANALYTICS_ID,
       },
     },
     `gatsby-plugin-sitemap`,
