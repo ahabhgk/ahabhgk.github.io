@@ -139,7 +139,7 @@ function co(gen) {
       try {
         ret = gen.next(res);
       } catch (e) { // try / catch 做错误捕获
-        return reject(e);
+        return reject(e); // 出错就 return reject 掉，return 是为了防止 reject 后仍然执行 next 函数
       }
       next(ret);
     }
@@ -155,7 +155,7 @@ function co(gen) {
     }
 
     function next(ret) {
-      if (ret.done) return resolve(ret.value);
+      if (ret.done) return resolve(ret.value); // new Promise 的 resolve 用来 resolve 最终 done 为 true 时的 value
       var value = toPromise.call(ctx, ret.value); // 把其他的 yieldable 转化成 promise
       if (value && isPromise(value)) return value.then(onFulfilled, onRejected);
       return onRejected(new TypeError('You may only yield a function, promise, generator, array, or object, '
@@ -193,6 +193,124 @@ function isPromise(obj) {
 ## ⚙️ 原理
 
 co 的原理其实是通过 generator.next() 得到 generatorResult，由于 yield 出是一个 promise，通过 generatorResult.value.then 再把 promise 的结果通过 generator.next 的参数传给 yield 的左边，让 generator 自动执行，通过 generatorResult.done 判断是否执行结束
+
+## 🍬 async / await
+
+async / await 是语法糖，我们还原一个 async 函数，使用 TypeScript 跟更体现一些类型本质的东西
+
+<CodeWave>
+
+```ts
+type ExtractType<T> =
+  T extends {
+    [Symbol.iterator](): {
+      next(): { done: true, value: infer U }
+    }
+  } ? U :
+  T extends {
+    [Symbol.iterator](): {
+      next(): { done: false }
+    }
+  } ? never :
+  T extends {
+    [Symbol.iterator](): {
+      next(): { value: infer U }
+    }
+  } ? U :
+  T extends {
+    [Symbol.iterator](): any
+  } ? unknown :
+  never
+
+type Async =
+  <F extends (...args: any[]) => Generator<unknown>>(fn: F)
+    => (...args: Parameters<F>) => Promise<ExtractType<ReturnType<F>>>
+```
+
+先对类型进行编写，async function 返回一个 Promise，Promise 包裹内部 return 的值，由于我们模拟 Async 函数要传入一个 GeneratorFunction，返回的一个函数才相当于 async function，所以通过 ExtractType 拿到 `Generator<unknown>` 最终 done 为 true 时的 value 的类型
+
+```ts
+const getData = async(function * (url: string) {
+  const result: Response = yield fetch(url)
+  const json = yield result.json()
+  return json
+})
+```
+
+我们实现的用法就想这样，除了 `() * yield` 写法不一致其他与 async function 用法一样，与 co 不同的是 yield 后可以跟任何值，不止是 Promise
+
+```ts
+const async: Async = (genFn) =>
+  (...args) => new Promise((resolve, reject) => {
+    const gen = genFn(...args)
+
+    function(next: () => IteratorResult<unknown>) {
+      let result = nextF()
+      // resolve value and deliver it to gen.next
+    }
+    
+    next(() => gen.next(undefined))
+  })
+```
+
+`(...args) => new Promise(...)` 相当于我们实际调用的 async function，通过 thunk 和展开运算符把 genFn 的参数拿到，并在传入 genFn，得到 gen
+
+同时我们要在 next 内部执行 gen.next，通过包裹一个函数传入，在内部得到 result
+
+```ts
+const async: Async = (genFn) =>
+  (...args) => new Promise((resolve, reject) => {
+    const gen = genFn(...args)
+
+    function(next: () => IteratorResult<unknown>) {
+      let result = nextF()
+
+      if(result.done) return resolve(result.value)
+      Promise.resolve(result.value).then((res) => {
+        next(() => gen.next(res))
+      })
+    }
+    
+    next(() => gen.next(undefined))
+  })
+```
+
+通过判断是否 done 进行 new Promise 的 resolve，如果没有完成就继续通过 next 进行传递，注意不同于 co 我们内部用 Promise.resolve 处理 result.value，所以我们 yield 时也可以不是一个 Promise
+
+> 之前的标准是使用 `new Promise(res => res(resule.value))` 进行包裹处理，v8 提出 [Faster async functions and promises](https://v8.dev/blog/fast-async#await-under-the-hood) 并 PR，现在已经修改为 `Promise.resolve`
+>
+> 对于这两个的区别在于 resolve 一个 Promise 时的表现不同，`Promise.resolve(p)` 对于 Promise 会直接返回这个 Promise，而 `new Promise(res => res(p))` 在内部调用 `p.then(resolve, reject)` 相当于多出一个微任务来处理 `res(p)`，所以目前新版的更快，有些代码执行顺序也会不同
+
+```ts
+const async: Async = (genFn) =>
+  (...args) => new Promise((resolve, reject) => {
+    const gen = genFn(...args)
+
+    function(next: () => IteratorResult<unknown>) {
+      let result: ReturnType<typeof nextF>
+      try {
+        result = nextF()
+      } catch(e) {
+        return reject(e)
+      }
+
+      if(result.done) return resolve(result.value)
+      Promise.resolve(result.value).then((res) => {
+        next(() => gen.next(res))
+      }, (err) => {
+        next(() => gen.throw(res))
+      })
+    }
+    
+    next(() => gen.next(undefined))
+  })
+```
+
+现在我们加上错误处理，当 resolve value 出错时会通过 gen.throw(err) 抛出错误，而 gen.throw 通过 genF 内部的 try / catch 捕捉，如果内部没有捕捉到再通过上面的 try / catch 捕捉
+
+</CodeWave>
+
+现在我们完成和 async / await 的函数的模拟，我们看到 async function 实际上返回一个 Promise 包裹的 return 值，await 后会自动使用 Promise.resolve 进行包裹
 
 ## 🤔 对于 JavaScript 异步的思考
 

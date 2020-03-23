@@ -63,6 +63,18 @@ const ron = 'weasley'
 ```
 ````
 
+In `<CodeWave>`
+
+````
+```js 1,3:5
+const test = 3
+const foo = 'bar'
+const harry = 'potter'
+const hermione = 'granger'
+const ron = 'weasley'
+```
+````
+
 **Hide line numbers:**
 
 ````
