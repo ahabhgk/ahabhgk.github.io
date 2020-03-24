@@ -22,7 +22,7 @@ FP 与并发：并发问题在于可变状态，定义后可被多次赋值，�
 除少数例外，Scala 中一切皆对象
 
 ```scala
-> 5.+(4.*(3)) // 这里 .+ 表示对象 5 上面的 + 方法
+> 5.+(4.*(3)) // 这里 .+ 表示对象 5 上面的 + 方法，操作符可重载
 Int = 17
 > 1 + 0.8
 Double = 1.8
@@ -74,3 +74,198 @@ person._2 // 18
 
 val (a, b) = (1, 2)
 ```
+
+类，双构造器
+
+```scala
+class Person(name: String, age: Int) {
+  // 主构造器
+  val info = name + age
+  println("outer constructor: " + info) // outer constructor: ahab19
+
+  def this(firstName: String, lastName: String, age: Int) { // 辅助构造器
+    this(firstName + lastName, age) // outer constructor: ahabhgk19
+    println("inner constructor: " + info) // inner constructor: ahabhgk19
+  }
+
+  def talk(): Unit = println("hello")
+}
+
+val p = new Person("ahab", 19)
+p.talk()
+
+val p2 = new Person("ahab", "hgk", 19)
+p.talk()
+```
+
+扩展类
+
+1. 伙伴对象和类方法
+
+```scala
+object TrueRing { // object 声明单例对象
+  def rule(): Unit = println("to rule them all")
+}
+
+TrueRing.rule()
+```
+
+2. 继承
+
+```scala
+class Person(val name: String) {
+  def talk(message: String) {
+    println(name + " says: " + message)
+  }
+  def id = name
+}
+
+class Employee(override val name: String, val number: Int) extends Person(name) {
+  override def id: String = super.id
+
+  override def talk(message: String) {
+    println("employee: " + name + " says: " + message)
+  }
+}
+
+val em = new Employee("yoda", 4)
+
+em.talk("hah") // employee: yoda says: hah
+```
+
+3. trait (mixin)
+
+```scala
+class Person(val name: String)
+
+trait Nice {
+  def greeting(): Unit = println("hello")
+}
+
+class GoodMan(override val name: String) extends Person(name) with Nice
+
+val p = new GoodMan("zkk")
+p.greeting() // "hello"
+```
+
+var 与 val：var is mutable, val is immutable
+
+集合：List、Set、Map
+
+1. List
+
+```scala
+> List(1, 2, 3)
+List[Int] = List(1, 2, 3)
+> List(1, 2, "ha")
+List[Any] = List(1, 2, "ha")
+> List(1, "ha")(0)
+Any = 1
+> List(1, 2, 3) == List(3, 2, 1)
+Boolean = false
+```
+
+2. Set
+
+```scala
+> val animals = Set("lions", "tigers")
+Set[String] = Set("lions", "tigers")
+> val animals2 = animals - "tigers"
+Set("lions")
+> val andAnimals = animals ++ Set("lions", "bears")
+Set("lions", "tigers", "bears")
+> val divAnimals = animals -- Set("lions")
+Set("tigers")
+> Set(1, 2, 3) == Set(3, 2, 1)
+Boolean = true
+```
+
+3. Map
+
+```scala
+> val ordinals = Map(0 -> "zero", 1 -> "one", 2 -> "two")
+Map[Int, String] = Map(0 -> "zero", 1 -> "one", 2 -> "two")
+> ordinals(2)
+String = "two"
+> val map = new HashMap[Int, String]
+> map += 4 -> "four"
+> map += 5 -> "five"
+```
+
+4. 所有类都继承与 Any，Nothing 继承自所有类。Null 是一个 trait，null 是 Null 的实例，Nil 是个空 List，Nothing 是一个 trait。抛出异常的方法返回类型为 Nothing，表示永不返回
+
+集合方法：foreach lenght size isEmpty head tail last init reverse drop count filter map forall exists sort
+
+foldLeft (reduce)
+
+```scala
+> val li = List(1, 2, 3)
+> val sum = (0 /: li) {(sum, i) => sum + i}
+> li.foldLeft(0)((sum, i) => sum + i) // curry
+```
+
+一等结构的 XML
+
+模式匹配
+
+```scala
+def factorial(n: Int): Int = n match {
+  case 0 => 1
+  case x if x > 0 => factorial(n - 1) * n
+}
+
+factorial(3)
+factorial(6)
+```
+
+## 并发
+
+actor 和消息传递，actor 拥有线程池和队列池，当用 ! 给 actor 发消息时，是讲一个对象放到 actor 的队列中，actor 读消息并行动，通常通过模式匹配处理消息
+
+```scala
+case object Poke
+case object Feed
+
+class Kid() extends Actor {
+  def act() {
+    loop {
+      react {
+        case Poke => println("Ow")
+        case Feed => println("Lala")
+      }
+    }
+  }
+}
+
+val kk = new Kid()
+val dd = new Kid()
+
+kk ! Poke
+dd ! Poke
+kk ! Feed
+dd ! Feed
+
+// "Ow"
+// "Lala"
+// "Ow"
+// "Lala"
+
+// "Ow"
+// "Ow"
+// "Lala"
+// "Lala"
+
+// 两次顺序不同，是并发的
+```
+
+reactWithin 超时处理、receive 阻塞线程、receiveWithin 超时时间内阻塞线程
+
+## think
+
+并发
+
+FP + 类
+
+灵活 trait 重载
+
+JVM 强大的社区
