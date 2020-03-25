@@ -244,26 +244,26 @@ const async: Async = (genFn) =>
   (...args) => new Promise((resolve, reject) => {
     const gen = genFn(...args)
 
-    function(next: () => IteratorResult<unknown>) {
+    function next(nextFn: () => IteratorResult<unknown>) {
       let result = nextF()
       // resolve value and deliver it to gen.next
     }
-    
+
     next(() => gen.next(undefined))
   })
 ```
 
 `(...args) => new Promise(...)` 相当于我们实际调用的 async function，通过 thunk 和展开运算符把 genFn 的参数拿到，并在传入 genFn，得到 gen
 
-同时我们要在 next 内部执行 gen.next，通过包裹一个函数传入，在内部得到 result
+同时我们要在 next 内部执行 gen.next，通过包裹一个函数 nextFn 传入，在内部得到 result
 
 ```ts
 const async: Async = (genFn) =>
   (...args) => new Promise((resolve, reject) => {
     const gen = genFn(...args)
 
-    function(next: () => IteratorResult<unknown>) {
-      let result = nextF()
+    function next(nextFn: () => IteratorResult<unknown>) {
+      let result = nextFn()
 
       if(result.done) return resolve(result.value)
       Promise.resolve(result.value).then((res) => {
@@ -286,10 +286,10 @@ const async: Async = (genFn) =>
   (...args) => new Promise((resolve, reject) => {
     const gen = genFn(...args)
 
-    function(next: () => IteratorResult<unknown>) {
+    function next(nextFn: () => IteratorResult<unknown>) {
       let result: ReturnType<typeof nextF>
       try {
-        result = nextF()
+        result = nextFn()
       } catch(e) {
         return reject(e)
       }
@@ -311,6 +311,8 @@ const async: Async = (genFn) =>
 </CodeWave>
 
 现在我们完成和 async / await 的函数的模拟，我们看到 async function 实际上返回一个 Promise 包裹的 return 值，await 后会自动使用 Promise.resolve 进行包裹
+
+这个函数与 co 的不同除了使用 Promise.resolve 自动包裹，不能处理 yield 数组和对象时实现的并行以外，还有将 gen.next 和 gen.throw 抽象成 nextFn，这也导致直观上代码行数不同，但本质实际上没有什么区别
 
 ## 🤔 对于 JavaScript 异步的思考
 
