@@ -181,7 +181,7 @@ function f(x, y = x) {
 
 #### 箭头函数
 
-没有 prototype，所以 this 是静态的
+箭头函数表达式的语法比函数表达式更短，并且不绑定自己的 this，arguments，super 或 new.target。这些函数表达式最适合用于非方法函数（non-method functions），并且它们不能用作构造函数（没 prototype）
 
 #### 尾递归优化
 
