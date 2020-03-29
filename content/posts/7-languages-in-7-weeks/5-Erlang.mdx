@@ -1,0 +1,69 @@
+---
+title: 读《7 周 7 语言》- Erlang
+date: 2020-03-23
+description: 《7 周 7 语言》读书笔记
+tags:
+  - Note
+  - 《7 周 7 语言》
+---
+
+无线程，轻量级进程：摆脱了共享资源和性能瓶颈
+
+可靠性：Let it crash、hot reload 可以运行多年不宕机
+
+小写是原子，大写开头是变量
+
+```erlang
+two == two.
+% true
+Var = 1.
+```
+
+变量不可变，只能被赋值一次
+
+列表与元组
+
+```erlang
+[1, two, "three"].
+{1, two, "three"}.
+```
+
+模式匹配
+
+```erlang
+Person = {ahabhgk, 19}.
+{Name, Age} = Person.
+
+[One, Two | Rest] = [1, 2, 3].
+One. % 1
+Two. % 2
+Rest. % [3]
+```
+
+位匹配
+
+函数
+
+```erlang
+% basic.erl
+-module(basic). % 模块名
+-export([number/1]). % 暴露出的函数，/1 表示有一个参数
+-export([fib/1]).
+
+number(one) -> 1;
+number(two) -> 2;
+number(three) -> 3.
+
+fib(0) -> 1;
+fib(1) -> 1;
+fib(N) -> fib(N - 1) + fib(N - 2).
+```
+
+```shell
+$ erl
+> c(basic).
+{ok,basic}
+> basic:fib(10).
+89
+```
+
