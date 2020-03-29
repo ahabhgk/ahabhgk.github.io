@@ -298,7 +298,7 @@ const async: Async = (genFn) =>
       Promise.resolve(result.value).then((res) => {
         next(() => gen.next(res))
       }, (err) => {
-        next(() => gen.throw(res))
+        next(() => gen.throw(err))
       })
     }
     
@@ -306,7 +306,7 @@ const async: Async = (genFn) =>
   })
 ```
 
-现在我们加上错误处理，当 resolve value 出错时会通过 gen.throw(err) 抛出错误，而 gen.throw 通过 genF 内部的 try / catch 捕捉，如果内部没有捕捉到再通过上面的 try / catch 捕捉
+现在我们加上错误处理，当 resolve value 出错时会通过 gen.throw(err) 抛出错误，而 gen.throw 通过 genF 内部的 try / catch 捕捉（所以 async / await 的错误处理一般也是在函数内写 try / catch）然后通过上面的 try / catch 将错误 reject 出来，不同于成功时 async 函数返回一个包裹 value 的 Promise，而是返回出一个包裹 error 的 Promise
 
 </CodeWave>
 
