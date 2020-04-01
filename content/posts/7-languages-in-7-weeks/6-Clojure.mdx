@@ -1,0 +1,174 @@
+---
+title: 读《7 周 7 语言》- Clojure
+date: 2020-04-01
+description: 《7 周 7 语言》读书笔记
+tags:
+  - Note
+  - 《7 周 7 语言》
+---
+
+Lisp on JVM
+
+动态类型
+
+并发：事务内存、代理
+
+前缀表达式
+
+```clojure
+(mod 5 / 4) ;; 1
+(+ 1 1 1 1) ;; 4
+(/ 8 2 2) ;; 2
+(< 1 2 4) ;; true
+(< 1 4 3) ;; false
+```
+
+字符串和字符
+
+```clojure
+(str "one: " 1 ", two: " 2) ;; "one: 1, two: 2"
+```
+
+布尔
+
+```clojure
+(if 0 (println "true")) ;; "true"
+(if "" (println "true")) ;; "true"
+(if nil (println "true") (println "false")) ;; "false"
+```
+
+列表
+
+```clojure
+(list 1 2 3)
+'(1 2 3) ;; 引用
+(first '(1 2 3)) ;; 1
+(last '(1 2 3)) ;; 3
+(rest '(1 2 3)) ;; (2 3)
+(cons :droid '(:r2d2 :c3po)) ;; (:droid :r2d2 :c3po)
+```
+
+向量，与列表不同在于随机访问优化
+
+```clojure
+(first [:hutt :wookie :ewok]) ;; :hutt
+(nth [:hutt :wookie :ewok] 2) ;; :ewok
+([:hutt :wookie :ewok] 2) ;; :ewok
+(last [:hutt :wookie :ewok]) ;; :ewok
+(rest [:hutt :wookie :ewok]) ;; (:wookie :ewok)
+(concat [:hutt] [:wookie]) ;; (:hutt :wookie)
+```
+
+集合
+
+```clojure
+(def nums #{1 2 3}) ;; #{1 3 2}
+(sort nums) ;; (1 2 3)
+(clojure.set/union nums #{4}) ;; #{1 4 2 3}
+(clojure.set/difference nums #{3 4}) ;; #{1 2}
+(nums 2) ;; 2
+(nums 4) ;; nil
+```
+
+映射
+
+```clojure
+(def person {:name "ahabhgk", :age 19})
+(person :name) ;; "ahabhgk"
+(merge person {:say "Hi"}) ;; {:name "ahabhgk", :age 19, :say "Hi"}
+(assoc person :say "Hi") ;; {:name "ahabhgk", :age 19, :say "Hi"}
+person ;; {:name "ahabhgk", :age 19}
+```
+
+函数
+
+```clojure
+(defn do-it [what] (str "use the " what))
+(do-it "force") ;; "use the force"
+
+;; doc
+(defn do-it
+  "do something"
+  [what]
+  (str "use the " what))
+
+(doc do-it)
+;; ([what])
+;;   do something
+;; nil
+```
+
+绑定
+
+```clojure
+(defn get-age [{age :age}] age)
+(get-age person) ;; 19
+
+;; let 简化
+(let [{age :age} person] (str "the person is " age " years old")) ;; "the person is 19 years old"
+(let [[_ _ three] [1 2 3]] three) ;; 3
+```
+
+匿名函数
+
+```clojure
+(map (fn [w] (count w)) ["hgk" "lj"]) ;; 3 2
+(map #(count %) ["hgk" "lj"])) ;; 3 2
+
+(apply + [1 2 3]) ;; 6
+(apply max [1 2 3]) ;; 3
+
+(filter odd? [1 2 3]) ;; (1 3)
+(filter #(< % 3) [1 2 3]) ;; (1 2)
+```
+
+尾递归需要 loop recur
+
+延迟计算
+
+defrecord defprotocol
+
+宏：将代码当作列表来处理，如果不想立即执行，就把它引起来
+
+```clojure
+(defn unless [test body] (if (not test) body))
+(unless true (println "nonono")) ;; nonono 参数立即执行
+
+(macroexpand '#(count %))
+;; (fn* [p1__2085#] (count p1__2085#)) 宏展开，查看定义的宏，前面要加 ' ，注释 ;、引用 '、匿名函数 # 都是宏
+
+(defmacro unless [test body]
+  (list 'if (list 'not test) body))
+(unless true (println "nonono")) ;; nil
+```
+
+引用和事务内存
+
+```clojure
+(def movie (ref "star wars"))
+movie ;; #object[clojure.lang.Ref 0x3441e2c1 {:status :ready, :val "star wars"}]
+(deref movie) ;; "star wars"
+@movie ;; "star wars"
+
+(alter movie str ": hah") ;; 只能在事务中修改状态
+;; Execution error (IllegalStateException) at user/eval2102 (REPL:1).
+;; No transaction running
+(dosync (alter movie str ": hah")) ;; 通过 dosync 在事务中修改
+;; "star wars: hah"
+@movie ;; "star wars: hah"
+;; Clojure 大部分使用 FP，对于可变的那些使用 STM（软件事务内存）
+```
+
+原子
+
+代理
+
+future
+
+## feeling
+
+Lisp 复杂化了，有 Lisp 优点也有 Lisp 缺点
+
+尾递归很难受
+
+并发：事务内存

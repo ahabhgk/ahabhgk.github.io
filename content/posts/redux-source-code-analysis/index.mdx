@@ -198,7 +198,7 @@ const createStore = (reducer, preloadedState, enhancer) => {
   }
 
   function dispatch(action) {
-    state = currentReducer(state, action)
+    state = currentReducer(state, action) // 确定了 reducer 中不能做异步操作
     // 依次执行订阅
     listenters.forEach(listener => listener())
 
