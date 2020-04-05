@@ -1,9 +1,9 @@
 ---
 title: 美团面试准备
+slug: interview-of-meituan-daily-internship
 date: 2020-04-04
 description: 美团面试准备
 tags:
-  - Note
   - Interview
 ---
 
@@ -91,7 +91,7 @@ BFC 就是块级格式上下文，是页面盒模型布局中的一种 CSS 渲�
 
 ## 浏览器缓存
 
-![cache](./src/images/cache.jpg)
+![cache](./images/cache.jpg)
 
 缓存位置：
 
@@ -148,12 +148,31 @@ new Image() 支持跨域，不占用 AJAX 请求，不用添加到 DOM 中不阻
 ## React Hooks 原理
 
 
+## React Hooks 闭包陷阱
+
+
+## React Fiber
+
 
 ## 网络 4 层 7 层
 
-![OSI](./src/images/OSI.png)
+![OSI](./images/OSI.png)
 
-物理层、数据链路层、网络层、传输层、会话层、表示层、应用层
+- 第 7 层：应用层为操作系统或网络应用程序提供访问网络服务的接口。应用层协议的代表包括： HTTP，HTTPS，FTP，TELNET，SSH，SMTP，POP3等。
+
+- 第 6 层：表示层把数据转换为接受者能够兼容并且适合传输的内容，比如数据加密，压缩，格式转换等。
+
+- 第 5 层：会话层负责数据传输中设置和维持网络设备之间的通信连接。管理主机之间的会话进程，还可以利用在数据中插入校验点来实现数据的同步。
+
+- 第 4 层：传输层把传输表头加至数据形成数据包，完成端到端的数据传输。传输表头包含了协议等信息，比如: TCP，UDP 等。
+
+- 第 3 层：网络层负责对子网间的数据包进行寻址和路由选择，还可以实现拥塞控制，网际互联等功能。网络层的协议包括：IP，IPX 等。
+
+- 第 2 层：数据链路层在不可靠的物理介质上提供可靠的传输，主要主要为：物理地址寻址、数据封装成帧、流量控制、数据校验、重发等。
+
+- 第 1 层：物理层在局域网上传送数据帧，负责电脑通信设备与网络媒体之间的互通，包括针脚，电压，线缆规范，集线器，网卡，主机适配等。
+
+4 层：
 
 - 链接层：负责在以太网、WiFi 这样的底层网络上发送原始数据包，使用 MAC 地址来标记网络上的设备
 
@@ -163,7 +182,27 @@ new Image() 支持跨域，不占用 AJAX 请求，不用添加到 DOM 中不阻
 
 - 应用层：Telnet、SSH、FTP、SMTP、HTTP
 
-## 白屏，从ISO七层每层进行分析
+## 首屏和白屏
+
+白屏时间：浏览器从响应用户输入网址地址，到浏览器开始显示内容的时间 = 地址栏输入网址后回车 - 浏览器出现第一个元素
+
+首屏时间：浏览器从响应用户输入网络地址，到首屏内容渲染完成的时间 = 地址栏输入网址后回车 - 浏览器第一屏渲染完成
+
+影响白屏时间的因素：网络，服务端性能，前端页面结构设计
+
+影响首屏时间的因素：白屏时间，资源下载执行时间
+
+可以使用 Performance API 获取性能信息，DevTools 中 Performance 面板也可以查看
+
+![performance](./images/performance.png)
+
+白屏时间 = performance.timing.domLoading - performance.timing.navigationStart
+
+首屏时间 ~= firstScreenImgs.loadTime - performance.timing.navigationStart（可用首屏所有图片加载完成的时间估算）
+
+> DOMContentLoaded 是指页面元素加载完毕，但是一些资源比如图片还无法看到，但是这个时候页面是可以正常交互的，比如滚动，输入字符等。 jQuery 中经常使用的 $(document).ready() 其实监听的就是 DOMContentLoaded 事件。
+>
+> load 是指页面上所有的资源（图片，音频，视频等）加载完成。jQuery 中 $(document).load() 监听的是 load 事件。
 
 ## UDP TCP 区别
 
@@ -201,12 +240,106 @@ UDP 是一个面向无连接的传输层协议
 
 ## XHR fetch 怎么取消和 timeout
 
-## JWT
+XHR：`xhr.abort()` 用于取消请求，`xhr.timeout` 可以设置超时时间，`xhr.ontimeout` 事件可以在超时时触发回调
+
+fetch：可以通过 AbortController 来取消请求，可以用 Promise.race 做兼容，超时可以创建一个定时器
+
+```js
+const { signal } = new AbortController()
+fetch('./data.json', { signal })
+```
+
+```js
+function abortableFetch(fetcher) {
+  let abort = null
+  const aborter = new Promise((_, reject) => {
+    abort = () => reject()
+  })
+  const abortable = Promise.race([
+    fetcher,
+    aborter,
+  ])
+
+  abortable.abort = abort
+  return abortable
+}
+```
+
+```js
+function timeout(ms, promise) {
+  return new Promise(function(resolve, reject) {
+    setTimeout(function() {
+      reject(new Error("timeout"))
+    }, ms)
+    promise.then(resolve, reject)
+  })
+}
+
+timeout(1000, fetch('/hello')).then(/* ... */)
+```
+
+## 移动端
+
+屏幕尺寸：手机屏幕左下角到右上角的距离（英尺）
+
+像素：最小单位
+
+分辨率：720p 1080p 2k 4k
+
+逻辑分辨率（设备独立像素）：设备物理分辨率不同，但逻辑分辨率都接近，iPhone5 320x568 iPhone6 375x667 iPhoneX 375x812
+
+设备像素比：物理像素和设备独立像素的比值 dpr
+
+1px 问题：由于 CSS 中 px 是逻辑像素，1px 对应到 dpr=2 的设备上就是 2px
+
+```css
+div {
+  height: 1px;
+  background: #000;
+  -webkit-transform: scaleY(0.5);
+  -webkit-transform-origin: 0 0;
+  overflow: hidden;
+}
+/* 2倍屏 */
+@media only screen and (-webkit-min-device-pixel-ratio: 2.0) {
+  .border-bottom::after {
+    -webkit-transform: scaleY(0.5);
+    transform: scaleY(0.5);
+  }
+}
+/* 3倍屏 */
+@media only screen and (-webkit-min-device-pixel-ratio: 3.0) {
+  .border-bottom::after {
+    -webkit-transform: scaleY(0.33);
+    transform: scaleY(0.33);
+  }
+}
+```
 
 ## 如何设计无缝轮播
 
-## Promise
+// TODO
 
 ## 垃圾回收
 
+基本类型用栈存储，引用类型用堆存储
+
+- 栈中的内存：JS 的执行栈，当当前执行上下文出栈时自动回收当前上下文所有基本类型的内存
+
+- 堆中的内存：
+
+    1. 分为新生代和老生代，新生代是临时分配的内存，存活时间短，老生代是常驻内存，存活的时间长
+  
+    2. 新生代分为 From 和 To 两个部分，新分配的对象会被放入 From 空间中，当 From 空间被占满时，新生代 GC 就会启动了。算法会检查 From 空间中存活的对象并复制到 To 空间中，如果有失活的对象就会销毁。当复制完成后将 From 空间和 To 空间互换
+  
+        > Scavenge 算法将原本 From 空间中散落的内存复制到 To 空间后会变成整齐排列的，有利于后续内存的分配，但缺点在于只能使用新生代中一般内存空间，会进行复制，所以只存放生命周期短的对象，这样的对象一般很少
+
+    3. 如果新生代中的变量在经历过以此 Scavenge 回收后，或 To（闲置）空间的内存占用超过 25% 时会变为老生代，由于空间较大自然不能使用 Scavenge 算法。使用标记清除算法，现对能访问到的内存进行标记，之后清除所有没有标记的内存，由于需要遍历一边，当占用空间较大时就很消耗性能，耗时很大，可能阻塞，于是改进为增量标记，将标记工作分为小块，在应用逻辑执行的空隙进行（类似于 React Fiber），之后还升级[并发标记](https://v8.dev/blog/concurrent-marking)，允许 GC 标记和 JS 逻辑同时运行
+
+## 性能优化
+
+> [读《前端性能优化原理与实践》]()
+
 ## 自我介绍
+
+您好，我叫何庚坤，河北石家庄人，现在在重庆读大二，专业是软件工程，成绩在年级前 15%，比较擅长 JS 基础，异步编程，了解浏览器运行机制，http 协议，去年 8 月做了学校 2019 年 PC 端的迎新网，并对其进行性能优化，使其性能有了大幅提升，之后学校庆祝国庆，完成国庆省份问答项目，大量使用 React Hooks 进行编写
