@@ -1,5 +1,5 @@
 ---
-title: 美团实习面试准备
+title: 美团实习面试
 slug: interview-of-meituan-internship
 date: 2020-04-04
 description: 美团实习面试
@@ -11,77 +11,77 @@ tags:
 
 1. 手写 Promise
 
-写了一部分，then 返回的 Promise 内部什么时候 resolve 没写上来，之后就没往下写，应该在 push 的 cb 处理
+    写了一部分，then 返回的 Promise 内部什么时候 resolve 没写上来，之后就没往下写，应该在 push 的 cb 处理
 
-```js
-Promise.prototype.then = function (onFulfilled, onRejected) {
-  // ...
-  if (self.state === PENDING) { // 等待态
-    return promise2 = new Promise(function (resolve, reject) {
-      // 当异步调用 resolve / rejected 时 将 onFulfilled / onRejected 收集暂存到集合中
-      self.onFulfilledCallbacks.push(function (value) {
-        try {
-          var x = onFulfilled(value)
-          resolvePromise(promise2, x, resolve, reject) // 针对不同的 x 进行处理
-        } catch (err) {
-          reject(err)
-        }
-      })
-      self.onRejectedCallbacks.push(function (reason) {
-        try {
-          var x = onRejected(reason)
-          resolvePromise(promise2, x, resolve, reject)
-        } catch (err) {
-          reject(err)
-        }
-      })
-    })
-  }
-}
-```
+    ```js
+    Promise.prototype.then = function (onFulfilled, onRejected) {
+      // ...
+      if (self.state === PENDING) { // 等待态
+        return promise2 = new Promise(function (resolve, reject) {
+          // 当异步调用 resolve / rejected 时 将 onFulfilled / onRejected 收集暂存到集合中
+          self.onFulfilledCallbacks.push(function (value) {
+            try {
+              var x = onFulfilled(value)
+              resolvePromise(promise2, x, resolve, reject) // 针对不同的 x 进行处理
+            } catch (err) {
+              reject(err)
+            }
+          })
+          self.onRejectedCallbacks.push(function (reason) {
+            try {
+              var x = onRejected(reason)
+              resolvePromise(promise2, x, resolve, reject)
+            } catch (err) {
+              reject(err)
+            }
+          })
+        })
+      }
+    }
+    ```
 
 2. 两个有序链表合并成一个新的有序链表
 
-没写上来，基本思路有了，有的逻辑没理清
+    没写上来，基本思路有了，有的逻辑没理清
 
 3. 深拷贝
 
-最简单的写出来了，之后循环引用那个 map 处理的地方不对
+    最简单的写出来了，之后循环引用那个 map 处理的地方不对，我想着在 get 这处理
 
-```js
-function deepClone(obj, map = new Map()) {
-  if (map.get(obj)) return obj
+    ```js
+    function deepClone(obj, map = new Map()) {
+      if (map.get(obj)) return obj
 
-  if (typeof obj !== 'object') return obj // 这里没有考虑 null，面试官说用 instanceof 更好点，当时也没反应过来
-  let result = Array.isArray(obj) ? [] : {}
-  for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      result[key] = deepClone(obj[key])
-      map.set(obj, true) // 应该在 deepClone 之前 set
+      if (typeof obj !== 'object') return obj // 这里没有考虑 null，面试官说用 instanceof 更好点，当时也没反应过来
+      let result = Array.isArray(obj) ? [] : {}
+      for (const key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          result[key] = deepClone(obj[key])
+          map.set(obj, true) // 应该在 deepClone 之前 set
+        }
+      }
+      return result
     }
-  }
-  return result
-}
-```
+    ```
 
-就是 map 返回的 obj 仍然是之前的 obj，并没有深拷贝，我想着在 get 这处理，下来觉得应该在 set 处理
+    就是 map 返回的 obj 仍然是之前的 obj，并没有深拷贝，下来才发现应该在 set 处理
 
-```js
-function deepClone(obj, map = new WeakMap()) {
-  const existobj = map.get(obj)
-  if (existobj) return existobj
+    ```js
+    function deepClone(obj, map = new WeakMap()) {
+      const existobj = map.get(obj)
+      if (existobj) return existobj
 
-  if (typeof obj !== 'object') return obj
-  let result = Array.isArray(obj) ? [] : {}
-  map.set(obj, result) // 应该在这里处理，result 是引用类型
-  for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      result[key] = deepClone(obj[key])
+      if (typeof obj !== 'object') return obj
+      let result = Array.isArray(obj) ? [] : {}
+      map.set(obj, result) // 应该在这里处理，result 是引用类型
+      for (const key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          result[key] = deepClone(obj[key])
+        }
+      }
+      return result
     }
-  }
-  return result
-}
-```
+    ```
 
 4. 谈谈原型链和继承
 
@@ -89,13 +89,13 @@ function deepClone(obj, map = new WeakMap()) {
 
 6. 快速排序为什么快
 
-真不知道，上学期有看过各个排序，当时可能能说出点东西，但几个月不看了
+    真不知道，上学期有看过各个排序，当时可能能说出点东西，但几个月不看了
 
 7. 说说栈和队列的区别
 
 8. 链表的特点，链表和数组的区别
 
-回看一下真的不难，自己有的地方确实理解不够深
+    回看一下真的不难，自己有的地方确实理解不够深
 
 ## 二面
 
