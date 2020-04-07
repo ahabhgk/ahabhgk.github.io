@@ -147,15 +147,108 @@ new Image() 支持跨域，不占用 AJAX 请求，不用添加到 DOM 中不阻
 
 ## React Hooks 原理
 
-// TODO
+> [brickspert / blog: React Hooks 原理](https://github.com/brickspert/blog/issues/26)
 
 ## React Hooks 闭包陷阱
 
-// TODO
+通过 useState 定义的值拿到（useEffect, useCallback, useMemo...）的都不是最新的现象，因为 effect、callback…… 执行时会创建一个闭包，其中拿到的是当前上下文中的值，而不是实时的值
+
+常见解决方法：
+
+1. 添加依赖：有向上的传递性（类似 await 调用 async function），组件 API 设计上不会反应是否 useCallback
+
+2. setState 回调：`setCount(c => c + 1)`
+
+3. useRef：ref 存储最新值，闭包存储快照值（闭包是穷人的对象，对象是穷人的闭包）
+
+    ```js
+    for (var i = 0; i < 10; i++) {
+      setTimeout(() => console.log('val:', i)) // 拿到的是最新值
+    }
+    for (var i = 0; i < 10; i++) {
+      setTimeout((val => console.log('val:', val)).bind(null, i)) // 拿到的是快照
+    }
+
+    const ref = { current: null }
+    for (var i = 0; i < 10; i++) { 
+      ref.current = i
+      setTimeout((val => console.log('val:', ref.current)).bind(null, ref)) // 拿到的是最新值
+    }
+    for (var i = 0; i < 10; i++) { // 拿到的是快照
+      let t = i
+      setTimeout(() => console.log("t:", t))
+    }
+    ```
+
+4. useReducer：useReducer 的 dispatch 的身份永远是稳定的 —— 即使 reducer 函数是定义在组件内部并且依赖 props。将 setCount 的上下文放到 reducer 中
+
+> [React Hooks(二): useCallback 之痛](https://zhuanlan.zhihu.com/p/98554943)
+>
+> [Hooks FAQ: 如果我的 effect 的依赖频繁变化，我该怎么办？](https://zh-hans.reactjs.org/docs/hooks-faq.html#what-can-i-do-if-my-effect-dependencies-change-too-often)
+>
+> [写React Hooks前必读](https://zhuanlan.zhihu.com/p/113216415)
 
 ## React Fiber
 
-// TODO
+What a fiber do? - It improves perceived performance and responsiveness for complex react applications
+
+What it is? - Fiber is the new reconciliation algorithm for react
+
+What is reconciliation? - 不同于以前的命令式，告诉浏览器 app 从 pervious version 到 next version 要做什么，声明式只需要告诉 React app 的 next version 是什么样，React 处理之间的不同并告诉浏览器怎么做。对于不同平台（Web、Native、VR……）都适用，于是通过 reconciler 找出要做什么，renderer 针对不同平台去做
+
+为了让复杂应用的动画流畅，就需要 60 帧每秒（16ms 每帧），如何实现？
+
+- ❎ Make React itself faster - 并不是说一个实例无法在16毫秒内适应，而是事实是它卡在了这些较大的更新之后，这些更新花的大部分时间在其他函数的 render 的用户代码上，而不是 React 自己的代码
+
+- ✅ Make the updates play together better - 不只是 React 的更新，还有来自浏览器的更新（CSS animation、browser resize……）也会造成阻塞，这是因为浏览器的工作方式（单线程），而之前 reconciler 通过 minimizing and batching DOM changes，而现在 fiber 通过告诉 reconciler **how to split up work and how to prioritize work** 同时让它 **can keep track of how much time is passed**
+
+How do they change the reconciler works?
+
+- How stack reconciler works? - ReactElement, Instance, DOM node constructed layer by layer. React 会依次创建或更新 ReactElement、Instance、DOM node。Reconciler recursively calls mount component or update component until it gets to the bottom to the tree. Performance 面板中会看到执行栈中所有函数的执行上下文都在里面，主线程（JS 引擎）处于面板最下面（执行栈最上面），而如果需要检查要不要做其他事就需要能够到达最上面
+
+- Fiber does that - 主线程可以计算树的一小部分然后回到顶部查看有没有其他的事要做，而 React 通过 Fiber 的数据结构记录树执行到哪了，之前通过 stack 记录树执行到哪，这就是 Fiber Reconciler / Stack Reconciler 名字的由来
+
+Fiber is a plain JavaScript object, 它对 Instance 具有一对一关系 fiber.stateNode = Instance，第一个 fiber 是 HostRoot，对应 ReactDOM.render 的第二个参数
+
+![fiber](./images/fiber.png)
+
+对于之前 Stack Reconciler 是找到当前节点差异后立即更新 DOM，而先不管子节点，Fiber Reconciler 为了保证可以打断当前的 diff 回到顶部查看有无其他事，同时保证 UI 的一致性，引入了 render phase 和 commit phase
+
+- render phase: 只 build 出 workInProgress tree 计算出变化，可被打断让主线程做其他事
+
+    - work loop
+
+        - next unit of work and time remaining
+
+        - clone of current into workInProgress
+
+        - ask shouldComponentUpdate
+
+- commit phase: Make these changes in the DOM，不可被打断，只能执行一次保证 UI 的一致性，引入了
+
+    - virtual dom is apply to dom
+
+How to solve commits got trapped behind other larger commits or lower priority updates? - priority
+
+- Sync // same as stack rec
+
+- Task // before the next tick of event loop
+
+- Animation // before next frame, use requestAnimationFrame
+
+- High // pretty soon, use requestIdleCallback
+
+- Low // minor delays ok, use requestIdleCallback
+
+- Offscreen // prep for display / scroll, use requestIdleCallback
+
+如果有一个高优先级的任务，改变了原来的任务顺序，就需要放弃已执行的 render phase（不再需要），重新执行 render phase
+
+![virtual-call-stack](./images/virtual-call-stack.jpg)
+
+> [如何理解 React Fiber 架构？](https://www.zhihu.com/question/49496872)
+>
+> [Lin Clark - A Cartoon Intro to Fiber - React Conf 2017](https://www.youtube.com/watch?v=ZCuYPiUIONs&t=945s)
 
 ## 网络 4 层 7 层
 
