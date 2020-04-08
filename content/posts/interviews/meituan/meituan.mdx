@@ -1,7 +1,7 @@
 ---
 title: 记美团实习面试
 slug: interview-of-meituan-internship
-date: 2020-04-04
+date: 2020-04-07
 description: 美团实习面试
 tags:
   - Interview
@@ -46,6 +46,27 @@ tags:
 
     没写上来，基本思路有了，有的逻辑没理清
 
+    ```js
+    function merge(p1, p2) {
+      let head1 = p1
+      let head2 = p2
+      let head = cur = { next: null } // 空的头节点
+      while (head1 && head2) {
+        if (head1.value > head2.value) {
+          cur.next = head2
+          cur = cur.next
+          head2 = head2.next
+        } else {
+          cur.next = head1
+          cur = cur.next
+          head1 = head1.next
+        }
+      }
+      cur.next = head1 ? head1 : head2 // 直接把剩下的赋给 next，省去两个 while
+      return head.next // 返回空的头节点的 next
+    }
+    ```
+
 3. 深拷贝
 
     最简单的写出来了，之后循环引用那个 map 处理的地方不对，我想着在 get 这处理
@@ -87,15 +108,21 @@ tags:
 
 4. 谈谈原型链和继承
 
-5. 手写 bind
+5. this 指向
 
-6. 快速排序为什么快
+6. 手写 bind
+
+7. 快速排序为什么快
 
     真不知道，上学期有看过各个排序，当时可能能说出点东西，但几个月不看了
 
-7. 说说栈和队列的区别
+    ![quick-sort](./images/quick-sort.png)
 
-8. 链表的特点，链表和数组的区别
+    第一趟排序过后，顺序变为 `[3,1,2,5,4,6,9,7,10,8]`，那么在下一次的排序中，6 左边的数不会再和右边的数比较，而对于冒泡来说或直接选择 / 插入排序等暴力排序来说，每排一个数都需要和剩下的数进行一次比较，产生了很多无意义的比较
+
+8. 说说栈和队列的区别
+
+9. 链表的特点，链表和数组的区别
 
 ## 二面
 
