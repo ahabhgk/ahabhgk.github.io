@@ -8,4 +8,38 @@ tags:
   - 7 Languages in 7 Weeks
 ---
 
+> 纯函数式
+>
+> 惰性处理
+>
+> 强类型静态类型
+>
+> 不会产生副作用，可以返回一个副作用并被延迟执行
+
+安装使用 stack，然后换成清华源，IDE 用 VSCode + HIE
+
+```haskell
+0.1 + 0.2
+-- 0.30000000000000004
+4 * (2.0 + 1)
+-- 12
+"hello" ++ " world"
+-- "hello world"
+['a', 'b']
+-- "ab"
+if 5 == 5 then "true" else "false"
+-- "true"
+if (1) then "true" else "false"
+-- error 强类型
+"one" + 1
+-- error
+
+:set +t -- 打开 t 查看类型
+4
+-- 4
+-- it :: Num p => p
+:t 4 -- :t 查看类型
+-- it :: Num p => p
+```
+
 // TODO
