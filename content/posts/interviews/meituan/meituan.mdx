@@ -9,7 +9,7 @@ tags:
 
 ## 一面
 
-回看一下真的不难，自己有的地方确实理解不够深
+回看一下真的不难，自己有的地方确实理解不够深，面试官是重邮的学长，很亲切
 
 1. 手写 Promise
 
@@ -126,7 +126,57 @@ tags:
 
 ## 二面
 
-// TODO
+面试官很厉害，也会对我进行引导，有点像聊天所以我也不太紧张
+
+1. https 怎么进行加密
+
+    主要是三方面：加密、完整性验证、证书验证，一开始没想到第三点，后来提醒打上来了，之后深入的问 CA 各个级之间如何验证没答上来
+
+2. TLS / SSL 是在哪一层
+
+3. 三次握手，四次挥手
+
+    后面问四次挥手为什么等待 2 MSL 没答上来
+
+4. 跨域，有哪些方式
+
+5. CORS 具体流程
+
+    没说到 OPTIONS，后来提醒了说了下
+
+5. CSSOM 和 DOM 合成的 Render Tree 渲染时会触发回流吗
+
+    这个之前知道有这一步，但是具体怎么触发没想过，就把自己的想法说了一下
+
+    1. 渲染时浏览器会分片渲染，有的间隔很小的就不会（分片这个真不知道）
+
+    2. 后面的 CSS 覆盖了之前的位置大小，造成回流（我答到的）
+
+    3. 出现层级，不造成回流
+
+6. V8 的内存模型
+
+    分栈内存和堆内存，然后讲到执行栈执行上下文，问我函数执行上下文那些内存存在哪，我说的执行栈，提醒我说 this、arguments 这些比较大，我说存到堆里面，然后讲了下词法环境
+
+    然后是 GC，分新生代老生代，然后问我那些会直接进入老生代，我说生命周期长的，提醒我还有体积比较大的，超过新生代 To 空间 25%，后面讲具体怎么回收，老生代中标记清除后什么时候进行内存的排列我没说到，然后告诉我其实大部分时间都是在进行整理
+
+7. 用 Vue 还是 React？讲讲 HOC
+
+    我说 React，面试官说那就没什么可说的了…… 😳，在我的认知里 React 才是那个一直挖坑的啊
+
+8. 为什么要用 Redux / Mobx
+
+9. React Hooks 有了还需要 Redux / Mobx 吗？什么时候要用到
+
+    不太清楚，我讲了下 Context 有时候可以替代状态管理，讲了下 unstated-next 是怎么做的
+
+10. 写个 20 个阶梯，每次走 1 或 2 阶，有多少种走法
+
+    想到的是递归，说了下思路，面试官说是动态规划
+
+11. 职业规划
+
+还是学的不够深入，最好能多写多去实验
 
 ## 面试准备
 
@@ -566,3 +616,87 @@ div {
 ### 自我介绍
 
 您好，我叫何庚坤，河北石家庄人，现在在重庆上大学，专业是软件工程，成绩在年级前 15%，比较擅长 JS 基础，异步编程，了解浏览器运行机制，http 协议，去年 8 月做了学校 2019 年 PC 端的迎新网，并对其进行性能优化，使其性能有了明显提升，之后学校庆祝国庆，完成国庆省份问答项目，大量使用 React Hooks 进行编写，这次参加实习希望能开阔视野，学到一些在学校学不到的东西，不管能不能通过面试都希望有所收获，谢谢
+
+### 各种手写代码
+
+```js
+Array.prototype.iMap = function iMap(fn, context) {
+  return this.reduce((acc, cur, index) => [...acc, fn.call(context, cur, index, this)], [])
+}
+
+Array.prototype.iReduce = function iReduce(fn, initial) {
+  let result = initial ? initial : this[0]
+  let start = initial ? 0 : 1
+  for (let i = start; i < this.length; i++) {
+    result = fn(result, this[i], i, this)
+  }
+  return result
+}
+
+Array.prototype.iFilter = function iFilter(fn, context) {
+  return this.reduce((acc, cur, index) => fn.call(context, cur, index, this) ? [...acc, cur] : acc, [])
+}
+
+Array.prototype.iFlat = function iFlat(depth = 1) {
+  let arr = this
+  while (depth && arr.some(Array.isArray)) {
+    arr = [].concat(...arr)
+    depth -= 1
+  }
+  return arr
+}
+
+Function.prototype.iCall = function iCall(context = window, ...args) {
+  const tmpKey = Symbol('tmp')
+  context[tmpKey] = this
+  const result = context[tmpKey](...args)
+  delete context[tmpKey]
+  return result
+}
+
+Function.prototype.iBind = function iBind(context, ...args) {
+  return (...rest) => this.apply(context, [...args, ...rest])
+}
+
+Object.iCreate = function iCreate(proto) {
+  function Noop() {}
+  Noop.prototype = proto
+  Noop.prototype.constructor = Noop
+  return new Noop
+}
+
+function iNew(Constructor, ...args) {
+  const instance = Object.create(Constructor.prototype) // 创建 + 绑定原型
+  const result = Constructor.apply(instance, args)
+  return result instanceof Object ? result : instance
+}
+
+function iInstanceof(left, right) {
+  const proto = Object.getPrototypeOf(left)
+  while (true) {
+    if (proto === null) return false
+    if (proto === right) return true
+    proto = Object.getPrototypeOf(proto)
+  }
+}
+
+function debounce(fn, delay) {
+  let timer = null
+  return (...args) => {
+    clearTimeout(timer)
+    timer = setTimeout(fn, delay, ...args)
+  }
+}
+
+function throttle(fn, delay) {
+  let canRun = true
+  return (...args) => {
+    if (!canRun) return
+    canRun = false
+    setTimeout(() => {
+      fn(...args)
+      canRun = true
+    }, delay)
+  }
+}
+```
