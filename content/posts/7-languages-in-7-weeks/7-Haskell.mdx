@@ -159,4 +159,157 @@ let crew = ["Lj", "Hgk"]
 -- [("Lj","Hgk"),("Hgk","Lj")]
 ```
 
-// TODO
+高阶函数
+
+```haskell
+module Throwaway where
+  squareAll list = map square list
+    where square x = x * x
+-- squareAll [1, 2, 3] -> [1, 4, 9]
+
+map (\x -> x * x) [1, 2, 3]
+-- [1, 4, 9]
+
+map (+ 1) [1, 2, 3] -- (+ 1) 是偏函数
+-- [2, 3, 4]
+
+filter odd [1, 2, 3, 4, 5]
+-- [1, 3, 5]
+
+-- foldl :: Foldable t => (b -> a -> b) -> b -> t a -> b
+foldl (\cur acc -> acc + cur) 0 [1 .. 10] -- fold left
+-- 55
+
+-- foldl1 :: Foldable t => (a -> a -> a) -> t a -> a
+foldl1 (+) [1 .. 10]
+-- 55
+```
+
+柯里化
+
+```haskell
+let prod x y = x * y
+let double = prod 2
+let triple = prod 3
+```
+
+惰性求值
+
+```haskell
+myRange start step = start:(myRange (start + step) step)
+myRange 1 1 -- [1, 2, 3, ............]
+take 5 (myRange 10 2) -- [10, 12, 14, 16, 18]
+```
+
+```haskell
+lazyFib x y = x:(lazyFib y (x + y))
+fib = lazyFib 1 1
+fibNth n = head (drop (n - 1) (take (n) fib))
+
+take 5 (lazyFib 1 1) -- [1, 1, 2, 3, 5]
+take 5 fib -- [1, 1, 2, 3, 5]
+take 5 (drop 200 fib) -- [453973694165307953197296969697410619233826, 734544867157818093234908902110449296423351, 1188518561323126046432205871807859915657177, 1923063428480944139667114773918309212080528, 3111581989804070186099320645726169127737705]
+fibNth 9 -- 34
+take 5 (zipWith (+) fib (drop 1 fib)) -- [2, 3, 5, 8, 13]
+take 5 (map (*2) [1 ..]) -- [2, 4, 6, 8, 10]
+take 5 (map ((* 2) . (* 5)) fib) -- [10, 10, 20, 30, 50]
+```
+
+类型
+
+```haskell
+'a' -- it :: Char
+"abc" -- it :: [Char]
+"abc" == ['a', 'b', 'c']
+-- True
+-- it :: Bool
+```
+
+```haskell:title=PlayCard.hs
+module PlayCard where
+
+-- 自定义类型
+data Suit = Spades | Hearts deriving (Show) -- 继承 Show 函数
+data Rank = Ten | Jack | Queen | King | Ace deriving (Show)
+type Card = (Rank, Suit)
+type Hand = [Card]
+
+value :: Rank -> Integer
+value Ten = 1
+value Jack = 2
+value Queen = 3
+value King = 4
+value Ace = 5
+
+cardValue :: Card -> Integer
+cardValue (rank, suit) = value rank
+```
+
+```haskell
+-- 范型
+backwards :: [a] -> [a] -- 不止是 Hand -> Hand
+backwards [] = []
+backwards (h:t) = backwards t ++ [h]
+```
+
+```haskell
+data Triplet a = Trio a a a deriving (Show)
+:t Trio 'a' 'b' 'c' -- it :: Triplet Char
+```
+
+```haskell
+-- 递归类型
+data Tree a = Children [Tree a] | Leaf a deriving (Show)
+depth (Leaf _) = 1
+depth (Children c) = 1 + maximum (map depth c)
+
+let tree = Children [Leaf 1, Children [Leaf 2, Leaf 3]]
+-- Children [Leaf 1, Children [Leaf 2, Leaf 3]]
+-- it :: Num a => Tree a
+
+-- 模式匹配
+let (Children ch) = tree
+-- ch -> [Leaf 1,Children [Leaf 2,Leaf 3]]
+
+depth tree -- 3
+```
+
+```haskell
+class Eq a where
+  (==), (/=) :: a -> a -> Bool
+  -- 最小完整定义
+  -- (==) 或 (/=)
+  x /= y   = not (x == y)
+  x == y   = not (x /= y)
+
+-- hs 中 Eq 类的定义
+```
+
+## 🤩 monad
+
+[Haskell/Understanding monads](https://en.wikibooks.org/wiki/Haskell/Understanding_monads)
+
+处理 I / O
+
+```haskell
+tryIo = do  putStr "Enter your name: " ;
+            line <- getLine ;
+            let { backwards = reverse line } ;
+            return ("Hello. Your name backwards is " ++ backwards)
+```
+
+Maybe
+
+```haskell
+case (html doc) of
+  Nothing -> Nothing
+  Just x  -> case body x of
+               Nothing -> Nothing
+               Just y  -> paragraph 2 y
+```
+
+## feeling
+
+类型系统
+
+纯
