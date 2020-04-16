@@ -190,17 +190,39 @@ tags:
 
 5. CSSOM 和 DOM 合成的 Render Tree 渲染时会触发回流吗
 
-    这个之前知道有这一步，但是具体怎么触发没想过，就把自己的想法说了一下
+    这个之前知道有这一步，但是具体怎么触发没想过，就把自己的想法说了一下，最后面试官说的感觉就是在考回流，答的时候没太理解题意吧
 
-    1. 渲染时浏览器会分片渲染，有的间隔很小的就不会（分片这个真不知道）
+    如何渲染大致分为：Parse HTML (DOM Tree) => Parse Stylesheet (CSSOM Tree) => (Render Tree) => Layout (reflow) => Paint (repaint) => Composite Layers 详细过程可以看 Performance 面板
 
-    2. 后面的 CSS 覆盖了之前的位置大小，造成回流（我答到的）
+    回流：元素的内容、结构、位置或尺寸发生了变化，需要重新计算样式和渲染树
+    
+    1. 现代浏览器对于渲染的优化，批处理回流，访问 offsetXxx、scrollXxx、clientXxx、width、height、getBoundingClientRect、getComputedStyle 由于需要得到准确的信息所以会触发回流
 
-    3. 出现层级，不造成回流
+    2. 两次修改间隔超过分批处理的时间引发回流
+
+    3. 浏览器渲染的图层分为普通图层和复合图层，普通文档流内可以理解为一个复合图层，其次，absolute 布局（fixed 也一样），虽然可以脱离普通文档流，但它仍然属于默认复合层，所以 absolute 中的变化仍能影响原来的复合图层。然后，可以通过硬件加速（`translate3d、translateZ、opacity、filter、will-change: tranform、<video><iframe><canvas><webgl>`）的方式，声明一个新的复合图层，它会单独分配资源（当然也会脱离普通文档流，这样一来，不管这个复合图层中怎么变化，也不会影响默认复合层里的回流重绘）
+
+    > [一篇文章说清浏览器解析和 CSS（GPU）动画优化](https://segmentfault.com/a/1190000008015671)
 
 6. 对于后端发过来的图片，前端用 img 标签怎么相对其父元素居中
 
     一开始写的 background 方式，然后说是类似子元素在父元素居中，没答对，说是一个用的 object-fit，因为我一般觉得 background 更好操作也就没太注意过这个属性
+
+    object-fit 类似 background-size，object-position 类似 background-position
+
+    ```html
+    <style>
+      .ant-avatar > img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    </style>
+    <span class="ant-avatar">
+      <img src="https://images.ahabhgk.top/hah.webp">
+    </span>
+    ```
 
 7. V8 的内存模型
 
