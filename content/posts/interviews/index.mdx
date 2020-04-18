@@ -7,4 +7,42 @@ tags:
   - Interview
 ---
 
-// TODO
+## HTTP
+
+### Content 系列字段
+
+TCP / UDP 由于是传输层协议，并不关心传输的数据，只关心传输，而 HTTP 是应用层协议，需要关心数据是什么，告诉上层应用数据类型、压缩方式、语言类型
+
+1. 数据类型
+
+多种格式的数据传输到客户端，客户端最低效的方式是根据前几个字节直接猜，更高效的方式是通过指定数据类型告诉客户端是什么格式
+
+MIME 之前是用在电子邮件系统里的，让电子邮件可以发送 ASCII 码以外的任意数据，常用的有：text/html、text/plain、text/css、image/gif、image/jpeg、image/png、audio/mpeg、video/mp4、application/json，application/javascript、application/pdf、application/octet-stream（不透明的二进制数据）
+
+客户端发送请求带有 Accept 头部字段标记可理解的数据类型：`Accept: text/html,application/xml,image/webp,image/png`，服务器会在响应报文里用头字段 Content-Type 告诉实体数据的真实类型：`Content-Type: text/html`
+
+2. 压缩方式
+
+HTTP 在传输时为了节约带宽，有时候还会压缩数据，为了不要让浏览器继续“猜”，还需要有一个“Encoding type”
+
+常用压缩格式：gzip、deflate、br（一种专门为 HTTP 优化的新压缩算法 Brotli）
+
+客户端通过 Accept-Encoding 标记客户端支持的压缩格式：`Accept-Encoding: gzip, deflate, br`，服务器实际使用的压缩格式放在响应头字段 Content-Encoding：`Content-Encoding: gzip`
+
+3. 语言类型和字符集
+
+Accept-Language 字段标记了客户端可理解的自然语言：`Accept-Language: zh-CN, zh, en`（最好给我 zh-CN 的汉语文字，如果没有就用其他的汉语方言，如果还没有就给英文），服务器应该在响应报文里用头字段 Content-Language 告诉客户端实体数据使用的实际语言类型：`Content-Language: zh-CN`
+
+字符集在 HTTP 里使用的请求头字段是 Accept-Charset：`Accept-Charset: gbk, utf-8`，响应头中放在 Content-Type 中：`ontent-Type: text/html; charset=utf-8`
+
+4. 内容协商
+
+Accept、Accept-Encoding、Accept-Language 等请求头字段进行内容协商的时候，还可以用一种特殊的“q”参数表示权重来设定优先级
+
+权重的最大值是 1，最小值是 0.01，默认值是 1，如果值是 0 就表示拒绝
+
+`Accept: text/html,application/xml;q=0.9,*/*;q=0.8` 表示客户端最希望 html 格式，权重 1，其次 xml 权重 0.9，最后任意类型权重 0.8
+
+内容协商的过程是不透明的，每个 Web 服务器使用的算法都不一样，但有的时候，服务器会在响应头里多加一个 Vary 字段，记录服务器在内容协商时参考的请求头字段：`Vary: Accept-Encoding,User-Agent,Accept`
+
+### // TODO
