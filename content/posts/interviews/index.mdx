@@ -190,3 +190,65 @@ ext json d
 
 2. 域名分片，由于限制并发连接数量，那就多开几个域名都指向同一个服务器
 
+### 重定向
+
+当发送请求，服务器返回 3xx 并带有 Location 字段的响应头，表示（由服务器）发起重定向，浏览器自动跳转到新的 URL，用户无感知
+
+Location 表示跳转到的地址，也分为绝对地址和相对地址，如果不带有 Location 响应头字段，则不会进行跳转；Refresh 表示延时跳转，`Refresh: 5, url=xxx` 表示 5 秒钟后跳转到 xxx
+
+Referer 表示跳转来源，`Referer: /18-1` 表示从 /18-1 跳转过来，可用于统计分析和防盗链
+
+- 301（Moved Permanently）：永久重定向，浏览器会做适当的优化。比如历史记录、更新书签，下次可能就会直接用新的 URI 访问，省去了再次跳转的成本。搜索引擎的爬虫看到 301，也会更新索引库，不再使用老的 URI
+
+- 302（Moved Temporarily）：临时重定向，原 URI 处于“临时维护”状态
+
+- 300（Multiple Choices）：返回多个跳转链接的页面，由用户自己决定
+
+- 307（Temporary Redirect）：重定向后请求里的方法和实体不允许变动，类似 302
+
+- 308（Permanent Redirect）：不允许重定向后的请求变动，类似 301
+
+应用：
+
+1. 资源不可用：域名变更、服务器变更、网站改版、系统维护、没有登录注册导致原 URI 指向的资源无法访问
+
+2. 避免重复：多个名称类似的域名重定向到主站上（qq.com、github.com）
+
+问题：
+
+1. 性能损耗：会发生多次请求应答（根据重定向次数而定），301 会优化
+
+2. 循环跳转：a 跳 b，b 跳 a
+
+### Cookie
+
+响应头 Set-Cookie 请求头自动带上 Cookie，多个 Cookie 设置时由多个 Set-Cookie 设置，请求时由一个 Cookie 携带并用“;”隔开
+
+属性：
+
+1. Expires 和 Max-Age 设置过期时间
+
+2. Domain 和 Path 指定了 Cookie 所属的域名和路径，浏览器在发送 Cookie 前会从 URI 中提取出 host 和 path 部分，对比 Cookie 的属性。如果不满足条件，就不会在请求头里发送 Cookie
+
+3. 安全性
+
+    - HttpOnly 不能用 JS 操作 Cookie
+    
+    - SameSite 防范 CSRF，SameSite=Strict 严格限定 Cookie 不能随着跳转链接跨站发送，而 SameSite=Lax 则略宽松一点，允许 GET/HEAD 等安全方法，但禁止 POST 跨站发送安全性
+
+    - Secure”，表示这个 Cookie 仅能用 HTTPS 协议加密传输，明文的 HTTP 协议会禁止发送。但 Cookie 本身不是加密的，浏览器里还是以明文的形式存在
+
+应用：
+
+1. 身份识别
+
+2. 广告跟踪：网页里嵌入广告代码，信息通过 Cookie 存储，然后在别的网站也有同一个广告商的广告代码，就会读 Cookie 得到信息
+
+### session 与 Cookie 的区别
+
+本来 session 是一个抽象概念，开发者为了实现中断和继续等操作，将 user agent 和 server 之间一对一的交互，抽象为“会话”，进而衍生出“会话状态”，也就是 session 的概念
+
+而 cookie 是一个实际存在的东西，http 协议中定义在 header 中的字段。可以认为是 session 的一种后端无状态实现
+
+session 因为需要 session id 维持会话作为唯一标识，通常要借助 cookie 实现，但这并非必要，只能说是通用性较好的一种实现方案，还可以在 URL 上添加 sid=xxxxx 的参数实现
+
