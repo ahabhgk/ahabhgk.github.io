@@ -138,7 +138,7 @@ tags:
 
     主要是三方面：加密、完整性验证、证书验证，一开始没想到第三点，后来提醒打上来了，之后深入的问 CA 各个级之间如何验证没答上来，相关加密算法也没答上来
 
-    // TODO
+    // 详见 [Accumulator](https://blog.ahabhgk.top/oip-accumulator) 中 HTTPS 部分
 
 2. TLS / SSL 是在哪一层
 
@@ -326,7 +326,7 @@ setState 的异步并不是真正的异步，没有产生宏任务微任务，�
 
 https：三次握手 => SSL 握手 => 加密通信并用 hash 验证完整性
 
-SSL 握手：
+SSL 握手（传统 RSA）：
 
 1. 浏览器发送请求到服务器，包括支持的加密算法列表和随机数 random1
 
