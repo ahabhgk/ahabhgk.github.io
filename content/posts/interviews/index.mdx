@@ -399,6 +399,12 @@ OpenSSL 是一个著名的开源密码学程序库和工具包，几乎支持所
 >
 > 签发的证书可信程度 DV < OV < EV
 
+证书体系的弱点：
+
+1. CA 失误签发错误证书，对应方案 CRL（证书吊销列表，Certificate revocation list）和 OCSP（在线证书状态协议，Online Certificate Status Protocol），及时废止有问题的证书
+
+2. CA 被黑或有恶意，信任的根源在于 Root CA，导致整个信任链里的所有证书也就都不可信，对应方案是浏览器或操作系统撤销对 CA 信任列入黑名单
+
 ### TLS 1.2 握手过程
 
 传统 RSA：
@@ -417,9 +423,47 @@ OpenSSL 是一个著名的开源密码学程序库和工具包，几乎支持所
 
 4. ECDHE 客户端可以不用等服务端发回 Finish 确认握手完毕，直接发送 HTTP 报文，省去了一个消息往返的时间浪费（RTT），提高传输的效率，叫做 TLS False Start（抢跑）
 
+### ECDHE 原理
+
+Change Cipher Spec 之后才是加密通信，那之前的 ClientKeyExchange.ClientParams 和 ServerKeyExchange.ServerParams 都可以被截获然后算出 pre-master，那如何保证安全呢？
+
+// TODO
+
 ### TLS 1.3 优化
 
-//
+![TLS1.3](./images/TLS1.3.png)
+
+- 兼容：1.3 会“伪装”成 TLS1.2，新特性在“扩展”里实现，以此兼容老版本
+
+- 安全性：1.1、1.2 在实践中发现了很多安全隐患，所以 TLS1.3 大幅度删减了加密算法，只保留了 ECDHE、AES、ChaCha20、SHA-2 等极少数算法，强化了安全
+
+> RSA 的缺点：1. RSA 存在 FREAK 攻击 2. RSA 每次握手私钥一致，获取私钥后就能破解之前所有加密数据，而 ECDHE 每次握手会生成一个临时的私钥，具有前向安全性
+
+- 性能：简化了握手过程，ClientHello 发送 ClientRandom、ClientParams、TLS 版本、加密套件列表，ServerHello 发送 ServerRandom、ServerParams、确认 TLS 版本、使用的加密套件、服务器证书，所以完全握手只需要一个消息往返（RTT），提升了性能
+
+### 优化 TLS 连接过程
+
+慢在于消息往返 RTT、验证证书、非对称加解密的运算
+
+- 硬件优化：是计算密集型可以使用更快 CPU；SSL 加速卡和 SSL 加速服务器专门进行非对称加解密运算，分担 CPU 压力
+
+- 软件优化：
+
+    - 软件升级：Linux 内核、Nginx、OpenSSL 升级有对应优化
+
+    - 协议优化：1.3 只用 1-RTT；1.2 的 ECDHE 算法运算速度快，安全性高，还支持抢跑，也是 1-RTT
+
+    - 证书验证优化：证书验证方面使用 ECDHE 算法；是否失效验证 OCSP Stapling（让服务器预先访问 CA 获取 OCSP 响应，然后在握手时随着证书一起发给客户端，免去了客户端连接 CA 服务器查询的时间）> OCSP（客户端向 CA 发送查询请求，让 CA 返回证书的有效状态）> CRL（客户端预先下载可能几 M 的 CRL）
+
+    - 会话复用优化：服务端内存保存 Session ID，再次连接时有则复用；Session Ticket 类似 JWT，客户端存 Ticket，Ticket 需要一个 ticket_key 加密，保证“前向安全”，ticket_key 需要定期更换；PSK（Pre-shared Key）实现 0-RTT，应用数据随 ticket 一起发给服务器，牺牲点安全性，一般只允许 GET/HEAD 方法
+
+### 浏览器地址栏直接输入域名如何跳转到 HTTPS 页面
+
+地址栏里直接敲域名（或者是旧的书签、超链接），默认使用 HTTP 协议访问
+
+1. 301 302，Nginx 配置 `return 301 https://$host$request_uri; rewrite ^ https://$host$request_uri permanent; #永久重定向`，但是增加了网络成本，多出了一次请求，重定向的响应可能会被“中间人”窜改，实现“会话劫持”，跳转到恶意网站
+
+2. HSTS（HTTP 严格传输安全，HTTP Strict Transport Security）添加响应头 `Strict-Transport-Security: max-age=15768000; includeSubDomains`，这样浏览器再访问同样的域名的时候就会自动使用 HTTPS
 
 ## 🔩 数据结构与算法
 
