@@ -11,7 +11,17 @@ tags:
 
 ### DNS
 
-// TODO
+域名使用字符串来代替 IP 地址，方便用户记忆，本质上一个名字空间系统
+
+![DNS](./images/DNS.png)
+
+例如，你要访问“www.apple.com”，如果没有缓存和 hosts 就要进行下面的三次查询：
+
+1. 访问根域名服务器，它会告诉你“com”顶级域名服务器的地址
+
+2. 访问“com”顶级域名服务器，它再告诉你“apple.com”域名服务器的地址
+
+3. 最后访问“apple.com”域名服务器，就得到了“www.apple.com”的地址
 
 ### Content 系列字段
 
@@ -309,7 +319,13 @@ Host: www.xxx.com\r\n
 
 #### CONNECT 方法
 
-// TODO
+网关可以由 HTTP 请求转化为其他协议通信，比如使用 SSL 提高安全性、连接数据库
+
+CONNECT 方法可以建立隧道，隧道使用 SSL 等加密手段进行通信，隧道的目的是确保客户端能与服务器进行安全的通信
+
+![web-tunnel](./images/web-tunnel.png)
+
+`CONNECT www.example.com:443 HTTP/1.1` 带有完整 URL，服务端返回 200 Connection established 完成隧道建立
 
 #### 缓存代理
 
@@ -497,7 +513,17 @@ TCP 为了保证可靠传输，有个特别的“丢包重传”机制，丢失�
 
 ### WebSocket
 
-// TODO
+HTTP/2 弥补 HTTP/1 队头堵塞的问题，WebSocket 弥补请求 - 响应模式的不足，半双工升级为全双工
+
+握手时客户端发一个 GET 请求，带有表示协议升级的相关头字段：
+
+![upgrade-websocket](./images/upgrade-websocket.png)
+
+之后响应返回 101 Switching Protocols，通知客户端之后使用 WebSocket 进行通信，响应报文头字段带有 `Sec-WebSocket-Accept: encode_base64( sha1( Sec-WebSocket-Key + '258EAFA5-E914-47DA-95CA-C5AB0DC85B11' ) )`，客户端使用同样的算法进行验证，相等则表示返回的报文是刚才握手时连接的服务器
+
+![accept-websocket](./images/accept-websocket.png)
+
+WebSocket 虽然是在应用层，但使用方式却与“TCP Socket”差不多，过于“原始”，用户必须自己管理连接、缓存、状态，开发上比 HTTP 复杂的多
 
 ## 🔋 Nginx
 
