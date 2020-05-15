@@ -1,15 +1,13 @@
 ---
-title: Accumulator
-slug: oip-accumulator
+title: Accumulator.HTTP
+slug: accumulator-http
 date: 2020-04-16
-description: 面向面试学习
+description: 积累 HTTP
 tags:
   - Interview
 ---
 
-## ☎️ HTTP
-
-### DNS
+## DNS
 
 域名使用字符串来代替 IP 地址，方便用户记忆，本质上一个名字空间系统
 
@@ -23,7 +21,7 @@ tags:
 
 3. 最后访问“apple.com”域名服务器，就得到了“www.apple.com”的地址
 
-### Content 系列字段
+## Content 系列字段
 
 TCP / UDP 由于是传输层协议，并不关心传输的数据，只关心传输，而 HTTP 是应用层协议，需要关心数据是什么，告诉上层应用数据类型、压缩方式、语言类型
 
@@ -59,11 +57,11 @@ Accept、Accept-Encoding、Accept-Language 等请求头字段进行内容协商�
 
 内容协商的过程是不透明的，每个 Web 服务器使用的算法都不一样，但有的时候，服务器会在响应头里多加一个 Vary 字段，记录服务器在内容协商时参考的请求头字段：`Vary: Accept-Encoding,User-Agent,Accept`
 
-### HTTP 大文件传输
+## HTTP 大文件传输
 
 压缩传输、分批传输、范围请求
 
-#### Transfer-Encoding: chunked 不定长数据 Content-Length 定长数据
+### Transfer-Encoding: chunked 不定长数据 Content-Length 定长数据
 
 对于定长数据添加 Content-Length 响应头
 
@@ -116,7 +114,7 @@ f
 0
 ```
 
-#### Range 范围请求
+### Range 范围请求
 
 不是必备的，所以服务器必须在响应头中添加 `Accept-Ranges: bytes` 告诉客户端支持范围请求，如果不支持需要用 `Accept-Ranges: none` 或不添加该字段
 
@@ -180,7 +178,7 @@ ext json d
 --00000000001--
 ```
 
-### Connection: keep-alive 长连接
+## Connection: keep-alive 长连接
 
 响应头 `Connection: keep-alive` HTTP/1.1 默认添加
 
@@ -196,7 +194,7 @@ ext json d
 
 > Connection: Upgrade 配合 101 表示协议升级，比如 HTTP 升级 WebSocket
 
-### 如何解决对头阻塞
+## 如何解决对头阻塞
 
 因为 HTTP 规定报文必须是“一发一收”，这就形成了一个先进先出的“串行”队列。队列里的请求没有轻重缓急的优先级，只有入队的先后顺序，排在最前面的请求被最优先处理，对首的处理太慢就会阻塞后面的
 
@@ -204,7 +202,7 @@ ext json d
 
 2. 域名分片，由于限制并发连接数量，那就多开几个域名都指向同一个服务器
 
-### 重定向
+## 重定向
 
 当发送请求，服务器返回 3xx 并带有 Location 字段的响应头，表示（由服务器）发起重定向，浏览器自动跳转到新的 URL，用户无感知
 
@@ -234,7 +232,7 @@ Referer 表示跳转来源，`Referer: /18-1` 表示从 /18-1 跳转过来，可
 
 2. 循环跳转：a 跳 b，b 跳 a
 
-### Cookie
+## Cookie
 
 响应头 Set-Cookie 请求头自动带上 Cookie，多个 Cookie 设置时由多个 Set-Cookie 设置，请求时由一个 Cookie 携带并用“;”隔开
 
@@ -258,7 +256,7 @@ Referer 表示跳转来源，`Referer: /18-1` 表示从 /18-1 跳转过来，可
 
 2. 广告跟踪：网页里嵌入广告代码，信息通过 Cookie 存储，然后在别的网站也有同一个广告商的广告代码，就会读 Cookie 得到信息
 
-### session 与 Cookie 的区别
+## session 与 Cookie 的区别
 
 本来 session 是一个抽象概念，开发者为了实现中断和继续等操作，将 user agent 和 server 之间一对一的交互，抽象为“会话”，进而衍生出“会话状态”，也就是 session 的概念
 
@@ -266,7 +264,7 @@ Referer 表示跳转来源，`Referer: /18-1` 表示从 /18-1 跳转过来，可
 
 session 因为需要 session id 维持会话作为唯一标识，通常要借助 cookie 实现，但这并非必要，只能说是通用性较好的一种实现方案，还可以在 URL 上添加 sid=xxxxx 的参数实现
 
-### 浏览器各种刷新发送的请求头有什么不同
+## 浏览器各种刷新发送的请求头有什么不同
 
 不止服务器可以发 Cache-Control 头，浏览器也可以发 Cache-Control，也就是说请求 - 应答的双方都可以用这个字段进行缓存控制，互相协商缓存的使用策略
 
@@ -276,13 +274,13 @@ session 因为需要 session id 维持会话作为唯一标识，通常要借助
 
 - 前进后退跳转：无 Cache-Control
 
-### 强弱 ETag
+## 强弱 ETag
 
 强 ETag 要求资源在字节级别必须完全相符，弱 ETag 在值前有个“W/”标记，只要求资源在语义上没有变化，但内部可能会有部分发生了改变（例如 HTML 里的标签顺序调整，或者多了几个空格）
 
-### 代理
+## 代理
 
-#### 代理的作用
+### 代理的作用
 
 1. **负载均衡**：随机算法、轮询、一致性hash、LRU（最近最少使用）等等
 
@@ -296,7 +294,7 @@ session 因为需要 session id 维持会话作为唯一标识，通常要借助
 
 6. 数据过滤：拦截上下行的数据，任意指定策略修改请求或者响应
 
-#### 代理相关头字段
+### 代理相关头字段
 
 Via：代理服务器以此标明自己的身份，在 HTTP 传输中留下自己的痕迹，`客户端 -> 代理1 -> 代理2 -> 源服务器` 的请求头是 `Via: proxy_server1, proxy_server2` 响应头是 `Via: proxy_server2, proxy_server1`
 
@@ -304,7 +302,7 @@ X-Forwarded-For（非标准）：Via 只能获取是否有代理，不能得到�
 
 X-Real-IP（非标准）：只获取真实客户端的 IP，X-Forwarded-Host 和 X-Forwarded-Proto 类似，记录真实客户端域名和协议
 
-#### 代理协议
+### 代理协议
 
 由于 X-Forwarded-For 请求头字段需要代理解析并修改请求头，所以影响性能，而且 HTTPS 时不能修改，于是出现代理协议
 
@@ -317,7 +315,7 @@ Host: www.xxx.com\r\n
 
 代理服务器拿到后只需解析第一行得到真实客户端的信息（TCP4 / 1.1.1.1:55555），不需要管之后的 HTTP 数据
 
-#### CONNECT 方法
+### CONNECT 方法
 
 网关可以由 HTTP 请求转化为其他协议通信，比如使用 SSL 提高安全性、连接数据库
 
@@ -327,7 +325,7 @@ CONNECT 方法可以建立隧道，隧道使用 SSL 等加密手段进行通信�
 
 `CONNECT www.example.com:443 HTTP/1.1` 带有完整 URL，服务端返回 200 Connection established 完成隧道建立
 
-#### 缓存代理
+### 缓存代理
 
 代理上的缓存与客户端的缓存不同在于，客户端缓存只能供该客户端使用，而代理上的缓存可以供多个客户端使用
 
@@ -355,7 +353,7 @@ CONNECT 方法可以建立隧道，隧道使用 SSL 等加密手段进行通信�
 >
 > 代理可以通过读取请求头的 Accept-Encoding、User-Agent 等字段对比缓存的响应头 Vary 字段值，如果完全相同，就表示版本一致可以返回
 
-### 什么是 HTTPS
+## 什么是 HTTPS
 
 HTTP 由于不安全，数据可能被劫持篡改，为了通信的安全性出现了 HTTPS
 
@@ -383,7 +381,7 @@ server suite 表示最后协商选定的是 ECDHE-RSA-AES256-GCM-SHA384（密钥
 
 OpenSSL 是一个著名的开源密码学程序库和工具包，几乎支持所有公开的加密算法和协议许多应用软件都会使用它作为底层库来实现 TLS 功能，包括常用的 Web 服务器 Apache、Nginx 等
 
-### HTTPS 机密性和加密算法
+## HTTPS 机密性和加密算法
 
 先通过非对称加密将对称加密的密钥加密传输，双方得到后通过对称加密进行通信，既保证安全性也保证性能
 
@@ -393,7 +391,7 @@ OpenSSL 是一个著名的开源密码学程序库和工具包，几乎支持所
 
 // TODO: 加密算法相关
 
-### HTTPS 完整性、身份认证、不可否认
+## HTTPS 完整性、身份认证、不可否认
 
 有了机密性黑客虽然无法破解密文，但是可以收集足够多密文，修改后发给服务器，通过响应获取线索，最终获取破解，所以需要保证完整性
 
@@ -425,7 +423,7 @@ OpenSSL 是一个著名的开源密码学程序库和工具包，几乎支持所
 
 2. CA 被黑或有恶意，信任的根源在于 Root CA，导致整个信任链里的所有证书也就都不可信，对应方案是浏览器或操作系统撤销对 CA 信任列入黑名单
 
-### TLS 1.2 握手过程
+## TLS 1.2 握手过程
 
 传统 RSA：
 
@@ -443,13 +441,13 @@ OpenSSL 是一个著名的开源密码学程序库和工具包，几乎支持所
 
 4. ECDHE 客户端可以不用等服务端发回 Finish 确认握手完毕，直接发送 HTTP 报文，省去了一个消息往返的时间浪费（RTT），提高传输的效率，叫做 TLS False Start（抢跑）
 
-### ECDHE 原理
+## ECDHE 原理
 
 Change Cipher Spec 之后才是加密通信，那之前的 ClientKeyExchange.ClientParams 和 ServerKeyExchange.ServerParams 都可以被截获然后算出 pre-master，那如何保证安全呢？
 
 // TODO
 
-### TLS 1.3 优化
+## TLS 1.3 优化
 
 ![TLS1.3](./images/TLS1.3.png)
 
@@ -461,7 +459,7 @@ Change Cipher Spec 之后才是加密通信，那之前的 ClientKeyExchange.Cli
 
 - 性能：简化了握手过程，ClientHello 发送 ClientRandom、ClientParams、TLS 版本、加密套件列表，ServerHello 发送 ServerRandom、ServerParams、确认 TLS 版本、使用的加密套件、服务器证书，所以完全握手只需要一个消息往返（RTT），提升了性能
 
-### 优化 TLS 连接过程
+## 优化 TLS 连接过程
 
 慢在于消息往返 RTT、验证证书、非对称加解密的运算
 
@@ -477,7 +475,7 @@ Change Cipher Spec 之后才是加密通信，那之前的 ClientKeyExchange.Cli
 
     - 会话复用优化：服务端内存保存 Session ID，再次连接时有则复用；Session Ticket 类似 JWT，客户端存 Ticket，Ticket 需要一个 ticket_key 加密，保证“前向安全”，ticket_key 需要定期更换；PSK（Pre-shared Key）实现 0-RTT，应用数据随 ticket 一起发给服务器，牺牲点安全性，一般只允许 GET/HEAD 方法
 
-### 浏览器地址栏直接输入域名如何跳转到 HTTPS 页面
+## 浏览器地址栏直接输入域名如何跳转到 HTTPS 页面
 
 地址栏里直接敲域名（或者是旧的书签、超链接），默认使用 HTTP 协议访问
 
@@ -485,7 +483,7 @@ Change Cipher Spec 之后才是加密通信，那之前的 ClientKeyExchange.Cli
 
 2. HSTS（HTTP 严格传输安全，HTTP Strict Transport Security）添加响应头 `Strict-Transport-Security: max-age=15768000; includeSubDomains`，这样浏览器再访问同样的域名的时候就会自动使用 HTTPS
 
-### HTTP/2
+## HTTP/2
 
 - 头部压缩：HTTP/1 就是大头娃娃，HTTP/2 通过 HPACK 对头进行压缩，HPACK 在服务器和客户端之间建立哈希表，将用到的字段（常用 61 作静态表，不常用或自定义的作动态表）存放在这张表中，那么在传输的时候对于之前出现过的值，只需要把索引（比如0，1，2，...）传给对方即可，对方拿到索引查表就行了，起始行转换成头字段，只不过前面加个“:”；并对于头部进行哈夫曼编码压缩
 
@@ -497,13 +495,13 @@ Change Cipher Spec 之后才是加密通信，那之前的 ClientKeyExchange.Cli
 
 - Server Push：比如浏览器请求一个 HTML，服务器就可以在返回 HTML 的基础上，将 HTML 中引用到的其他资源文件一起返回给客户端，减少客户端的等待
 
-### HTTP/3
+## HTTP/3
 
 TCP 为了保证可靠传输，有个特别的“丢包重传”机制，丢失的包必须要等待重新传输确认，其他的包即使已经收到了，也只能放在缓冲区里，上层的应用拿不出来，形成阻塞，所以 HTTP/2 仍没有解决弱网环境下的对头阻塞，HTTP/3 不用 TCP 而基于 UDP 使用 QUIC，保证快而稳定
 
 ![http-stack](./images/http-stack.png)
 
-### CDN
+## CDN
 
 由全局负载均衡（DNS）和缓存系统（代理缓存）组成。
 
@@ -511,7 +509,7 @@ TCP 为了保证可靠传输，有个特别的“丢包重传”机制，丢失�
 
 命中率就是命中次数与所有访问次数之比，回源率是回源（回源服务器）次数与所有访问次数之比
 
-### WebSocket
+## WebSocket
 
 HTTP/2 弥补 HTTP/1 队头堵塞的问题，WebSocket 弥补请求 - 响应模式的不足，半双工升级为全双工
 
@@ -525,7 +523,7 @@ HTTP/2 弥补 HTTP/1 队头堵塞的问题，WebSocket 弥补请求 - 响应模�
 
 WebSocket 虽然是在应用层，但使用方式却与“TCP Socket”差不多，过于“原始”，用户必须自己管理连接、缓存、状态，开发上比 HTTP 复杂的多
 
-## 🔋 Nginx
+## Nginx
 
 - 进程池：每个请求用一个线程或进程处理会有创建和上下文切换的开销。Nginx 在启动时预先创建好多个 worker 进程，运行过程中不会再 fork 出新进程，完全消除了进程创建和切换的成本，由一个 master 进程监控 worker 进程，自动恢复发生异常
 
@@ -536,47 +534,3 @@ WebSocket 虽然是在应用层，但使用方式却与“TCP Socket”差不多
 ![nginx-io](./images/nginx-io.png)
 
 - 多阶段处理：使用了“职责链”模式，多个模块分工合作，自由组合，以流水线的方式处理 HTTP 请求
-
-## 🔩 数据结构与算法
-
-### 数组和链表的不同
-
-本质上是内存存储结构的不同，数组是一段连续的内存，链表是不连续的
-
-由于数组是连续的，所以更适合通过下标访问：`array[i]_address = base_address + i * data_type_size`
-
-而对于插入删除由于需要保证内存的连续性，就需要大量的移动，如果忽略其连续性，插入时直接把原来的元素移到最后面时间复杂度同样是 O(1)，对于删除操作，在用到时再把多次删除集中到一起，移动一次
-
-### 容器能否完全替代数组
-
-容器的优势在于封装大量操作，支持动态扩容。由于动态扩容会有涉及内存申请和数据搬移，消耗性能，如果事先已知大小，那使用数组性能更好，对于底层框架开发性能更重要，对于业务开发，可维护性更重要
-
-### 数组下标为什么从 0 开始
-
-1. 从内存上看，下标叫做 offset 更合适，如果从 1 开始，`array[i]_address = base_address + (i - 1) * data_type_size` 每次访问就需要多一个减法运算，CPU 就需要多一个减法指令
-
-2. 历史原因，C 从 0 开始，之后的语言都效仿 C
-
-### LRU 缓存淘汰算法
-
-LRU（Least Recently Used，最近最少使用），如果数据最近被访问过，那么将来被访问的几率也更高
-
-#### 单链表实现
-
-一个单向链表，最近访问的放到头部，越接近尾部就是越早访问的，当有一个新的数据访问时，从头遍历：
-
-- 如果有缓存，就删除缓存节点，并插入到头部
-
-- 如果没有缓存
-
-    - 如果缓存未满，直接插到头部
-
-    - 如果满了，就先删除最后一个尾节点再插入到头部
-
-需要遍历链表，时间复杂度为 O(n)
-
-#### 散列表实现
-
-// TODO
-
-## 📜 深入 JS / HTML

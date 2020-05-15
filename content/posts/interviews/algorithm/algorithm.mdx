@@ -1,0 +1,257 @@
+---
+title: Accumulator.Algorithm
+slug: accumulator-algorithm
+date: 2020-04-16
+description: 积累 Algorithm
+tags:
+  - Interview
+---
+
+## 数组和链表的不同
+
+本质上是内存存储结构的不同，数组是一段连续的内存，链表是不连续的
+
+由于数组是连续的，所以更适合通过下标访问：`array[i]_address = base_address + i * data_type_size`
+
+而对于插入删除由于需要保证内存的连续性，就需要大量的移动，如果忽略其连续性，插入时直接把原来的元素移到最后面时间复杂度同样是 O(1)，对于删除操作，在用到时再把多次删除集中到一起，移动一次
+
+## 容器能否完全替代数组
+
+容器的优势在于封装大量操作，支持动态扩容。由于动态扩容会有涉及内存申请和数据搬移，消耗性能，如果事先已知大小，那使用数组性能更好，对于底层框架开发性能更重要，对于业务开发，可维护性更重要
+
+## 数组下标为什么从 0 开始
+
+1. 从内存上看，下标叫做 offset 更合适，如果从 1 开始，`array[i]_address = base_address + (i - 1) * data_type_size` 每次访问就需要多一个减法运算，CPU 就需要多一个减法指令
+
+2. 历史原因，C 从 0 开始，之后的语言都效仿 C
+
+## LRU 缓存淘汰算法
+
+LRU（Least Recently Used，最近最少使用），如果数据最近被访问过，那么将来被访问的几率也更高
+
+### 单链表实现
+
+一个单向链表，最近访问的放到头部，越接近尾部就是越早访问的，当有一个新的数据访问时，从头遍历：
+
+- 如果有缓存，就删除缓存节点，并插入到头部
+
+- 如果没有缓存
+
+    - 如果缓存未满，直接插到头部
+
+    - 如果满了，就先删除最后一个尾节点再插入到头部
+
+需要遍历链表，时间复杂度为 O(n)
+
+### 散列表实现
+
+// TODO
+
+## 完全二叉树与堆的关系
+
+![完全二叉树](./images/complete-bin-tree.jpg)
+
+完全二叉树按层序遍历的顺序通过数组存储，浪费很少，堆就是完全二叉树
+
+## 二叉搜索树如何删除
+
+![二叉查找树的删除](./images/bin-search-tree-delete.jpg)
+
+1. 无子节点，直接删除
+
+2. 有一个子节点，用该子节点替换
+
+3. 两个子节点，用右子树的最小节点替换
+
+## 有重复数据的二叉搜索树
+
+存储的数据往往是个对象，需要一个 key 作为唯一标识，重复数据表示 key 相同的情况
+
+1. 通过链表把 key 相同的数据都存储在同一个节点上
+
+2. 把新的数据当作大于这个节点数据来处理。插入时放到节点右子树；查找时找到相同的之后继续在右子树中查找，返回所有查找到的；删除时将每个找到的节点跟上面的方式一样删除即可
+
+## 散列表与二叉搜索树比较
+
+散列表插入删除查找都是 O(1)，而二叉查找树在比较平衡时插入删除查找才是 O(logn)，为什么还要用二叉查找树？
+
+1. 散列表无序，二叉树中序遍历是有序的
+
+2. 散列表扩容耗时，需处理散裂冲突，二叉树性能稳定
+
+3. 散列表处理冲突，hash 函数耗时不一定比平衡二叉查找树快
+
+4. 散列表需要考虑散列函数的设计、冲突解决办法、扩容、缩容等，平衡二叉查找树只需考虑平衡性
+
+## 排序
+
+```js
+// min: O(n), max: O(n^2)
+// O(1) 原地排序
+// 稳定
+function bubbleSort(arr) {
+  for (let i = 0; i < arr.length; i++) {
+    let hasSwap = false
+    for (let j = 0; j < arr.length - i - 1; j++) {
+      if (arr[j] > arr[j + 1]) {
+        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]]
+        hasSwap = true
+      }
+    }
+    if (!hasSwap) break
+  }
+  return arr
+}
+
+// min: O(n), max: O(n^2)
+// O(1) 原地排序
+// 稳定
+function insertSort(arr) {
+  for (let i = 1; i < arr.length; i++) {
+    let value = arr[i]
+    let j = i - 1
+    for (; j >= 0; j--) {
+      if (arr[j] > value) {
+        arr[j + 1] = arr[j]
+      } else break
+    }
+    arr[j + 1] = value
+  }
+  return arr
+}
+
+// min: O(n^2), max: O(n^2)
+// O(1)
+// 不稳定
+function selectSort(arr) {
+  for (let i = 0; i < arr.length - 1; i++) {
+    let index = i
+    for (let j = i + 1; j < arr.length; j++) {
+      if (arr[j] < arr[index]) {
+        index = j
+      }
+    }
+    [arr[index], arr[i]] = [arr[i], arr[index]]
+  }
+  return arr
+}
+
+// min: O(nlogn), max: O(nlogn)
+// O(n)
+// 稳定
+function mergeSort(arr) {
+  function slice(arr) {
+    if (arr.length === 1) return arr
+    let mid = Math.floor(arr.length / 2)
+    let leftArr = arr.slice(0, mid)
+    let rightArr = arr.slice(mid)
+    return sortAndMerge(slice(leftArr), slice(rightArr))
+  }
+  function sortAndMerge(leftArr, rightArr) {
+    let res = []
+    while (leftArr.length && rightArr.length) {
+      if (leftArr[0] < rightArr[0]) {
+        res.push(leftArr.shift())
+      } else {
+        res.push(rightArr.shift())
+      }
+    }
+    while (leftArr.length) res.push(leftArr.shift())
+    while (rightArr.length) res.push(rightArr.shift())
+    return res
+  }
+  return slice(arr)
+}
+
+// min: O(nlogn), max: O(n^2), ava: O(nlogn)
+// O(logn)
+// 不稳定
+function quickSort(arr, left = 0, right = arr.length - 1) {
+  function partition(arr, left, right) {
+    let pivotValue = arr[left]
+    while (left < right) {
+      while (left < right && pivotValue <= arr[right]) right -= 1
+      ;[arr[right], arr[left]] = [arr[left], arr[right]]
+      while (left < right && arr[left] <= pivotValue) left += 1
+      ;[arr[right], arr[left]] = [arr[left], arr[right]]
+    }
+    return left
+  }
+
+  if (left < right) {
+    let pivot = partition(arr, left, right)
+    quickSort(arr, left, pivot - 1)
+    quickSort(arr, pivot + 1, right)
+  }
+  return arr
+}
+
+// max: O(nlogn) 一个桶, min: O(n) n 个桶
+// 可以处理大量数据的情况，分桶存入内存处理
+// 稳定性根据桶内的排序算法决定
+function bucketSort(arr, bucketSize) {
+  let max = Math.max(...arr)
+  let min = Math.min(...arr)
+  let bucketNum = Math.floor((max - min) / bucketSize) + 1
+  let buckets = Array.from({ length: bucketNum }, _ => [])
+  for (let i = 0; i < arr.length; i++) {
+    let index = Math.floor((arr[i] - min) / bucketSize)
+    buckets[index].push(arr[i])
+  }
+  let res = []
+  for (let i = 0; i < bucketNum; i++) {
+    res = res.concat(quickSort(buckets[i]))
+  }
+  return res
+}
+
+// 类似桶排序，保证 n 个桶
+// 负数和小数的情况下需要变为正数（+）和整数（*）
+function countSort(arr) {
+  let min = Math.min(...arr)
+  let max = Math.max(...arr)
+  let bucketNum = Math.floor((max - min) / 1) + 1
+  let buckets = Array.from({ length: bucketNum }, _ => 0)
+  for (let i = 0; i < arr.length; i++) {
+    buckets[arr[i] - min] += 1
+  }
+  let res = []
+  for (let i = 0; i < bucketNum; i++) {
+    for (let j = 0; j < buckets[i]; j++) {
+      res.push(i + min)
+    }
+  }
+  return res
+}
+
+// O(n)
+// 适合位数很大的情况，比如手机号排序
+function radixSort(arr) {
+  let digit = `${Math.max(...arr)}`.length
+  let start = 1
+  while (digit) {
+    start *= 10
+    let buckets = []
+    for(let i = 0; i < arr.length; i++) {
+      const index = arr[i] % start
+      !buckets[index] && (buckets[index] = [])
+      buckets[index].push(arr[i])
+    }
+    arr = []
+    for(let i = 0; i < buckets.length; i++) {
+      buckets[i] && (arr = arr.concat(buckets[i]))
+    }
+    digit -= 1
+  }
+  return arr
+}
+```
+
+### 插入排序为什么比冒泡排序性能好
+
+时间复杂度都是最差 O(n^2)，最好 O(n)，平均 O(n^2)，但是冒泡是通过交换，交换需要三步，而插入是通过移动，移动需要一步
+
+### 如何用快排思想在 O(n) 内查找第 K 大元素
+
+通过 pivot 得到三个部分，小于 arr[pivot] 的，arr[pivot]，大于 arr[pivot] 的，判断 pivot + 1 === K，是则返回 arr[pivot]，大于则说明第 K 大的在 arr[0...pivot - 1] 中，递归继续查找，小于同理
+
