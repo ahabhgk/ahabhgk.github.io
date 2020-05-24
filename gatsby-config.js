@@ -20,6 +20,7 @@ module.exports = {
     {
       resolve: `@lekoarts/gatsby-theme-minimal-blog`,
       options: {
+        mdx: false, // for `gatsby-remark-katex`
         navigation: [
           {
             title: `Blogs`,
@@ -81,6 +82,34 @@ module.exports = {
             sizes: `512x512`,
             type: `image/png`,
           },
+        ],
+      },
+    },
+    {
+      resolve: `gatsby-plugin-mdx`,
+      options: {
+        extensions: [`.mdx`, `.md`],
+        gatsbyRemarkPlugins: [
+          {
+            resolve: `gatsby-remark-images`,
+            options: {
+              maxWidth: 960,
+              quality: 90,
+              linkImagesToOriginal: false,
+            },
+          },
+          `gatsby-remark-katex`,
+        ],
+        plugins: [
+          {
+            resolve: `gatsby-remark-images`,
+            options: {
+              maxWidth: 960,
+              quality: 90,
+              linkImagesToOriginal: false,
+            },
+          },
+          `gatsby-remark-katex`,
         ],
       },
     },
