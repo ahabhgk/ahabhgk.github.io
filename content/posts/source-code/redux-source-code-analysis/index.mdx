@@ -72,11 +72,13 @@ Mobx 也认为数据的一致性很重要，但是它认为解决问题的根本
 
 ### 3.1 Redux 为什么需要 middleware
 
-middleware 大部分都是用来处理异步，因为 Redux 的 reducer 必须要是一个纯函数，不能有任何的副作用，所以 Redux 引入了 middleware，在 action 没有到 reducer 的时候就拦截 action 并进行副作用的操作
-
-如果 reducer 不纯（我们当然可以写成不纯的），就可以在 reducer 中处理副作用，但这样不仅代码难看（async reducer() => await ...），而且没有可预测性、组织性……
+middleware 大部分都是用来处理异步，因为 Redux 内部是 `state = reducer(state, action)` 调用，所以 Redux 的 reducer 必须要是一个纯函数，不能有任何的副作用，以至 Redux 必须引入了 middleware，在 action 没有到 reducer 的时候就拦截 action 并进行副作用的操作
 
 也正因为 reducer 是纯函数，我们通过 middleware 进行的异步操作和在一些大项目中对 action 的特殊需求的一些处理，才可以很好的进行组织管理
+
+### 3.2 流程控制
+
+由于 middleware 中的操作最终都需要 dispatch 一个 plain object，不同 middleware 中也需要 dispatch 进行跳转，所以导致 dispatch 处的逻辑难以抽象过程，除非传入 dispatch 参数，以至于 middleware 内部逻辑是一种通过 dispatch 的流程控制
 
 ## 🐦 高阶 reducer
 
