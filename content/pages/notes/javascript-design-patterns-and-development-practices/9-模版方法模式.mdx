@@ -1,0 +1,192 @@
+---
+title: 模版方法模式
+slug: /notes/javascript-design-patterns-and-development-practices/template
+date: 2019-07-09
+description: 《JavaScript 设计模式与开发实践》读书笔记
+tags:
+  - Note
+  - JavaScript Design Patterns and Development Practices
+---
+
+模板方法模式由两部分结构组成，第一部分是抽象父类，第二部分是具体的实现子类。通常在抽象父类中封装了子类的算法框架，包括实现一些公共方法以及封装子类中所有方法的执行顺序。子类通过继承这个抽象类，也继承了整个算法结构，并且可以选择重写父类的方法。
+
+## Coffee or Tea
+
+泡咖啡 | 泡茶
+-|-
+泡咖啡 | 泡茶
+把水煮沸 | 把水煮沸
+用沸水冲泡咖啡 | 用沸水浸泡茶叶
+把咖啡倒进杯子 | 把茶水倒进杯子
+加糖和牛奶 | 加柠檬
+
+分离逻辑共同点：
+
+1. 把水烧开
+
+2. 用沸水冲泡饮料
+
+3. 把饮料倒进杯子
+
+4. 加调料
+
+```js
+class Beverage {
+  boilWater() {
+    console.log('把水烧开')
+  }
+
+  brew() {
+    throw new Error('子类必须重写 brew 方法')
+  }
+
+  pourInCup() {
+    throw new Error('子类必须重写 pourInCup 方法')
+  }
+
+  addCondiments() {
+    throw new Error('子类必须重写 addCondiments 方法')
+  }
+
+  init() {
+    this.boilWater()
+    this.brew()
+    this.pourInCup()
+    this.addCondiments()
+  }
+}
+
+class Coffee extends Beverage {
+  brew() {
+    console.log('用沸水冲泡咖啡')
+  }
+
+  pourInCup() {
+    console.log('冲泡咖啡')
+  }
+
+  addCondiments() {
+    console.log('加糖和牛奶')
+  }
+}
+
+class Tea extends Beverage {
+  brew() {
+    console.log('用沸水浸泡茶叶')
+  }
+
+  pourInCup() {
+    console.log('把茶水倒进杯子')
+  }
+
+  addCondiments() {
+    console.log('加柠檬')
+  }
+}
+
+const c = new Coffee()
+const t = new Tea()
+
+c.init()
+t.init()
+```
+
+## 抽象类
+
+模板方法模式是一种严重依赖抽象类的设计模式。
+
+在 Java 中，类分为两种，一种为具体类，另一种为抽象类。具体类可以被实例化，抽象类不能被实例化。如果有人编写了一个抽象类，那么这个抽象类一定是用来被某些具体类继承的。
+
+抽象方法被声明在抽象类中，抽象方法并没有具体的实现过程，当子类继承了这个抽象类时，必须重写父类的抽象方法。由于 JavaScript 没有在语言层面支持抽象类，所以只能让其方法抛出错误，保证子类能重写方法
+
+## 钩子方法
+
+有一些客人喝咖啡是不加调料（糖和牛奶）的。既然Beverage作为父类，已经规定好了冲泡饮料的4个步骤，那么有什么办法可以让子类不受这个约束呢？
+
+放置钩子是隔离变化的一种常见手段。我们在父类中容易变化的地方放置钩子，钩子可以有一个默认的实现，究竟要不要“挂钩”，这由子类自行决定。钩子方法的返回结果决定了模板方法后面部分的执行步骤，也就是程序接下来的走向，这样一来，程序就拥有了变化的可能。
+
+```js
+class Beverage {
+  // ...
+  customerWantsCondiments() {
+    return true // 默认
+  }
+
+  init() {
+    this.boilWater()
+    this.brew()
+    this.pourInCup()
+    if (this.customerWantsCondiments()) {
+      this.addCondiments()
+    }
+  }
+}
+
+class Tea extends Beverage {
+  // ...
+  customerWantsCondiments() {
+    return window.confirm('请问需要调料吗？')
+  }
+}
+
+const c = new Tea()
+c.init()
+```
+
+## 好莱坞原则
+
+底层组件将自己挂钩到高层组件中，而高层组件会决定什么时候、以何种方式去使用这些底层组件
+
+模板方法模式是好莱坞原则的一个典型使用场景，它与好莱坞原则的联系非常明显，当我们用模板方法模式编写一个程序时，就意味着子类放弃了对自己的控制权，而是改为父类通知子类，哪些方法应该在什么时候被调用。作为子类，只负责提供一些设计上的细节。除此之外，好莱坞原则还常常应用于其他模式和场景，例如发布-订阅模式和回调函数。
+
+## 真的需要继承吗？
+
+在好莱坞原则的指导之下，下面这段代码可以达到和继承一样的效果。
+
+```js
+const Beverage = function (param) {
+  const boilWater = function () {
+    console.log('把水烧开')
+  }
+
+  const brew = param.brew || function () {
+    throw new Error('子类必须重写 brew 方法')
+  }
+
+  const pourInCup = param.pourInCup || function () {
+    throw new Error('子类必须重写 pourInCup 方法')
+  }
+
+  const addCondiments = param.addCondiments || function () {
+    throw new Error('子类必须重写 addCondiments 方法')
+  }
+
+  const F = function () {}
+  F.prototype.init = function () {
+    boilWater()
+    brew()
+    pourInCup()
+    addCondiments()
+  }
+  return F
+}
+
+const Tea = Beverage({
+  brew() {
+    console.log('用沸水浸泡茶叶')
+  },
+  pourInCup() {
+    console.log('把茶水倒进杯子')
+  },
+  addCondiments() {
+    console.log('加柠檬')
+  },
+})
+
+const t = new Tea()
+t.init()
+```
+
+可以看出 JavaScript 的强大灵活性：工厂创建构造函数
+
+在JavaScript中，我们很多时候都不需要依样画瓢地去实现一个模版方法模式，高阶函数是更好的选择

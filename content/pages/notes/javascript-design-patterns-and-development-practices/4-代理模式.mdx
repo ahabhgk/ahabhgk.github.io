@@ -1,0 +1,199 @@
+---
+title: 代理模式
+slug: /notes/javascript-design-patterns-and-development-practices/proxy
+date: 2019-07-04
+description: 《JavaScript 设计模式与开发实践》读书笔记
+tags:
+  - Note
+  - JavaScript Design Patterns and Development Practices
+---
+
+代理模式是为一个对象提供一个代用品或占位符，以便控制对它的访问
+
+## 保护代理与虚拟代理
+
+* 保护代理：代理帮主体过滤掉一些请求
+
+* 虚拟代理：把一些开销很大的对象，延迟到真正需要它的时候才去创建
+
+## 虚拟代理实现图片预加载
+
+图片加载完成前的 loading 展位图
+
+```js
+const myImg = (function () {
+  const imgNode = document.createElement('img')
+  document.body.appendChild(imgNode)
+
+  return {
+    setSrc(src) {
+      imgNode.src = src
+    },
+  }
+})()
+
+const proxyImg = (function () {
+  const img = new Image()
+  img.onload = function () {
+    myImg.setSrc(this.src)
+  }
+
+  return {
+    setSrc(src) {
+      myImg.setSrc('./img/loading.gif')
+      img.src = src
+    }
+  }
+})()
+
+proxyImg.setSrc('http://abigimage.com/abigimage.png')
+```
+
+可进一步改进，封装成组件，暴露 setLoadingSrc 和 setSrc
+
+## 代理和主体接口的一致性
+
+如果有一天我们不再需要预加载图片，保证接口的一致性可以让我们在**任何使用代理的地方切换成本体**
+
+在 JavaScript 中，如果代理对象和本体对象都是一个函数，函数必然都能被执行，则可认为他们有一致的“接口”
+
+```js
+const myImg = (function () {
+  const imgNode = document.createElement('img')
+  document.body.appendChild(imgNode)
+
+  return function (src) {
+    imgNode.src = src
+  }
+})()
+
+const proxyImg = (function () {
+  const img = new Image()
+  img.onload = function () {
+    myImg(this.src)
+  }
+
+  return function (src) {
+    myImg('./img/loading.gif')
+    img.src = src
+  }
+})()
+```
+
+## 虚拟代理合并 http 请求
+
+一个文件列表，点击 checkbox 上传相应文件，如果选中过快，频繁的网络请求是一笔极大的开销
+
+可以将多次网络请求（几秒钟内的）合并成一次，减小服务器的压力
+
+```js
+const uploadFiles = function (ids) {
+  // 对 ids 数组相应的文件进行处理
+  // 发送一次请求
+}
+
+const proxyUploadFiles = (function () {
+  const ids = []
+  let timer
+
+  return function (id) {
+    ids.push(id)
+
+    if (timer) {
+      return
+    }
+
+    timer = setTimeout(() => {
+      uploadFiles(ids)
+
+      clearTimeout(timer)
+      timer = null
+      ids.length = 0
+    }, 2000)
+  }
+})()
+
+// 事件委托
+```
+
+## 缓存代理
+
+缓存计算结果：
+
+```js
+const calculate = function (...args) {
+  let result
+  // 一些消耗巨大的运算
+  return result
+}
+
+const proxyCalculate = (function () {
+  const cache = {}
+
+  return function (...args) {
+    const key = args.join(',')
+
+    if (cache[key]) {
+      return cache[key]
+    }
+
+    cache[key] = calculate(...args)
+    return cache[key]
+  }
+})()
+```
+
+进一步解耦，修改为创建代理的工厂，更有通用性
+
+```js
+const createProxy = function (fn) {
+  const cache = {}
+
+  return function (...args) {
+    const key = args.join(',')
+
+    if (cache[key]) {
+      return cache[key]
+    }
+
+    cache[key] = fn(...args)
+    return cache[key]
+  }
+}
+
+const mult = function (...args) {
+  args.reduce((current, next) => current * next)
+}
+
+const plus = function (...args) {
+  args.reduce((current, next) => current + next)
+}
+
+const proxyMult = createProxy(mult)
+const proxyPlus = createProxy(plus)
+
+console.log(proxyMult(1, 2, 3))
+console.log(proxyPlus(1, 2, 3))
+```
+
+缓存请求：
+
+略
+
+## ES6 中的代理模式
+
+[Proxy、Reflect](http://es6.ruanyifeng.com/#docs/proxy)
+
+new Proxy() 这个实例就是对象的代理
+
+## 其他代理模式
+
+* 防火墙代理：控制网络资源的访问，保护主题不让“坏人”接近。
+
+* 远程代理：为一个对象在不同的地址空间提供局部代表，在 Java 中，远程代理可以是另一个虚拟机中的对象。
+
+* 保护代理：用于对象应该有不同访问权限的情况。
+
+* 智能引用代理：取代了简单的指针，它在访问对象时执行一些附加操作，比如计算一个对象被引用的次数。
+
+* 写时复制代理：通常用于复制一个庞大对象的情况。写时复制代理延迟了复制的过程，当对象被真正修改时，才对它进行复制操作。写时复制代理是虚拟代理的一种变体，DLL（操作系统中的动态链接库）是其典型运用场景。

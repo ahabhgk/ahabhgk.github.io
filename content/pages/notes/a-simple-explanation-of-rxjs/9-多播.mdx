@@ -1,0 +1,411 @@
+---
+title: 多播
+slug: /notes/a-simple-explanation-of-rxjs/subject
+date: 2020-02-20
+description: 《深入浅出 RxJS》读书笔记
+tags:
+  - Note
+  - A Simple Explanation of RxJS
+---
+
+多播就是让一个数据流的内容被多个 Observer 订阅
+
+* Subject
+
+* BehaviorSubject
+
+* ReplaySubject
+
+* AsyncSubject
+
+## 数据流的多播
+
+* 单播
+
+* 多播
+
+* 广播
+
+广播会影响全局环境，筛选消息的责任在接收方，同时多个广播时容易混乱，所以 RxJS 不支持多播
+
+Cold Observable 无法实现多播，每次订阅都会是彼此之间不同的 Observable 对象
+
+```ts
+const oba$ = interval(1000)
+oba$.subscribe(console.log)
+sleep(3000).then(() => oba$.subscribe(console.log))
+```
+
+## Hot 数据流
+
+fromPromise、fromEvent、fromEventPattern 产生 Hot Observable，这些数据源都来自外部（DOM、Promise、EventPattern、WebSocket……），与 Observable 无关
+
+Hot Observable 实现多播，但有时 Cold Observable 也需要实现多播，这时就需要 Subject，将 Cold Observable 变为 Hot Observable
+
+## Subject
+
+为了保证 RxJS 的 Immutable 特性，Cold Observable 转换为 Hot Observable 时不能改变本身，而是产生一个新的对象，这个对象订阅 Cold Observable，同时被订阅，所以 Subject 需要有订阅和被订阅的能力（是一个 Observable 同时是一个 Observer，因此 `next*(error|complete)?`）
+
+```ts
+// 实现类似观察者模式，通过 new 出来的实例中的 next、error、complete 方法订阅 Observable
+export declare class Subject<T> extends Observable<T> implements SubscriptionLike {
+  // ...
+  observers: Observer<T>[] = []
+
+  next(value: T) {
+    this.observers.forEach((ob) => ob.next(T))
+  }
+  // error complete 类似
+}
+```
+
+### 实现多播
+
+```ts
+const subject = new Subject<number>()
+
+subject.subscribe({
+  next: (v) => console.log(`observerA: ${v}`)
+})
+subject.subscribe({
+  next: (v) => console.log(`observerB: ${v}`)
+})
+
+subject.next(1)
+subject.next(2)
+
+// Logs:
+// observerA: 1
+// observerB: 1
+// observerA: 2
+// observerB: 2
+```
+
+```ts
+const subject = new Subject<number>()
+const oba$ = interval(1000)
+oba$.subscribe(subject)
+subject.subscribe(console.log)
+sleep(3000).then(() => subject.subscribe(console.log))
+```
+
+### Subject 可以有多个上游
+
+new Subject 得到的是一个有 next、error、compete 方法的对象，同时具有 subscribe 方法进行订阅，对于 observer 的那三个方法就类似发布者一样，依次通知所有的订阅者，所以对于上游的数据 subject 实例只是调用那三个方法依次通知订阅者，不论是那个上游
+
+### Subject 错误处理
+
+Observable 内部类似这样处理 subscribe，忽略了一些其他的逻辑
+
+```ts
+try {
+  // observer.next 那些
+} catch (err) {
+  // observer.error(err)
+}
+```
+
+这里 observer 就是 subject，subject 内部使用类似 `this.observers.forEach((ob) => ob.next(data))` 处理数据
+
+subject 就是一个转接头，上游的数据通过 subject 传给下游
+
+## 多播操作符
+
+### multicast 最基本的操作符
+
+```ts
+const subject = new Subject<number>()
+// const oba$ = multicast(subject)(interval(1000))
+const oba$ = interval(1000).pipe(multicast(subject)) as ConnectableObservable<number>
+oba$.subscribe(console.log)
+sleep(3000).then(() => oba$.subscribe(console.log))
+sleep(6000).then(() => oba$.connect())
+// after 6000 ms
+// 0
+// 0
+// 1
+// 1
+// 2
+// 2
+// ...
+```
+
+multicast 返回一个 ConnectableObservable，可以通过 connect 方法控制多播的时机
+
+如果同步的数据流，通过 subject 实现多播，在 subject 订阅之前就订阅 subject，那就没有任何输出：
+
+```ts
+const source = from([1, 2, 3])
+const subject = new Subject()
+const multicasted = source.subscribe(subject)
+
+subject.subscribe({
+  next: v => console.log(`observerA: ${v}`)
+})
+subject.subscribe({
+  next: v => console.log(`observerB: ${v}`)
+})
+```
+
+如果之后订阅 subject，则会正常输出：
+
+```ts
+const source = from([1, 2, 3])
+const subject = new Subject()
+
+subject.subscribe({
+  next: v => console.log(`observerA: ${v}`)
+})
+subject.subscribe({
+  next: v => console.log(`observerB: ${v}`)
+})
+
+const multicasted = source.subscribe(subject)
+```
+
+此时就可以通过 connect 控制多播时机
+
+但是此时如果我们退订，就需要在多个订阅者都退订后，在手动退订 subject（ConnectableObservable），这样就造成逻辑冗杂，RxJS 通过 refCount 解决这一问题，refCount 就像自动对订阅者计数一样
+
+> refCount makes the multicasted Observable automatically start executing when the first subscriber arrives, and stop executing when the last subscriber leaves.
+
+之前：
+
+```ts
+const source = interval(500);
+const subject = new Subject();
+const multicasted = source.pipe(multicast(subject));
+let subscription1, subscription2, subscriptionConnect;
+
+subscription1 = multicasted.subscribe({
+  next: (v) => console.log(`observerA: ${v}`)
+});
+// We should call `connect()` here, because the first
+// subscriber to `multicasted` is interested in consuming values
+subscriptionConnect = multicasted.connect();
+
+setTimeout(() => {
+  subscription2 = multicasted.subscribe({
+    next: (v) => console.log(`observerB: ${v}`)
+  });
+}, 600);
+
+setTimeout(() => {
+  subscription1.unsubscribe();
+}, 1200);
+
+// We should unsubscribe the shared Observable execution here,
+// because `multicasted` would have no more subscribers after this
+setTimeout(() => {
+  subscription2.unsubscribe();
+  subscriptionConnect.unsubscribe(); // for the shared Observable execution
+}, 2000);
+```
+
+之后：
+
+```ts
+const source = interval(500);
+const subject = new Subject();
+const refCounted = source.pipe(multicast(subject), refCount());
+let subscription1, subscription2;
+
+// This calls `connect()`, because
+// it is the first subscriber to `refCounted`
+console.log('observerA subscribed');
+subscription1 = refCounted.subscribe({
+  next: (v) => console.log(`observerA: ${v}`)
+});
+
+setTimeout(() => {
+  console.log('observerB subscribed');
+  subscription2 = refCounted.subscribe({
+    next: (v) => console.log(`observerB: ${v}`)
+  });
+}, 600);
+
+setTimeout(() => {
+  console.log('observerA unsubscribed');
+  subscription1.unsubscribe();
+}, 1200);
+
+// This is when the shared Observable execution will stop, because
+// `refCounted` would have no more subscribers after this
+setTimeout(() => {
+  console.log('observerB unsubscribed');
+  subscription2.unsubscribe();
+}, 2000);
+
+// Logs
+// observerA subscribed
+// observerA: 0
+// observerB subscribed
+// observerA: 1
+// observerB: 1
+// observerA unsubscribed
+// observerB: 2
+// observerB unsubscribed
+```
+
+multicast 参数也可以是一个 SubjectFactory 函数，与直接使用 Subject 实例的区别在于，使用 refCount 自动退订 subject 后，之后再有订阅就没有用，因为 Subject 实例退订后生命周期结束，而使用工厂函数时会重新调用该函数，产生一个新的 Subject 实例
+
+```ts
+const coldSource$ = interval(1000).pipe(take(3))
+const tick$ = coldSource$.pipe(multicast(new Subject()), refCount())
+
+tick$.subscribe(value => console.log('observer 1: ' + value))
+
+setTimeout(() => {
+  tick$.subscribe(value => console.log('observer 2: ' + value))
+}, 1500)
+
+setTimeout(() => {
+  tick$.subscribe(value => console.log('observer 3: ' + value))
+}, 5000)
+// observer 1: 0
+// observer 1: 1
+// observer 2: 1
+// observer 1: 2
+// observer 2: 2
+```
+
+```ts
+const coldSource$ = interval(1000).pipe(take(3))
+const tick$ = coldSource$.pipe(multicast(() => new Subject()), refCount())
+
+tick$.subscribe(value => console.log('observer 1: ' + value))
+
+setTimeout(() => {
+  tick$.subscribe(value => console.log('observer 2: ' + value))
+}, 1500)
+
+setTimeout(() => {
+  tick$.subscribe(value => console.log('observer 3: ' + value))
+}, 5000)
+// observer 1: 0
+// observer 1: 1
+// observer 2: 1
+// observer 1: 2
+// observer 2: 2
+// observer 3: 0
+// observer 3: 1
+// observer 3: 2
+```
+
+selector 参数：只要指定了 selector 参数，就指定了 multicast 返回的 Observable 对象的生成方法
+
+### publish
+
+```ts
+function publish(selector) {
+  if (selector) {
+    return this.multicast(() => new Subject(), selector)
+  } else {
+    return this.multicast(new Subject())
+  }
+}
+```
+
+### share
+
+```ts
+function share() {
+  return multicast(() => new Subject()).refCount()
+}
+```
+
+## 高级多播，增强的 Subject
+
+* publishLast AsyncSubject
+
+* publishReplay ReplaySubject
+
+* publishBehavior BehaviorSubject
+
+### publishLast AsyncSubject
+
+```ts
+export function publishLast<T>(): UnaryFunction<Observable<T>, ConnectableObservable<T>> {
+  return (source: Observable<T>) => multicast(new AsyncSubject<T>())(source);
+}
+
+export class AsyncSubject<T> extends Subject<T> {
+  private value: T = null;
+  private hasNext: boolean = false;
+  private hasCompleted: boolean = false;
+
+  next(value: T): void {
+    if (!this.hasCompleted) {
+      this.value = value;
+      this.hasNext = true;
+    }
+  }
+
+  error(error: any): void {
+    if (!this.hasCompleted) {
+      super.error(error);
+    }
+  }
+
+  complete(): void {
+    this.hasCompleted = true;
+    if (this.hasNext) {
+      super.next(this.value);
+    }
+    super.complete();
+  }
+}
+```
+
+### publishReplay ReplaySubject
+
+replay 有回放的能力，只订阅一次数据源，pipe 只运行一次，把数据记录下来在吐出一遍，而 re-subscribe 是多次订阅，pipe 运行多次，把所有数据都重新产生一遍
+
+```ts
+function publishReplay(
+  bufferSize = Number.POSITIVE_INFINITY,
+  windowTime = Number.POSITIVE_INFINITY,
+) {
+  return multicast(new ReplaySubject(bufferSize, windowTime));
+}
+```
+
+```ts
+const tick$ = interval(1000).pipe(
+  take(3),
+  tap(x => console.log('source ', x)),
+)
+const sharedTick$ = (tick$.pipe(publishReplay()) as ConnectableObservable<number>).refCount()
+sharedTick$.subscribe(value => console.log('observer 1: ' + value))
+setTimeout(() => {
+  sharedTick$.subscribe(value => console.log('observer 2: ' + value))
+}, 5000)
+// source 0
+// observer 1: 0
+// source 1
+// observer 1: 1
+// source 2
+// observer 1: 2
+// 同时打印出来下面的
+// observer 2: 0
+// observer 2: 1
+// observer 2: 2
+```
+
+> tap 原来叫 do，tap 有窃听的意思，不能改变数据，但常用来触发副作用
+
+### publishBehavior BehaviorSubject
+
+```ts
+export class BehaviorSubject<T> extends Subject<T> {
+  constructor(private _value: T) {
+    super();
+  }
+  // ...
+  next(value: T): void {
+    super.next(this._value = value);
+  }
+}
+```
+
+提供一个“默认数据”，当添加 Observer 的时候，即使上游还没有吐出数据 Observer 也会立即获得这个“默认数据”；而且，这个 “默认数据” 总是会被上游吐出的最新数据替代

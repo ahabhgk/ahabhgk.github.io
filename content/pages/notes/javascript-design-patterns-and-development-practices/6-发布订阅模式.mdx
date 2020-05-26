@@ -1,0 +1,239 @@
+---
+title: 发布订阅模式
+slug: /notes/javascript-design-patterns-and-development-practices/pub-sub
+date: 2019-07-06
+description: 《JavaScript 设计模式与开发实践》读书笔记
+tags:
+  - Note
+  - JavaScript Design Patterns and Development Practices
+---
+
+发布—订阅模式又叫观察者模式，它定义对象间的一种一对多的依赖关系，当一个对象的状态发生改变时，所有依赖于它的对象都将得到通知。在JavaScript开发中，我们一般用事件模型来替代传统的发布—订阅模式。
+
+* 发布—订阅模式可以广泛应用于异步编程中，这是一种替代传递回调函数的方案。
+
+* 发布—订阅模式可以取代对象之间硬编码的通知机制，一个对象不用再显式地调用另外一个对象的某个接口。发布—订阅模式让两个对象松耦合地联系在一起，虽然不太清楚彼此的细节，但这不影响它们之间相互通信。当有新的订阅者出现时，发布者的代码不需要任何修改；同样发布者需要改变时，也不会影响到之前的订阅者。只要之前约定的事件名没有变化，就可以自由地改变它们。
+
+## DOM 上的 addEventListener 简单模拟
+
+DOM（document object module）
+
+及 document 对象，HTMLDocument 对象的一个实例
+
+在控制台中输入，查看其原型链（继承关系）：
+
+null -- Object.prototype -- EventTarget.prototype -- Node.prototype -- Document.prototype -- HTMLDocument.prototype
+
+其中 addEventListener 和 removeEventListener 在 EventTarget.prototype 对象上，所以可以在 DOM 元素上使用此方法
+
+思路是对 onevent（onclick...）方法封装
+
+```js
+EventTarget.prototype.ion = function (event, callback) {
+  // 如果没想错的话，DOM 应该有对应 `event`Callback 的一个栈，我不知道具体在哪，这里就先这样挂在实例上
+  Array.isArray(this[`${event}Callback`]) || (this[`${event}Callback`] = [])
+
+  this[`${event}Callback`].push(callback)
+
+  this[`on${event}`] = function (e) {
+    // call 保证了 callback 以 function 形式传入时，this 指向元素实例，
+    // 以箭头函数传入时，call 失效，保证 this 指向原 context
+    this[`${event}Callback`].forEach(cb => cb.call(this, e))
+  }
+}
+
+
+EventTarget.prototype.iremove = function (event, callback) {
+  this[`${event}Callback`] = this[`${event}Callback`].filter(cb => cb !== callback)
+}
+```
+
+## Promise 中的发布订阅模式
+
+这里只关注其中的发布订阅模式，不关注一些异步的处理和其他的方法，[具体实现点我]()
+
+```js
+class Promise {
+  constructor(executor) {
+    const self = this
+    self.state = 'pending'
+    self.value = undefined
+    self.reason = undefined
+    // 存放成功态函数和失败态函数的两个栈
+    self.onFulfilledCallbacks = []
+    self.onRejectedCallbacks = []
+
+    function resolve(value) {
+      if (self.state === 'pending') {
+        setTimeout(() => { // 这里加上 setTimeout 是为了保证在 executor（异步） 执行后才执行
+          self.state = 'fulfilled'
+          self.value = value
+          self.onFulfilledCallbacks.forEach(cb => cb(self.value)) // this.value 做下一个 then cb 的参数
+        }, 0)
+      }
+    }
+
+    function reject(reason) {
+      if (self.state === 'pending') {
+        setTimeout(() => { // 同上
+          self.state = 'rejected'
+          self.reason = reason
+          self.onRejectedCallbacks.forEach(cb => cb(self.reason))
+        }, 0)
+      }
+    }
+
+    try {
+      executor(resolve, reject)
+    } catch (err) {
+      reject(err)
+    }
+  }
+
+  then(onFulfilled, onRejected) {
+    if (this.state === 'pending') {
+      this.onFulfilledCallbacks.push(value => {
+        this.value = onFulfilled(value) // 通过 this.value 把上一个 then cb 执行的结果传递为下一个 then cb 的参数
+      })
+      this.onRejectedCallbacks.push(reason => {
+        this.reason = onRejected(reason)
+      })
+    }
+    return this // 实现链式 then 调用
+  }
+
+  static all(promises) {
+    //
+  }
+}
+
+
+// test
+const p = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    resolve('ha')
+  }, 1000)
+})
+p.then(r => {
+  console.log(r)
+  return 'ga'
+}).then(r => {
+  console.log(r)
+})
+```
+
+以上只是很简单的一个实现，还很不完善
+
+大体思路就是 then 方法给成功后和失败后的栈添加函数，相当于**订阅**，executer 执行中调用 resolve 或 reject，相当于**发布**，之后执行栈中的函数
+
+## Vue 中的发布订阅模式
+
+### Vue 源码中的 Dep
+
+```js
+class Dep {
+  constructor() {
+    this.subs = []
+  }
+
+  addSub(watcher) {
+    this.subs.push(watcher)
+  }
+
+  notify() {
+    this.subs.forEach(watcher => watcher.update())
+  }
+}
+```
+
+通过 addSub 方法添加 watcher 对象，由 notify 方法通知每个 watcher（订阅者），使其调用 update 方法，以此更新视图（watcher 监视可能会变化的节点，例：{{ }}、v-if... ）
+
+每个 Vue 实例都对应一个 Dep，所以其中的 subs 就是一个数组，而如果我们设计时，一个 Dep 可能观察多个对象，比如教务处人员会在学生挂科时通知他，这时让 sub 是一个对象
+
+### Vue 中一种简易的状态管理方式 eventBus（总线）
+
+有时两个非父子组件的通信，如果项目不是很大，可以用 eventBus
+
+```js
+// eventBus.js
+export default eventBus = {
+  install(Vue, options) {
+    Vue.prototype.$bus = new Vue()
+  }
+}
+
+// app.js
+import eventBus from '/eventBus.js'
+Vue.use(eventBus)
+
+// NewTodoInput.vue
+export default {
+  methods: {
+    addTodo() {
+      eventBus.$emit('add-todo', { text: this.newTodoText })
+      this.newTodoText = ''
+    }
+  }
+}
+
+// DeleteTodoButton.vue
+export default {
+  methods: {
+    deleteTodo(id) {
+      eventBus.$emit('delete-todo', id)
+    }
+  }
+}
+
+// Todos.vue
+export default {
+  created() {
+    eventBus.$on('add-todo', this.addTodo)
+    eventBus.$on('delete-todo', this.deleteTodo)
+  },
+  // 最好在组件销毁前
+  // 清除事件监听
+  beforeDestroy() {
+    eventBus.$off('add-todo', this.addTodo)
+    eventBus.$off('delete-todo', this.deleteTodo)
+  },
+  methods: {
+    addTodo(newTodo) {
+      this.todos.push(newTodo)
+    },
+    deleteTodo(todoId) {
+      this.todos = this.todos.filter(function (todo) {
+        return todo.id !== todoId
+      })
+    }
+  }
+}
+```
+
+[eventBus 状态管理](https://cn.vuejs.org/v2/guide/migration.html#dispatch-%E5%92%8C-broadcast-%E6%9B%BF%E6%8D%A2)
+
+## 必须先订阅后发布吗？
+
+可以做一个队列，储存发布的消息，订阅之后执行队列就可以实现先发布后订阅了
+
+## JavaScript 中的发布订阅模式
+
+其实传统 OOP 语言中的发布订阅模式与 Vue 中的比较像，是把订阅者传入到发布者中，Vue 源码由于代码量相对较大，用传统的模式会更易于维护，更加适合
+
+而 addEventListener 则更贴近 JavaScript 的特性：高阶函数
+
+## 优缺点
+
+优点：
+
+* 为时间上的解耦
+
+* 对象之间的解耦
+
+它的应用非常广泛，既可以用在异步编程中，也可以帮助我们完成更松耦合的代码编写。发布—订阅模式还可以用来帮助实现一些别的设计模式，比如中介者模式。从架构上来看，无论是 MVC 还是 MVVM，都少不了发布—订阅模式的参与，而且JavaScript 本身也是一门基于事件驱动的语言。
+
+缺点：
+
+* 创建订阅者本身要消耗一定的时间和内存，而且当你订阅一个消息后，也许此消息最后都未发生，但这个订阅者会始终存在于内存中。
+
+* 发布—订阅模式虽然可以弱化对象之间的联系，但如果过度使用的话，对象和对象之间的必要联系也将被深埋在背后，会导致程序难以跟踪维护和理解。特别是有多个发布者和订阅者嵌套到一起的时候，要跟踪一个bug不是件轻松的事情。
