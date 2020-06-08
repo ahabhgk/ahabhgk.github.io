@@ -1,7 +1,7 @@
 ---
 title: 从零开始
 slug: /notes/learn-you-a-haskell/start
-date: 2020-05-12
+date: 2020-06-01
 description: 《Haskell 趣学指南》读书笔记
 tags:
   - Note
@@ -183,3 +183,34 @@ zip :: [a] -> [b] -> [(a, b)]
 > rightTriangles
 [(3,4,5),(6,8,10)]
 ```
+## Sum
+
+- `not`：非
+
+- `/=`：不等
+
+- `++`： List 拼接
+
+- `'a':"bc"`：List 加入头部
+
+- `[1, 2, 3] !! 0`：取下标
+
+- `head tail last init take drop`：List 截取操作，小心空数组
+
+- `length`：取 List Length
+
+- `null`：判断 List 是否为空
+
+- `reverse`：List 逆序
+
+- `minimum maximum`：List 最大最小
+
+- `sum product`：List 求和求积
+
+- 1 \`elem\` [1, 2, 3]：判断 List 是否存在该元素
+
+- `[2, 4..10]`：Range
+
+- `[ x * 2 | x <- [1..5] ]`：List Comprehension
+
+- `(True, 1)`：Tuple
