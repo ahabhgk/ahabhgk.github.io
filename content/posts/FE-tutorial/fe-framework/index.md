@@ -539,7 +539,7 @@ Facebook 最近重构了自家的网站，使用 Atomic CSS 将主页 CSS 减少
 
 > [我们用 React 重构了 Facebook.com 的技术栈](https://www.infoq.cn/article/Kv81gRrwEV4z2eqihagm)
 
-Facebook 具体用了什么库并没有公布，但是目前最好的原子 CSS 库应该是 [tailwind](https://www.tailwindcss.cn/)
+Facebook 具体用了什么库并没有公布，但是目前开源最好的原子 CSS 库应该是 [tailwind](https://www.tailwindcss.cn/)
 
 ## 7. 构建工具
 
@@ -552,6 +552,24 @@ Webpack 适合用于打包 Web 应用，Rollup 适合用于打包库，最近新
 ## 8. SSR
 
 服务端渲染，将一部分客户端渲染压力放到服务端，服务端直接返回渲染好的 html 字符串，这样有利于首屏渲染，SEO
+
+## homework
+
+1. 用 Vue2 写一个 todolist，通过提供的 api：[jsonplaceholder](https://jsonplaceholder.typicode.com/) 的 todos api 获取初始的 todolist，之后删除完成的请求不作要求
+
+    ![todos api](./images/todos-api.png)
+
+2. 现在 Slowly Render 已经有了 HashRouter，为了更完善的使用方式，用 history api 完成 HistoryRouter 吧
+
+3. 将作业 1 用 Vue3 的 [Composition API](https://composition-api.vuejs.org/zh/api.html) 进行重构，并阅读 [Composition API 的 RFC](https://composition-api.vuejs.org/zh/)
+
+    Vue3 尝鲜方式：
+
+    - 直接用 [vite 创建 Vue3 应用](https://github.com/vitejs/vite)
+
+    - 在 vue-cli 中使用 [vue-cli-plugin-vue-next](https://github.com/vuejs/vue-cli-plugin-vue-next)
+
+    - 在 Vue2 中使用 [@vue/composition-api 插件](https://github.com/vuejs/composition-api/blob/master/README.zh-CN.md)
 
 ## ref
 
