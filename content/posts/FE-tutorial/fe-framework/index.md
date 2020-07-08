@@ -20,7 +20,7 @@ What you will get:
 
 2. 简单了解常用框架的原理
 
-3. 一个简易的前端 DSL
+3. 一个简易的前端框架
 
 4. 课后作业
 
@@ -156,7 +156,7 @@ Vue 主要使用了 template，通过 compiler 编译成渲染函数，由于它
 
 ### 2.2 JSX
 
-React 使用了 JSX，它本身就是 JS（`<div className="ui">hah</div>` 编译成 `React.createElement('div', { className: 'ui' }, hah)`），获得了远超模版的灵活性，同时 React 团队也有在探索对于 JSX 的性能优化方案
+React 使用了 JSX，它本身就是 JS（`<div className="ui">hah</div>` 编译成 `React.createElement('div', { className: 'ui' }, 'hah')`），获得了远超模版的灵活性，同时 React 团队也有在探索对于 JSX 的性能优化方案
 
 还有 JSX 非常创新的一点就是将 HTML 和 JS 放到一起，让人们重新思考将本来耦合的组件的 HTML、CSS、JS 分开写是否合适
 
@@ -168,60 +168,82 @@ React 使用了 JSX，它本身就是 JS（`<div className="ui">hah</div>` 编�
 
 我们想把 data（Model）和 UI（View）分离，自己实现一个简单很不完善的 render 函数：
 
-```js:title=slowly-render/index.js
-export const render = (App, data) => document.innnerHTML = `
-  <!DOCTYPE html>
-  <html>
-    <head>
-      <title>slowly render</title>
-    </head>
-    <body>
-      ${App(data)}
-    </body>
-  </html>
-`
-// ViewModel
-export const reactive = (App, data) => new Proxy(data, {
-  set(target, propKey, value) {
-    target[propKey] = value
-    render(App, target) // update
+```js:title=slowly-render/render.js {8,12,22-24,27-29}
+let parentDom = null
+let View = null
+let data = null
+
+const deepProxy = (target, callback) => new Proxy(target, {
+  get(target, key, receiver) {
+    const value = Reflect.get(target, key, receiver)
+    return (typeof value === 'object' && value !== null) ? deepProxy(value, callback) : value
+  },
+  set(target, key, value, receiver) {
+    const result = Reflect.set(target, key, value, receiver)
+    callback()
+    return result
   },
 })
+
+export const reactive = (model) => {
+  data = deepProxy(model, render)
+  return data
+}
+
+export const render = () => {
+  parentDom.innerHTML = View(data)
+}
+
+export const createApp = (App, model, dom) => {
+  parentDom = dom
+  View = App
+  data = model
+  return { render }
+}
 ```
 
 ```js:title=app.js
-// View（这里组件的参数可以换成更熟悉的命名：props）
+import { createApp, reactive } from 'slowly-render/render.js'
+// View，没有状态，完全是展示型组件
 const Header = (data) => `
   <header>
-    <div>${data.title}</div>
-    ${data.nav.map(e => `<nav>${e}</nav>`)}
+    <h1>${data.title}</h1>
+    ${data.keywords.map(e => `<span>${e}</span>`).join(' ')}
   </header>
 `
 const Content = (data) => `
-  <main onclick="${data.handleContentClick}">
-    ${data.content}
+  <main>
+    ${data.num}
   </main>
+  <button onclick="${data.handleDec()}"> - </button>
+  <button onclick="${data.handleInc()}"> + </button>
 `
-const App = (data) => `
-  ${Header(data.HeaderData)}
-  ${Body(data.BodyData)}
+const App = (Model) => `
+  ${Header(Model.Header)}
+  ${Content(Model.Counter)}
 `
-
-// Model
-const data = reactive(App)({
-  HeaderData: {
-    title: 'slowly render',
-    nav: ['a', 'b', 'c'],
+// Model，因为是将所有状态放到的顶层，所以兼具状态管理，相当于一个顶层的接入型组件（Container）
+const Model = reactive({
+  Header: {
+    title: 'Slowly Render',
+    keywords: ['The', 'render', 'phase', 'is', 'very', 'slow'],
   },
-  BodyData: {
-    content: 'wulawulawulawula...',
-    handleContentClick(e) {
-      console.log(`On Content Click Event: ${e}`)
+  Counter: {
+    num: 0,
+    // 因为是通过 HTML inline 的方式绑定的事件，需要将事件处理函数放到 window 上，然后返回函数名
+    handleDec() {
+      window.handleDec = () => Model.Counter.num -= 1
+      return 'handleDec()'
+    },
+    handleInc() {
+      window.handleInc = () => Model.Counter.num += 1
+      return 'handleInc()'
     },
   },
 })
 
-render(App, data) // mount
+const rootDom = document.getElementById('root')
+createApp(App, Model, rootDom).render() // mount
 ```
 
 当然这会导致每次 data 改变就会触发 document.innerHTML 整体的重新渲染，引发回流重绘，有巨大的性能问题，如何解决就成了我们的问题
@@ -258,7 +280,7 @@ Vue3 则是在 Vue2 的基础上将 template 编译优化进行到了极致，�
 
 ### 3.2 细粒度绑定更新
 
-Vue1.0、Svelte、SlowlyRender（粗粒度绑定更新 🐶）
+Vue1.0、Svelte、Slowly Render（粗粒度绑定更新 🐶）
 
 看看 Svelte 是如何实现的
 
@@ -393,69 +415,78 @@ Relay、Apollo Client
 
 对于 hash 来说，只是控制 url 的 hash，并不会向后端发送新的请求；对于 history 来说，改变的是 url 的 path 等部分，会向后端发送请求，为了防止后端返回给你 404，就需要[对服务器进行配置](https://router.vuejs.org/zh/guide/essentials/history-mode.html)
 
-```js:title=slowly-render/router.js
+```js:title=slowly-render/router.js {3,8-11,20-22,26}
+import { render } from './render.js'
+
 let currentRouterView = () => ''
+let base = ''
 
-export class HashRouter {
-  constructor(routes) {
-    this.routes = routes.reduce((routes, route) => routes[route.path] = route.component, {})
-    this.bindEvent()
-  }
+export const createHashRouter = (baseUrl, routes) => {
+  base = baseUrl
+  const routesMap = new Map() // JS 中 Map 可以实现 LRU 算法
+  routes.forEach((route) => {
+    routesMap.set(route.path, route.component)
+  })
 
-  go(path) {
-    if (this.routes[path]) {
+  const go = (path) => {
+    if (routesMap.has(path)) {
       window.location.hash = path
-    } else throw new Error('url has not setted.')
+    } else throw new Error('url is not exist.')
   }
 
-  bindEvent() {
-    const handleHashChange = e => {
-      const path = window.location.hash.slice(1) // #/about => /about
-      currentRouterView = this.routes[path]
-    }
-
-    window.addEventListener('load', handleHashChange)
-    window.addEventListener('hashchange', handleHashChange)
+  const handleHashChange = e => {
+    const path = window.location.hash.slice(1) // #/about => /about
+    currentRouterView = routesMap.get(path ? path : '/') // 处理 url 没有 hash 时当作首页处理，127.0.0.1/ => 127.0.0.1/#/
+    render()
   }
+
+  window.addEventListener('load', handleHashChange)
+  window.addEventListener('hashchange', handleHashChange)
+
+  return { go }
+}
+
+export const createHistoryRouter = (baseUrl, routes) => {
+  // TODO: homework
 }
 
 export const RouterView = (props) => currentRouterView(props)
-export const RouterLink = (props) => `<a href="/#${props.url}">${props.text}</a>`
+export const RouterLink = (props) => `<a href="${base}${props.url}">${props.text}</a>`
 ```
 
 ```js:title=app.js
-import { render, reactive } from 'slowly-render'
-import { HashRouter, RouterView, RouterLink } from 'slowly-render/router'
-import { data } from './model'
+import { createApp, render, reactive } from 'slowly-render/render.js'
+import { createHashRouter, RouterView, RouterLink } from 'slowly-render/router.js'
 
-const router = new HashRouter([
+const Home = (props) => `
+  <h1>Home Page</h1>
+  <button onclick="${props.handleGoAbout()}">go to about page</button>
+`
+const About = (props) => `<h1>About Page</h1>`
+const App = (Model) => `
+  ${RouterLink({ url: '/', text: 'home' })}
+  ${RouterLink({ url: '/about', text: 'about' })}
+  <div>
+    ${RouterView(Model.Home)}
+  </div>
+`
+
+const router = createHashRouter('/demo/hashRouter/#', [
   { path: '/', component: Home },
   { path: '/about', component: About },
 ])
 
-const data = reactive({
-  HomeData: {
+const Model = reactive({
+  Home: {
     handleGoAbout() {
-      router.go('/about') // 命令式路由跳转
+      window.handleGoAbout = () => router.go('/about') // 命令式路由跳转
+      return 'handleGoAbout()'
     },
   },
 })
 
-const Home = (props) => `
-  <h1>Home Page</h1>
-  <button onclick="${props.handleGoAbout}">go to about page</button>
-`
-const About = (props) => `<h1>About Page</h1>`
-// 其实 data 就是我们的全局状态管理
-const App = (data) => `
-  ${RouterLink({ url: '/', text: 'home' })}
-  ${RouterLink({ url: '/about', text: 'about' })}
-  <div>
-    ${RouterView(data.HomeData)}
-  </div>
-`
-
-render(App, data)
+const rootDom = document.getElementById('root')
+createApp(App, Model, rootDom).render() // mount
 ```
 
 除了简单的路由跳转至外，一个完整的前端路由还有很多需要我们考虑，比如重定向、路由跳转钩子、页面 data 的 keep alive
@@ -527,11 +558,54 @@ Vue 的 `<style scope lang="scss">` 就是借鉴于此通过编译然后经过�
 
 ### 6.2 CSS in JS
 
-这是一种很激进的方案，完全抛弃 CSS，将所有样式通过 JS 来写，用 JS 的模块化和编程能力解决 CSS 的这两个问题，但是这样使用不了原有的 Post CSS 生态，但是 Post CSS 工具也是用 JS 来写的，也可以通过 JS 解决
+```js:title=slowly-render/styled.js {1,3-4,7,15}
+let uuid = 0
+
+const styleElement = document.createElement('style')
+document.head.appendChild(styleElement)
+
+export const styled = (styles) => {
+  uuid += 1
+
+  styleElement.textContent += `
+    .styled-${uuid} {
+      ${Object.entries(styles).reduce((styles, [key, value]) => styles += `${key}: ${value};`, '')}
+    }
+  `
+
+  return `styled-${uuid}`
+}
+```
+
+```js:title=app.js
+import { createApp, styled } from '../../src/index.js'
+
+const headerStyles = styled({
+  color: 'red',
+})
+
+const mainStyles = styled({
+  'font-size': '30px',
+})
+
+const App = () => `
+  <header class="${headerStyles}">
+    <h1>Rendering My Styles</h1>
+  </header>
+  <main class="${mainStyles}">
+    styling...
+  </main>
+`
+
+const rootDom = document.getElementById('root')
+createApp(App, null, rootDom).render()
+```
+
+这是一种很激进的方案，完全抛弃 CSS，将所有样式通过 JS 来写，用 JS 解决 CSS 的这两个问题，但是这样使用不了原有的 CSS 生态，但是处理 CSS 的工具也是用 JS 来写的，也可以通过 JS 解决
 
 目前缺点之一是没有一个具体的标准，各种 CSS-in-JS 库写法都有区别
 
-推荐扩展文章：[CSS in JS 的好与坏](https://zhuanlan.zhihu.com/p/103522819)、[vjeux/React: Css in JS](https://speakerdeck.com/vjeux/react-css-in-js)、[A Unified Styling Language](https://medium.com/seek-blog/a-unified-styling-language-d0c208de2660)
+推荐扩展文章：[CSS in JS 的好与坏](https://zhuanlan.zhihu.com/p/103522819)、[vjeux/React: CSS in JS](https://speakerdeck.com/vjeux/react-css-in-js)、[A Unified Styling Language](https://medium.com/seek-blog/a-unified-styling-language-d0c208de2660)
 
 ### 6.3 原子 CSS
 
@@ -559,7 +633,7 @@ Webpack 适合用于打包 Web 应用，Rollup 适合用于打包库，最近新
 
     ![todos api](./images/todos-api.png)
 
-2. 现在 Slowly Render 已经有了 HashRouter，为了更完善的使用方式，用 history api 完成 HistoryRouter 吧（要求使用方式同 HashRouter）
+2. 现在 [Slowly Render](https://github.com/ahabhgk/slowly-render) 已经有了 HashRouter，为了更完善的使用方式，用 history api 完成 HistoryRouter 吧（要求使用方式同 HashRouter）
 
 3. 将作业 1 用 Vue3 的 [Composition API](https://composition-api.vuejs.org/zh/api.html) 进行重构，并阅读 [Composition API 的 RFC](https://composition-api.vuejs.org/zh/)
 
