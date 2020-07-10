@@ -447,7 +447,7 @@ export const createHashRouter = (baseUrl, routes) => {
 }
 
 export const createHistoryRouter = (baseUrl, routes) => {
-  // TODO: homework
+  // homework :P
 }
 
 export const RouterView = (props) => currentRouterView(props)
@@ -544,7 +544,7 @@ export default function App() {
 
 CSS 两大问题：
 
-1. 模块化
+1. 模块化（模块之间的样式不会被污染）
 
 2. 编程能力
 
@@ -554,12 +554,80 @@ CSS 两大问题：
 
 为了解决 CSS 模块化的问题，可以通过配置打包工具使用 CSS Module 解决，对于 CSS 编程能力的提升，可以使用 SCSS、LESS 等预处理器，因为都是在打包工具上进行配置，还可以完美结合 Post CSS
 
-Vue 的 `<style scope lang="scss">` 就是借鉴于此通过编译然后经过打包工具预处理和 Post CSS 处理得到最终样式
+Vue 的 `<style scope lang="scss">` 就是借鉴于此通过编译实现模块化然后经过 Vue Loader 预处理和 Post CSS 处理得到最终样式
+
+```vue
+<style scoped>
+.example {
+  color: red;
+}
+</style>
+
+<template>
+  <div class="example">hi</div>
+</template>
+```
+
+经过编译：
+
+```vue {2,8}
+<style>
+.example[data-v-f3f3eg9] {
+  color: red;
+}
+</style>
+
+<template>
+  <div class="example" data-v-f3f3eg9>hi</div>
+</template>
+```
+
+但是 Vue Loader 进行的编译个人认为并没有完美解决模块化的问题，如果父组件中的样式添加了 scoped，子组件“继承”这个 scope
+
+```vue:title=App.vue
+<template>
+  <div class="root"><Child /></div>
+</template>
+
+<style scoped>
+.root { display: flex; }
+</style>
+```
+
+```vue:title=Child.vue
+<template>
+  <div class="root">Oops!</div>
+</template>
+
+<style scoped>
+.root { display: inline block; }
+</style>
+```
+
+经过编译：
+
+![vue scoped style](./images/vue-scoped-style.png)
+
+比较有影响的就是对于基础组件的编写，父组件中已经提供了一种 shadow 子组件样式的方式（`.a >>> .b`），而现在又是一种 shadow 掉 style 的方式，为了防止这种方式进行的破坏，就又要引入 BEM 的负担
+
+Vue 官方认为这个是个 feature，也早就有（27 Aug 2017）相关的 [issue](https://github.com/vuejs/vue-loader/issues/957) 提出，要求 scoped 影响到子组件的可选的
+
+对于 scoped 官方也有一种替代方式，就是使用 CSS Module 解决模块化
+
+```vue {2}
+<template>
+  <p :class="$style.red">red red red...</p>
+</template>
+
+<style module>
+.red { color: red; }
+</style>
+```
 
 ### 6.2 CSS in JS
 
 ```js:title=slowly-render/styled.js {1,3-4,7,15}
-let uuid = 0
+let uuid = 0 // or use hash
 
 const styleElement = document.createElement('style')
 document.head.appendChild(styleElement)
