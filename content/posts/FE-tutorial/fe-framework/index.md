@@ -677,6 +677,8 @@ createApp(App, null, rootDom).render()
 
 ### 6.3 原子 CSS
 
+![Atomic CSS](./images/atomic-css.png)
+
 Facebook 最近重构了自家的网站，使用 Atomic CSS 将主页 CSS 减少 80%，同时还添加了 Dark Mode
 
 > [我们用 React 重构了 Facebook.com 的技术栈](https://www.infoq.cn/article/Kv81gRrwEV4z2eqihagm)
