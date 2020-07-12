@@ -47,8 +47,7 @@ class Promise {
     }
     try {
       fn(resolve, reject)
-    }
-    catch (e) {
+    } catch (e) {
       reject(e)
     }
   }
@@ -62,30 +61,25 @@ class Promise {
           try {
             let result = onFulfilled(this.value)
             resolvePromise(bridgePromise, result, resolve, reject)
-          }
-          catch (e) {
+          } catch (e) {
             reject(e)
           }
         }, 0)
-      }
-      else if (this.status === REJECTED) {
+      } else if (this.status === REJECTED) {
         setTimeout(() => {
           try {
             let result = onRejected(this.reason)
             resolvePromise(bridgePromise, result, resolve, reject)
-          }
-          catch (e) {
+          } catch (e) {
             reject(e)
           }
         }, 0)
-      }
-      else if (this.status === PENDING) {
+      } else if (this.status === PENDING) {
         this.onFulfilledCallbacks.push(() => {
           try {
             let result = onFulfilled(this.value)
             resolvePromise(bridgePromise, result, resolve, reject)
-          }
-          catch (e) {
+          } catch (e) {
             reject(e)
           }
         })
@@ -93,8 +87,7 @@ class Promise {
           try {
             let result = onRejected(this.reason)
             resolvePromise(bridgePromise, result, resolve, reject)
-          }
-          catch (e) {
+          } catch (e) {
             reject(e)
           }
         })

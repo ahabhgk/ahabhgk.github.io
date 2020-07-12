@@ -349,7 +349,7 @@ Promise 作为 async function 中的异步最小单位通过 await 进行传递�
 
 // TODO: RxJS 与 async 区别，RxJS 理念等
 
-### 3.6 🔑 the keys
+### 3.6 🔑 the key
 
 异步的关键就在于调用 callback 的时机，因为我们不知道异步操作需要多少时间，我们自然也就不知道何时调用异步之后的操作，所以我们通过 callback 将之后操作的控制权交给异步操作，实现控制反转，在异步操作完成之后自动调用 callback，就完成了在合适的时机进行合适的操作
 
