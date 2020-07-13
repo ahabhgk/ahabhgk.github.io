@@ -57,3 +57,131 @@ var coinChange = function(coins, amount) {
   return (dp[amount] === amount + 1) ? -1 : dp[amount]
 };
 ```
+
+### [96. 不同的二叉搜索树](https://leetcode-cn.com/problems/unique-binary-search-trees/)
+
+假设 n 个节点存在的二叉搜索树有 G(n) 种，f(i) 为以 i 为根的二叉搜索树的个数
+
+$$G(n)=f(1)+f(2)+f(3)+...+f(n)$$
+
+$$f(i)=G(i-1)*G(n-i)$$
+
+得到：
+
+$$G(n) = \sum_{i=1}^n G(i-1) * G(n-i)$$
+
+递归法：
+
+```js
+/**
+ * @param {number} n
+ * @return {number}
+ */
+let memo = [1, 1]
+var numTrees = function(n) {
+  if (m = memo[n]) return m
+  let res = 0
+  for (let i = 1; i <= n; i++) {
+    res += numTrees(i - 1) * numTrees(n - i) // 子问题
+  }
+  memo[n] = res
+  return res
+};
+```
+
+迭代法：
+
+```js
+/**
+ * @param {number} n
+ * @return {number}
+ */
+var numTrees = function(n) {
+  let dp = new Array(n + 1).fill(0)
+  dp[0] = 1, dp[1] = 1
+  for (let m = 2; m <= n; m++) { // 2 ～ n 的解
+    for (let i = 1; i <= m; i++) {
+      dp[m] += dp[i - 1] * dp[m - i] // 子问题
+    }
+  }
+  return dp[n]
+};
+```
+
+### [剑指 Offer 14- II. 剪绳子 II](https://leetcode-cn.com/problems/jian-sheng-zi-ii-lcof/)
+
+先看不需要求模的版本
+
+```js
+/**
+ * @param {number} n
+ * @return {number}
+ */
+var cuttingRope = function(n) {
+  let dp = new Array(n + 1).fill(0)
+  ;[dp[0], dp[1]] = [0, 1]
+  for (let i = 2; i <= n; i++) { // 自下而上，先求 0 1 2... 的结果，求上去得到 n 的
+    for (let j = 1; j <= i; j++) { // 剪多长
+      dp[i] = Math.max(dp[i], dp[i - j] * j, (i - j) * j) // 剪了还剪、剪了就不剪了
+    }
+  }
+  return dp[n]
+};
+```
+
+但是在需要求模时就不行了，因为 Math.max 不能正确比较出经过求模后的原来的最大值，如果先比较后求模又会溢出
+
+所以可以用贪心：因为 1 和任何一个更大的数就有更大的，2 可以，3 可以，4 拆成两个 2 效果一样，5 可以拆成 2 * 3
+
+```js
+/**
+ * @param {number} n
+ * @return {number}
+ */
+var cuttingRope = function(n) {
+  if (n < 3) return 1
+  if (n === 3) return 2
+  let res = 1
+  let mod = 1000000007
+  while (n > 4) {
+    res = (res * 3) % mod
+    n -= 3
+  }
+  return (res * n) % mod
+};
+```
+
+对此就是求 3 的幂，可以使用快速幂进行进一步优化
+
+因为 $(xy) \mod p = [(x \mod p) * (y \mod p)] \mod p$，所以可以同时取余防止溢出
+
+```js
+// 递归快速幂
+function qpow(a, n) { // a ** n
+  if (n === 1) return 1
+  if (n % 2 === 1) return qpow(a, n - 1) * a % MOD
+  let tmp = qpow(a, Math.floor(n / 2) % MOD)
+  return tmp * tmp % MOD
+}
+```
+
+```js
+// 迭代快速幂，7 ^ 10 = 7 ^ 0b1010 = 7 ^ 0b1000 * 7 ^ 0b10
+function qpow(a, n) {
+  let res = 1
+  while (n > 0) {
+    if ((n & 1) === 1) {
+      res *= a
+      res = res % MOD
+    }
+    a *= a // 相当于左移
+    a = a % MOD
+    n = n >> 1
+  }
+  return res
+}
+```
+
+![qpow](./images/qpow.png)
+
+因为取余是为了防溢出，所以 JS 也可以使用 BigInt，最后取余（具体类似于前两个代码块版本，只不过 number 全都变为 BigInt，最后再取余）
