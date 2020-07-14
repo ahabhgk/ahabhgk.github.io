@@ -6,14 +6,14 @@ slug: /notes/leetcoding
 ## 记录
 
 | 2020-07-14 | 2020-07-16 | 2020-07-19 | 2020-07-23 | 2020-07-28 |
-|--|:--:|--|--|--|
+|--|:--:|:--:|:--:|:--:|
 | [283. 移动零](https://leetcode-cn.com/problems/move-zeroes/) | ✅ | | | |
 | [11. 盛最多水的容器](https://leetcode-cn.com/problems/container-with-most-water/) | | | | |
 | [1. 两数之和](https://leetcode-cn.com/problems/two-sum/) | | | | |
 | [15. 三数之和](https://leetcode-cn.com/problems/3sum/) | | | | |
 
 <!-- | 2020- | 2020- | 2020- | 2020- | 2020- |
-|--|--|--|--|--|
+|--|:--:|:--:|:--:|:--:|
 | []() | | | | |
 | []() | | | | |
 | []() | | | | |
