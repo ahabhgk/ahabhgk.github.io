@@ -3,6 +3,69 @@ title: Notes - Leetcoding
 slug: /notes/leetcoding
 ---
 
+## 记录
+
+| 2020-07-14 | 2020-07-16 | 2020-07-19 | 2020-07-23 | 2020-07-28 |
+|:--:|:--:|:--:|:--:|:--:|
+| [283. 移动零](https://leetcode-cn.com/problems/move-zeroes/) | - [x] Eat | | | |
+| [11. 盛最多水的容器](https://leetcode-cn.com/problems/container-with-most-water/) | | | | |
+| [1. 两数之和](https://leetcode-cn.com/problems/two-sum/) | | | | |
+| [15. 三数之和](https://leetcode-cn.com/problems/3sum/) | | | | |
+
+| 2020- | 2020- | 2020- | 2020- | 2020- |
+|:--:|:--:|:--:|:--:|:--:|
+| []() | | | | |
+| []() | | | | |
+| []() | | | | |
+| []() | | | | |
+
+## 数组、链表、跳表
+
+### [283. 移动零](https://leetcode-cn.com/problems/move-zeroes/)
+
+双指针
+
+### [11. 盛最多水的容器](https://leetcode-cn.com/problems/container-with-most-water/)
+
+双指针，left > right 时，如果 left 不论右移多少，都比原来小，所以可以从两边双指针试
+
+### [1. 两数之和](https://leetcode-cn.com/problems/two-sum/)
+
+利用 Map 对一遍历过的数进行存储，如果 `map.get(target - nums[i]) != null` 就得到结果
+
+### [15. 三数之和](https://leetcode-cn.com/problems/3sum/)
+
+先排序，排序是为了去重，`nums[i] === nums[i - 1]` 就 continue，然后对于 `i + 1` 和 `nums.length - 1` 做双指针，当三数之和为 0 时就移动双指针，sum < 0 时就移动左指针，sum > 0 时就移动右指针
+
+```ts
+function threeSum(nums: number[]): number[][] {
+  let res: number[][] = []
+  if (nums.length < 3) return res
+  nums.sort((a, b) => a - b)
+  for (let i = 0; i < nums.length - 2; i++) {
+    if (nums[i] > 0) break // 最小的数大于 0 就可以直接结束了，三个大于 0 的数之和必大于 0
+    if (nums[i] === nums[i - 1]) continue // 去重
+    let left = i + 1
+    let right = nums.length - 1
+    while (left < right) {
+      let sum = nums[i] + nums[left] + nums[right]
+      if (sum === 0) {
+        res.push([nums[i], nums[left], nums[right]])
+        while (left < right && nums[left + 1] === nums[left]) left += 1 // 去重
+        while (left < right && nums[right - 1] === nums[right]) right -= 1 // 去重
+        left += 1
+        right -= 1
+      } else if (sum < 0) {
+        left += 1
+      } else if (sum > 0) {
+        right -= 1
+      }
+    }
+  }
+  return res
+};
+```
+
 ## 动态规划
 
 ### [322. 零钱兑换](https://leetcode-cn.com/problems/coin-change/)
