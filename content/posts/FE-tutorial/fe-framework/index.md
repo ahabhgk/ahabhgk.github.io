@@ -405,7 +405,8 @@ Vue 和 React 的数据流都是单向的，只能通过 props 从父组件传�
 
 Relay、Apollo Client
 
-不懂……
+> [Building The New Facebook With React and Relay | Ashley Watkins](https://www.youtube.com/watch?v=KT3XKDBZW7M)
+> [Data Fetching With Suspense In Relay | Joe Savona](https://www.youtube.com/watch?v=Tl0S7QkxFE4)
 
 ## 5. 前端路由
 
@@ -679,9 +680,9 @@ createApp(App, null, rootDom).render()
 
 ![Atomic CSS](./images/atomic-css.png)
 
-Facebook 最近重构了自家的网站，使用 Atomic CSS 将主页 CSS 减少 80%，同时还添加了 Dark Mode
+Facebook 最近重构了自家的网站，使用 CSS-in-JS 将代码编译成 Atomic CSS，主页 CSS 减少 80%，同时还添加了 Dark Mode
 
-> [我们用 React 重构了 Facebook.com 的技术栈](https://www.infoq.cn/article/Kv81gRrwEV4z2eqihagm)
+> [Building the New Facebook with React and Relay | Frank Yan](https://www.youtube.com/watch?v=9JZHodNR184)
 
 Facebook 具体用了什么库并没有公布，但是目前开源最好的原子 CSS 库应该是 [tailwind](https://www.tailwindcss.cn/)
 

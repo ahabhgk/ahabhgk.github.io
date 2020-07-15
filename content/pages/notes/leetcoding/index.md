@@ -12,6 +12,13 @@ slug: /notes/leetcoding
 | [1. 两数之和](https://leetcode-cn.com/problems/two-sum/) | | | | |
 | [15. 三数之和](https://leetcode-cn.com/problems/3sum/) | | | | |
 
+| 2020-07-15 | 2020-17 | 2020-20 | 2020-24 | 2020-29 |
+|--|:--:|:--:|:--:|:--:|
+| [206. 反转链表](https://leetcode-cn.com/problems/reverse-linked-list/) | | | | |
+| [92. 反转链表 II](https://leetcode-cn.com/problems/reverse-linked-list-ii/) | | | | |
+| [24. 两两交换链表中的节点](https://leetcode-cn.com/problems/swap-nodes-in-pairs/) | | | | |
+| [141. 环形链表](https://leetcode-cn.com/problems/linked-list-cycle/) | | | | |
+
 <!-- | 2020- | 2020- | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
 | []() | | | | |
@@ -65,6 +72,22 @@ function threeSum(nums: number[]): number[][] {
   return res
 };
 ```
+
+### [206. 反转链表](https://leetcode-cn.com/problems/reverse-linked-list/)
+
+迭代、递归
+
+### [92. 反转链表 II](https://leetcode-cn.com/problems/reverse-linked-list-ii/)
+
+迭代，双指针保留 m 和 m - 1，m 到 n 反转后进行连接
+
+### [24. 两两交换链表中的节点](https://leetcode-cn.com/problems/swap-nodes-in-pairs/)
+
+迭代、递归
+
+### [141. 环形链表](https://leetcode-cn.com/problems/linked-list-cycle/)
+
+双指针、哈希表
 
 ## 动态规划
 
