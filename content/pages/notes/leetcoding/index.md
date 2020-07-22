@@ -5,19 +5,58 @@ slug: /notes/leetcoding
 
 ## 记录
 
-| 2020-07-14 | 2020-07-16 | 2020-07-19 | 2020-07-23 | 2020-07-28 |
+| 2020-07-14 | 2020-07-17 | 2020-07-19 | 2020-07-23 | 2020-07-28 |
 |--|:--:|:--:|:--:|:--:|
-| [283. 移动零](https://leetcode-cn.com/problems/move-zeroes/) | ✅ | | | |
-| [11. 盛最多水的容器](https://leetcode-cn.com/problems/container-with-most-water/) | | | | |
-| [1. 两数之和](https://leetcode-cn.com/problems/two-sum/) | | | | |
-| [15. 三数之和](https://leetcode-cn.com/problems/3sum/) | | | | |
+| [283. 移动零](https://leetcode-cn.com/problems/move-zeroes/) | ✅ | ✅ | | |
+| [11. 盛最多水的容器](https://leetcode-cn.com/problems/container-with-most-water/) | ✅ | ✅ | | |
+| [1. 两数之和](https://leetcode-cn.com/problems/two-sum/) | ✅ | ✅ | | |
+| [15. 三数之和](https://leetcode-cn.com/problems/3sum/) | ✅ | ✅ | | |
 
-| 2020-07-15 | 2020-17 | 2020-20 | 2020-24 | 2020-29 |
+> 16 号 ✌️ 跟 LJ 去修电脑，吃了小吃街嘻嘻
+
+| 2020-07-15 | 2020-07-17 | 2020-07-20 | 2020-07-24 | 2020-07-29 |
 |--|:--:|:--:|:--:|:--:|
-| [206. 反转链表](https://leetcode-cn.com/problems/reverse-linked-list/) | | | | |
-| [92. 反转链表 II](https://leetcode-cn.com/problems/reverse-linked-list-ii/) | | | | |
-| [24. 两两交换链表中的节点](https://leetcode-cn.com/problems/swap-nodes-in-pairs/) | | | | |
-| [141. 环形链表](https://leetcode-cn.com/problems/linked-list-cycle/) | | | | |
+| [206. 反转链表](https://leetcode-cn.com/problems/reverse-linked-list/) | ✅ | ✅ | | |
+| [92. 反转链表 II](https://leetcode-cn.com/problems/reverse-linked-list-ii/) | ✅ | ✅ | | |
+| [24. 两两交换链表中的节点](https://leetcode-cn.com/problems/swap-nodes-in-pairs/) | ✅ | ✅ | | |
+| [141. 环形链表](https://leetcode-cn.com/problems/linked-list-cycle/) | ✅ | ✅ | | |
+
+| 2020-07-17 | 2020-07-19 | 2020-07-22 | 2020-07-26 | 2020-07-31 |
+|--|:--:|:--:|:--:|:--:|
+| [142. 环形链表 II](https://leetcode-cn.com/problems/linked-list-cycle-ii/) | ✅ | | | |
+| [25. K 个一组翻转链表](https://leetcode-cn.com/problems/reverse-nodes-in-k-group/) | ✅ | | | |
+| [20. 有效的括号](https://leetcode-cn.com/problems/valid-parentheses/) | ✅ | | | |
+| [155. 最小栈](https://leetcode-cn.com/problems/min-stack/) | ✅ | | | |
+
+| 2020-07-18 | 2020-07-20 | 2020-07-23 | 2020-07-27 | 2020-08-01 |
+|--|:--:|:--:|:--:|:--:|
+| [622. 设计循环队列](https://leetcode-cn.com/problems/design-circular-queue/) | ✅ | | | |
+| [641. 设计循环双端队列](https://leetcode-cn.com/problems/design-circular-deque/) | ✅ | | | |
+| [84. 柱状图中最大的矩形](https://leetcode-cn.com/problems/largest-rectangle-in-histogram/) | ✅ | | | |
+| [239. 滑动窗口最大值](https://leetcode-cn.com/problems/sliding-window-maximum/) | ✅ | | | |
+
+| 2020-07-19 | 2020-07-21 | 2020-07-24 | 2020-07-28 | 2020-08-02 |
+|--|:--:|:--:|:--:|:--:|
+| [242. 有效的字母异位词](https://leetcode-cn.com/problems/valid-anagram/) | ✅ | | | |
+| [49. 字母异位词分组](https://leetcode-cn.com/problems/group-anagrams/) | ✅ | | | |
+| [94. 二叉树的中序遍历](https://leetcode-cn.com/problems/binary-tree-inorder-traversal/) | ✅ | | | |
+| [144. 二叉树的前序遍历](https://leetcode-cn.com/problems/binary-tree-preorder-traversal/) | ✅ | | | |
+
+| 2020-07-20 | 2020-07-22 | 2020-07-25 | 2020-07-29 | 2020-08-03 |
+|--|:--:|:--:|:--:|:--:|
+| [590. N叉树的后序遍历](https://leetcode-cn.com/problems/n-ary-tree-postorder-traversal/) | | | | |
+| [589. N叉树的前序遍历](https://leetcode-cn.com/problems/n-ary-tree-preorder-traversal/) | | | | |
+| [429. N叉树的层序遍历](https://leetcode-cn.com/problems/n-ary-tree-level-order-traversal/) | | | | |
+| [22. 括号生成](https://leetcode-cn.com/problems/generate-parentheses/) | | | | |
+
+| 2020-07-21 | 2020-07-23 | 2020-07-26 | 2020-07-30 | 2020-08-04 |
+|--|:--:|:--:|:--:|:--:|
+| [226. 翻转二叉树](https://leetcode-cn.com/problems/invert-binary-tree/) | | | | |
+| [98. 验证二叉搜索树](https://leetcode-cn.com/problems/validate-binary-search-tree/) | | | | |
+| [104. 二叉树的最大深度](https://leetcode-cn.com/problems/maximum-depth-of-binary-tree/) | | | | |
+| [111. 二叉树的最小深度](https://leetcode-cn.com/problems/minimum-depth-of-binary-tree/) | | | | |
+
+> 22 号 ✌️ 去拿电脑了，生产力回来了，LJ 去超市跟零食告别 👋
 
 <!-- | 2020- | 2020- | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
