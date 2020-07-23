@@ -156,7 +156,7 @@ slug: /notes/leetcoding
 
 - [104. 二叉树的最大深度](https://leetcode-cn.com/problems/maximum-depth-of-binary-tree/)
 
-- [111. 二叉树的最小深度](https://leetcode-cn.com/problems/minimum-depth-of-binary-tree/)
+- [111. 二叉树的最小深度](https://leetcode-cn.com/problems/minimum-depth-of-binary-tree/)：递归（DFS）、迭代（BFS 层序遍历、DFS）
 
 ## 动态规划
 
