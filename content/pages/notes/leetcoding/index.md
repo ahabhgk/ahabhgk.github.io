@@ -57,6 +57,7 @@ slug: /notes/leetcoding
 | [111. 二叉树的最小深度](https://leetcode-cn.com/problems/minimum-depth-of-binary-tree/) | ✅ | | |
 
 > 22 号 ✌️ 去拿电脑了，生产力回来了，LJ 去超市跟零食告别 👋
+>
 > 开始写项目了，后面随缘刷题了，等写好项目再好好刷
 
 | 2020-07-28 | 2020- | 2020- | 2020- | 2020- |
