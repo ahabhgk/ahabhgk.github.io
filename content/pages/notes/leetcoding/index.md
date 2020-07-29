@@ -14,12 +14,12 @@ slug: /notes/leetcoding
 
 > 16 号 ✌️ 跟 LJ 去修电脑，吃了小吃街嘻嘻
 
-| 2020-07-15 | 2020-07-17 | 2020-07-20 | 2020-07-24 |
+| 2020-07-15 | 2020-07-17 | 2020-07-20 | 2020-07-27 |
 |--|:--:|:--:|:--:|:--:|
-| [206. 反转链表](https://leetcode-cn.com/problems/reverse-linked-list/) | ✅ | ✅ | |
-| [92. 反转链表 II](https://leetcode-cn.com/problems/reverse-linked-list-ii/) | ✅ | ✅ | |
-| [24. 两两交换链表中的节点](https://leetcode-cn.com/problems/swap-nodes-in-pairs/) | ✅ | ✅ | |
-| [141. 环形链表](https://leetcode-cn.com/problems/linked-list-cycle/) | ✅ | ✅ | |
+| [206. 反转链表](https://leetcode-cn.com/problems/reverse-linked-list/) | ✅ | ✅ | ✅ |
+| [92. 反转链表 II](https://leetcode-cn.com/problems/reverse-linked-list-ii/) | ✅ | ✅ | ✅ |
+| [24. 两两交换链表中的节点](https://leetcode-cn.com/problems/swap-nodes-in-pairs/) | ✅ | ✅ | ✅ |
+| [141. 环形链表](https://leetcode-cn.com/problems/linked-list-cycle/) | ✅ | ✅ | ✅ |
 
 | 2020-07-17 | 2020-07-19 | 2020-07-22 | 2020-07-26 |
 |--|:--:|:--:|:--:|:--:|
@@ -37,17 +37,17 @@ slug: /notes/leetcoding
 
 | 2020-07-19 | 2020-07-21 | 2020-07-24 | 2020-07-28 |
 |--|:--:|:--:|:--:|:--:|
-| [242. 有效的字母异位词](https://leetcode-cn.com/problems/valid-anagram/) | ✅ | | |
-| [49. 字母异位词分组](https://leetcode-cn.com/problems/group-anagrams/) | ✅ | | |
-| [94. 二叉树的中序遍历](https://leetcode-cn.com/problems/binary-tree-inorder-traversal/) | ✅ | | |
-| [144. 二叉树的前序遍历](https://leetcode-cn.com/problems/binary-tree-preorder-traversal/) | ✅ | | |
+| [242. 有效的字母异位词](https://leetcode-cn.com/problems/valid-anagram/) | ✅ | ✅ | |
+| [49. 字母异位词分组](https://leetcode-cn.com/problems/group-anagrams/) | ✅ | ✅ | |
+| [94. 二叉树的中序遍历](https://leetcode-cn.com/problems/binary-tree-inorder-traversal/) | ✅ | ✅ | |
+| [144. 二叉树的前序遍历](https://leetcode-cn.com/problems/binary-tree-preorder-traversal/) | ✅ | ✅ | |
 
 | 2020-07-20 | 2020-07-22 | 2020-07-25 | 2020-07-29 |
 |--|:--:|:--:|:--:|:--:|
-| [590. N叉树的后序遍历](https://leetcode-cn.com/problems/n-ary-tree-postorder-traversal/) | ✅ | | |
-| [589. N叉树的前序遍历](https://leetcode-cn.com/problems/n-ary-tree-preorder-traversal/) | ✅ | | |
-| [429. N叉树的层序遍历](https://leetcode-cn.com/problems/n-ary-tree-level-order-traversal/) | ✅ | | |
-| [22. 括号生成](https://leetcode-cn.com/problems/generate-parentheses/) | ✅ | | |
+| [590. N 叉树的后序遍历](https://leetcode-cn.com/problems/n-ary-tree-postorder-traversal/) | ✅ | ✅ | |
+| [589. N 叉树的前序遍历](https://leetcode-cn.com/problems/n-ary-tree-preorder-traversal/) | ✅ | ✅ | |
+| [429. N 叉树的层序遍历](https://leetcode-cn.com/problems/n-ary-tree-level-order-traversal/) | ✅ | ✅ | |
+| [22. 括号生成](https://leetcode-cn.com/problems/generate-parentheses/) | ✅ | ✅ | |
 
 | 2020-07-21 | 2020-07-23 | 2020-07-26 | 2020-07-30 |
 |--|:--:|:--:|:--:|:--:|
@@ -57,6 +57,18 @@ slug: /notes/leetcoding
 | [111. 二叉树的最小深度](https://leetcode-cn.com/problems/minimum-depth-of-binary-tree/) | ✅ | | |
 
 > 22 号 ✌️ 去拿电脑了，生产力回来了，LJ 去超市跟零食告别 👋
+> 开始写项目了，后面随缘刷题了，等写好项目再好好刷
+
+| 2020-07-28 | 2020- | 2020- | 2020- | 2020- |
+|--|:--:|:--:|:--:|:--:|
+| [297. 二叉树的序列化与反序列化](https://leetcode-cn.com/problems/serialize-and-deserialize-binary-tree/) | | | | |
+| [235. 二叉搜索树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-search-tree/) | | | | |
+| [236. 二叉树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-tree/) | | | | |
+
+| 2020-07-29 | 2020- | 2020- | 2020- | 2020- |
+|--|:--:|:--:|:--:|:--:|
+| [105. 从前序与中序遍历序列构造二叉树](https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/) | | | | |
+| [77. 组合](https://leetcode-cn.com/problems/combinations/) | | | | |
 
 <!-- | 2020- | 2020- | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
@@ -157,6 +169,16 @@ slug: /notes/leetcoding
 - [104. 二叉树的最大深度](https://leetcode-cn.com/problems/maximum-depth-of-binary-tree/)
 
 - [111. 二叉树的最小深度](https://leetcode-cn.com/problems/minimum-depth-of-binary-tree/)：递归（DFS）、迭代（BFS 层序遍历、DFS）
+
+- [297. 二叉树的序列化与反序列化](https://leetcode-cn.com/problems/serialize-and-deserialize-binary-tree/)：前序遍历、JSON 偷懒
+
+- [235. 二叉搜索树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-search-tree/)
+
+- [236. 二叉树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-tree/)：分治
+
+- [105. 从前序与中序遍历序列构造二叉树](https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/)
+
+- [77. 组合](https://leetcode-cn.com/problems/combinations/)：回溯
 
 ## 动态规划
 
