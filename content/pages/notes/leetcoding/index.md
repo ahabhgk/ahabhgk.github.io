@@ -32,22 +32,22 @@ slug: /notes/leetcoding
 |--|:--:|:--:|:--:|:--:|
 | [622. 设计循环队列](https://leetcode-cn.com/problems/design-circular-queue/) | ✅ | ✅ | |
 | [641. 设计循环双端队列](https://leetcode-cn.com/problems/design-circular-deque/) | ✅ | ✅ | |
-| [84. 柱状图中最大的矩形](https://leetcode-cn.com/problems/largest-rectangle-in-histogram/) | ✅ | ✅ | |
-| [239. 滑动窗口最大值](https://leetcode-cn.com/problems/sliding-window-maximum/) | ✅ | ✅ | |
+| [84. 柱状图中最大的矩形](https://leetcode-cn.com/problems/largest-rectangle-in-histogram/) | ✅ | ✅ | ✅ |
+| [239. 滑动窗口最大值](https://leetcode-cn.com/problems/sliding-window-maximum/) | ✅ | ✅ | ✅ |
 
-| 2020-07-19 | 2020-07-21 | 2020-07-24 | 2020-07-28 |
+| 2020-07-19 | 2020-07-21 | 2020-07-24 | 2020-08-09 |
 |--|:--:|:--:|:--:|:--:|
 | [242. 有效的字母异位词](https://leetcode-cn.com/problems/valid-anagram/) | ✅ | ✅ | |
 | [49. 字母异位词分组](https://leetcode-cn.com/problems/group-anagrams/) | ✅ | ✅ | |
-| [94. 二叉树的中序遍历](https://leetcode-cn.com/problems/binary-tree-inorder-traversal/) | ✅ | ✅ | |
-| [144. 二叉树的前序遍历](https://leetcode-cn.com/problems/binary-tree-preorder-traversal/) | ✅ | ✅ | |
+| [94. 二叉树的中序遍历](https://leetcode-cn.com/problems/binary-tree-inorder-traversal/) | ✅ | ✅ | ✅ |
+| [144. 二叉树的前序遍历](https://leetcode-cn.com/problems/binary-tree-preorder-traversal/) | ✅ | ✅ | ✅ |
 
-| 2020-07-20 | 2020-07-22 | 2020-07-25 | 2020-07-29 |
+| 2020-07-20 | 2020-07-22 | 2020-07-25 | 2020-08-09 |
 |--|:--:|:--:|:--:|:--:|
 | [590. N 叉树的后序遍历](https://leetcode-cn.com/problems/n-ary-tree-postorder-traversal/) | ✅ | ✅ | |
 | [589. N 叉树的前序遍历](https://leetcode-cn.com/problems/n-ary-tree-preorder-traversal/) | ✅ | ✅ | |
-| [429. N 叉树的层序遍历](https://leetcode-cn.com/problems/n-ary-tree-level-order-traversal/) | ✅ | ✅ | |
-| [22. 括号生成](https://leetcode-cn.com/problems/generate-parentheses/) | ✅ | ✅ | |
+| [429. N 叉树的层序遍历](https://leetcode-cn.com/problems/n-ary-tree-level-order-traversal/) | ✅ | ✅ | ✅ |
+| [22. 括号生成](https://leetcode-cn.com/problems/generate-parentheses/) | ✅ | ✅ | ✅ |
 
 | 2020-07-21 | 2020-07-23 | 2020-07-26 | 2020-07-30 |
 |--|:--:|:--:|:--:|:--:|
@@ -60,16 +60,18 @@ slug: /notes/leetcoding
 >
 > 开始写项目了，后面随缘刷题了，等写好项目再好好刷
 
-| 2020-07-28 | 2020- | 2020- | 2020- | 2020- |
+| 2020-07-28 | 2020-08-09 | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
-| [297. 二叉树的序列化与反序列化](https://leetcode-cn.com/problems/serialize-and-deserialize-binary-tree/) | | | | |
+| [297. 二叉树的序列化与反序列化](https://leetcode-cn.com/problems/serialize-and-deserialize-binary-tree/) | ✅ | | | |
 | [235. 二叉搜索树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-search-tree/) | | | | |
 | [236. 二叉树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-tree/) | | | | |
 
-| 2020-07-29 | 2020- | 2020- | 2020- | 2020- |
+| 2020-07-29 | 2020-08-09 | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
 | [105. 从前序与中序遍历序列构造二叉树](https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/) | | | | |
-| [77. 组合](https://leetcode-cn.com/problems/combinations/) | | | | |
+| [77. 组合](https://leetcode-cn.com/problems/combinations/) | ✅ | | | |
+| [46. 全排列](https://leetcode-cn.com/problems/permutations/) | | | | |
+| [47. 全排列 II](https://leetcode-cn.com/problems/combinations/) | | | | |
 
 <!-- | 2020- | 2020- | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
@@ -139,7 +141,7 @@ slug: /notes/leetcoding
 
 - [641. 设计循环双端队列](https://leetcode-cn.com/problems/design-circular-deque/)
 
-- [84. 柱状图中最大的矩形](https://leetcode-cn.com/problems/largest-rectangle-in-histogram/)
+- [84. 柱状图中最大的矩形](https://leetcode-cn.com/problems/largest-rectangle-in-histogram/)：单调栈
 
 - [239. 滑动窗口最大值](https://leetcode-cn.com/problems/sliding-window-maximum/)
 
