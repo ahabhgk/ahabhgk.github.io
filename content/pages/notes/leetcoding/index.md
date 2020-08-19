@@ -63,15 +63,20 @@ slug: /notes/leetcoding
 | 2020-07-28 | 2020-08-09 | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
 | [297. 二叉树的序列化与反序列化](https://leetcode-cn.com/problems/serialize-and-deserialize-binary-tree/) | ✅ | | | |
-| [235. 二叉搜索树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-search-tree/) | | | | |
-| [236. 二叉树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-tree/) | | | | |
+| [235. 二叉搜索树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-search-tree/) | ✅ | | | |
+| [236. 二叉树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-tree/) | ✅ | | | |
 
 | 2020-07-29 | 2020-08-09 | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
-| [105. 从前序与中序遍历序列构造二叉树](https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/) | | | | |
-| [77. 组合](https://leetcode-cn.com/problems/combinations/) | ✅ | | | |
-| [46. 全排列](https://leetcode-cn.com/problems/permutations/) | | | | |
-| [47. 全排列 II](https://leetcode-cn.com/problems/combinations/) | | | | |
+| [105. 从前序与中序遍历序列构造二叉树](https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/) | ✅ | | | |
+| [77. 组合](https://leetcode-cn.com/problems/combinations/) | ✅ | ✅ | | |
+| [46. 全排列](https://leetcode-cn.com/problems/permutations/) | ✅ | | | |
+| [47. 全排列 II](https://leetcode-cn.com/problems/permutations-ii/) | ✅ | | | |
+
+| 2020- | 2020- | 2020- | 2020- | 2020- |
+|--|:--:|:--:|:--:|:--:|
+| [78. 子集](https://leetcode-cn.com/problems/subsets/) | | | | |
+| [50. Pow(x, n)](https://leetcode-cn.com/problems/powx-n/) |  | | | |
 
 <!-- | 2020- | 2020- | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
@@ -182,6 +187,14 @@ slug: /notes/leetcoding
 - [105. 从前序与中序遍历序列构造二叉树](https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/)
 
 - [77. 组合](https://leetcode-cn.com/problems/combinations/)：回溯
+
+- [46. 全排列](https://leetcode-cn.com/problems/permutations/)：回溯
+
+- [47. 全排列 II](https://leetcode-cn.com/problems/permutations-ii/)：回溯（dfs）+ 剪枝
+
+- [78. 子集](https://leetcode-cn.com/problems/subsets/)：回溯
+
+- [50. Pow(x, n)](https://leetcode-cn.com/problems/powx-n/)：快速幂
 
 ## 动态规划
 
