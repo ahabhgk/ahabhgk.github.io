@@ -73,10 +73,16 @@ slug: /notes/leetcoding
 | [46. 全排列](https://leetcode-cn.com/problems/permutations/) | ✅ | | | |
 | [47. 全排列 II](https://leetcode-cn.com/problems/permutations-ii/) | ✅ | | | |
 
-| 2020- | 2020- | 2020- | 2020- | 2020- |
+| 2020-08-19 | 2020- | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
 | [78. 子集](https://leetcode-cn.com/problems/subsets/) | | | | |
-| [50. Pow(x, n)](https://leetcode-cn.com/problems/powx-n/) |  | | | |
+| [50. Pow(x, n)](https://leetcode-cn.com/problems/powx-n/) | | | | |
+
+| 2020-08-20 | 2020- | 2020- | 2020- | 2020- |
+|--|:--:|:--:|:--:|:--:|
+| [169. 多数元素](https://leetcode-cn.com/problems/majority-element/) | | | | |
+| [51. N皇后](https://leetcode-cn.com/problems/n-queens/) | | | | |
+| [17. 电话号码的字母组合](https://leetcode-cn.com/problems/letter-combinations-of-a-phone-number/) | | | | |
 
 <!-- | 2020- | 2020- | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
@@ -190,11 +196,17 @@ slug: /notes/leetcoding
 
 - [46. 全排列](https://leetcode-cn.com/problems/permutations/)：回溯
 
-- [47. 全排列 II](https://leetcode-cn.com/problems/permutations-ii/)：回溯（dfs）+ 剪枝
+- **[47. 全排列 II](https://leetcode-cn.com/problems/permutations-ii/)：回溯（dfs）+ 剪枝**
 
 - [78. 子集](https://leetcode-cn.com/problems/subsets/)：回溯
 
 - [50. Pow(x, n)](https://leetcode-cn.com/problems/powx-n/)：快速幂
+
+- **[169. 多数元素](https://leetcode-cn.com/problems/majority-element/)：哈希表、分治、投票**
+
+- [51. N皇后](https://leetcode-cn.com/problems/n-queens/)：回溯
+
+- [17. 电话号码的字母组合](https://leetcode-cn.com/problems/letter-combinations-of-a-phone-number/)：回溯
 
 ## 动态规划
 
