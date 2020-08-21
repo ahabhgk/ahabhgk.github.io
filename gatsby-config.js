@@ -20,7 +20,7 @@ module.exports = {
     {
       resolve: `@lekoarts/gatsby-theme-minimal-blog`,
       options: {
-        mdx: false, // for `gatsby-remark-katex`
+        mdx: false, // reload default setting for `gatsby-remark-katex`
         navigation: [
           {
             title: `Blogs`,
@@ -68,7 +68,7 @@ module.exports = {
     {
       resolve: `gatsby-plugin-manifest`,
       options: {
-        name: `ahabhgk's bolg / minimal-blog`,
+        name: `ahabhgk's bolg`,
         short_name: `ahabhgk's blog`,
         description: `ahabhgk's blog, for code, for love, for life.`,
         start_url: `/`,
@@ -102,18 +102,12 @@ module.exports = {
               linkImagesToOriginal: false,
             },
           },
-          `gatsby-remark-katex`,
-        ],
-        plugins: [
           {
-            resolve: `gatsby-remark-images`,
+            resolve: `gatsby-remark-katex`,
             options: {
-              maxWidth: 960,
-              quality: 90,
-              linkImagesToOriginal: false,
+              strict: false,
             },
           },
-          `gatsby-remark-katex`,
         ],
       },
     },

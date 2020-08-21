@@ -9,7 +9,7 @@ tags:
 
 ## Unit 1: ML Functions, Tuples, Lists, and More
 
-```sml
+```reason
 (* Let's SML! *)
 
 val x = 1;
