@@ -51,10 +51,10 @@ slug: /notes/leetcoding
 
 | 2020-07-21 | 2020-07-23 | 2020-07-26 | 2020-07-30 |
 |--|:--:|:--:|:--:|:--:|
-| [226. 翻转二叉树](https://leetcode-cn.com/problems/invert-binary-tree/) | ✅ | | |
-| [98. 验证二叉搜索树](https://leetcode-cn.com/problems/validate-binary-search-tree/) | ✅ | | |
-| [104. 二叉树的最大深度](https://leetcode-cn.com/problems/maximum-depth-of-binary-tree/) | ✅ | | |
-| [111. 二叉树的最小深度](https://leetcode-cn.com/problems/minimum-depth-of-binary-tree/) | ✅ | | |
+| [226. 翻转二叉树](https://leetcode-cn.com/problems/invert-binary-tree/) | ✅ | ✅ | |
+| [98. 验证二叉搜索树](https://leetcode-cn.com/problems/validate-binary-search-tree/) | ✅ | ✅ | |
+| [104. 二叉树的最大深度](https://leetcode-cn.com/problems/maximum-depth-of-binary-tree/) | ✅ | ✅ | |
+| [111. 二叉树的最小深度](https://leetcode-cn.com/problems/minimum-depth-of-binary-tree/) | ✅ | ✅ | |
 
 > 22 号 ✌️ 去拿电脑了，生产力回来了，LJ 去超市跟零食告别 👋
 >
@@ -83,6 +83,11 @@ slug: /notes/leetcoding
 | [169. 多数元素](https://leetcode-cn.com/problems/majority-element/) | | | | |
 | [51. N皇后](https://leetcode-cn.com/problems/n-queens/) | | | | |
 | [17. 电话号码的字母组合](https://leetcode-cn.com/problems/letter-combinations-of-a-phone-number/) | | | | |
+
+| 2020-08-21 | 2020- | 2020- | 2020- | 2020- |
+|--|:--:|:--:|:--:|:--:|
+| [102. 二叉树的层序遍历](https://leetcode-cn.com/problems/binary-tree-level-order-traversal/) | | | | |
+| [515. 在每个树行中找最大值](https://leetcode-cn.com/problems/find-largest-value-in-each-tree-row/submissions/) | | | | |
 
 <!-- | 2020- | 2020- | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
@@ -174,7 +179,7 @@ slug: /notes/leetcoding
 
 - [429. N叉树的层序遍历](https://leetcode-cn.com/problems/n-ary-tree-level-order-traversal/)
 
-- **[22. 括号生成](https://leetcode-cn.com/problems/generate-parentheses/)：回溯（DFS）、动态规划**
+- **[22. 括号生成](https://leetcode-cn.com/problems/generate-parentheses/)：回溯（DFS）、BFS、动态规划**
 
 - [226. 翻转二叉树](https://leetcode-cn.com/problems/invert-binary-tree/)：迭代、递归
 
