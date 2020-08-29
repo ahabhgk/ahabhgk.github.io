@@ -1,13 +1,3 @@
----
-title: Vue3.0 源码分析
-slug: /blogs/vue3-source-code
-date: 2020-07-29
-author: ahabhgk
-description: vue3.0 源码分析
-tags:
-  - SourceCode
----
-
 > **drafting**
 
 ### StaticNode 优化实现
