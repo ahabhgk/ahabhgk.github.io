@@ -705,3 +705,5 @@ console.log(count) // 1
 然后是不能解构，因为 setup 只会运行一次，通过 proxy.key 才能成功 track 或 trigger，如果将解构赋值（取值）写到 render function 中，每次渲染都会重新取值，就能使用解构，但这样代码反而更乱
 
 最后是更多的灵活性来自更多的自我克制，我很同意这句话：**编写有组织的 JavaScript 代码的技能直接转化为了编写有组织的 Vue 代码的技能**
+
+> [simple-vue/reactivity 实现完整代码](https://github.com/ahabhgk/simple-vue3/tree/master/packages/reactivity)
