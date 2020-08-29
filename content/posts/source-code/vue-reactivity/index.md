@@ -94,7 +94,7 @@ export function toRaw(ob) {
 
 下面来看 `createReactiveObject` 的实现
 
-```js
+```js:title=reactivity/reactive.js
 export const reactiveMap = new WeakMap()
 export const readonlyMap = new WeakMap()
 
@@ -680,7 +680,7 @@ function createComputedRef(getter, setter) {
 
 大致流程就是：
 
-1. (first get computed, call computeEffect, track getter dep, set new value, , track computed value, return value) =>
+1. (first get computed, call computeEffect, track getter dep, set new value, track computed value, return value) =>
 
 2. (second get computed, dirty is false, return value) =>
 
