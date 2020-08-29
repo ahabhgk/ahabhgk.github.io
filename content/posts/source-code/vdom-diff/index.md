@@ -1,3 +1,13 @@
+---
+title: VDOM DIFF
+slug: /blogs/vdom-diff
+date: 2020-08-29
+author: ahabhgk
+description: vdom diff
+tags:
+  - SourceCode
+---
+
 > **drafting**
 
 ### StaticNode 优化实现
