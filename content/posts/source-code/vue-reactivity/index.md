@@ -166,12 +166,12 @@ export const readonlyHandlers = {
     )
     return true
   },
-  has,
-  ownKeys,
 }
 ```
 
-可以看到 readonly 与 reactive 的不同就在于 readonly 代理的修改操作，修改时不会真正去修改对象，并在开发模式下报警告
+可以看到 readonly 与 reactive 的不同就在于 readonly 代理的修改操作，修改时不会真正去修改对象，并在开发模式下报警告；readonly 代理的 get、has、ownKeys 操作不会去 track 收集依赖，get 比较特殊，has、ownKeys 可以直接用原对象操作就不会 track，直接不加即可
+
+> 呜呜呜～ 我的 PR 没被 merge：[PR: readonly object should not track on 'has' and 'ownKeys'](https://github.com/vuejs/vue-next/pull/2002)
 
 对于 get、readonlyGet 和 set 则是通过 createGetter 和 createSetter 创建
 
