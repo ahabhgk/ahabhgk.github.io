@@ -10,6 +10,12 @@ tags:
 
 > **drafting**
 
+## Simple Preact
+
+[ahabhgk/simple-preact](https://github.com/ahabhgk/simple-preact)
+
+实现的简易 Preact，或者说是 Stack Reconciler React + Hooks
+
 ### StaticNode 优化实现
 
 从 patch 进入，匹配 type 为 Static 时处理
