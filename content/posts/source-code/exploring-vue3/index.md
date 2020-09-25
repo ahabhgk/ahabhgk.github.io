@@ -16,7 +16,7 @@ tags:
 
 本篇文章并不是为了深入 Vue3 源码，而是对 Vue3 核心 VDOM 和新特性的简单了解，适合作为深入 Vue3 源码的**入门**文章
 
-## Let's build a VDOM runtime
+## 🥳 Let's build a VDOM runtime
 
 我们先看一下 Vue3 的 JSX 组件怎么写，因为我们只是造一个 runtime，所以不会涉及到 Vue 的模版编译，直接用 JSX 就很方便
 
@@ -66,6 +66,8 @@ export function createRenderer(options) {
 
 通过 `createRenderer(nodeOps).render(<App />, document.querySelector('root'))` 调用，没错我就是抄 react 的，但是与 react 不同的在于 react 中调用 `<App />` 返回的是一个 ReactElement，这里我们直接返回 VNode，ReactElement 其实就是 `Partial<Fiber>`，react 中是通过 ReactElement 对 Fiber（VNode）进行 diff，我们直接 VNode 对比 VNode 也是可以的（实际上 Vue 和 Preact 都是这么做的）
 
+### VNode design
+
 接下来我们来设计 VNode，因为 VNode 很大程度上决定了内部 runtime 如何去 diff
 
 ```js:title=runtime-core/vnode.js
@@ -88,15 +90,17 @@ export function h(type, props, ...children) {
     type,
     props,
     key, // key diff 用的
-    node: null, // 宿主环境的元素（dom node……）
-    instance: null, // 组件实例
+    node: null, // 宿主环境的元素（dom node……），组件 VNode 为 null
+    instance: null, // 组件实例，只有组件 VNode 会有，其他 VNode 为 null
     parent: null, // parent VNode
     children: null, // VNode[]，建立内部 VNode 树结构
   }
 }
 ```
 
-Vue3 的 JSX 语法已经跟 React 很像了，除了 props.children 是通过 Slots 实现以外，基本都一样，这里我们并不打算实现 Slots，因为 Slots 实现的 children 也是一种 props，是一段 JSX 而已，并不算特殊，毕竟你随便写个 props 不叫 children 然后传 JSX 也是可以的
+Vue3 的 JSX 语法已经跟 React 很像了，除了 props.children 是通过 Slots 实现以外，基本都一样，这里我们并不打算实现 Slots，因为 Slots 实现的 children 也是一种 props，是一段 JSX 而已，并不算特殊，毕竟你随便写个 props 不叫 children 然后传 JSX 也是可以的。Vue 专门弄一个 Slots 是为了兼容它的 template 语法
+
+### patchElement & patchText
 
 ```js:title=runtime-core/renderer.js
 export function createRenderer(options) {
@@ -298,7 +302,7 @@ const unmount = (vnode) => {
 
 然后实现 unmount，因为目前只考虑 Element 和 Text 的 diff，unmount 就没有对 Component 的 unmount 进行处理，后面我们会加上，现在可以写个 demo 看看效果了
 
-```js
+```jsx
 /** @jsx h */
 import { createRenderer, h } from '../../packages/runtime-core'
 
@@ -316,3 +320,190 @@ setInterval(() => {
   )  
 }, 300)
 ```
+
+### patchComponent
+
+下面实现 Component 的 patch
+
+```js:title=runtime-core/renderer.js
+const processComponent = (n1, n2, container) => {
+  if (n1 == null) {
+    const instance = n2.instance = {
+      props: reactive(n2.props), // initProps
+      update: null,
+    }
+    const render = n2.type.setup(instance.props)
+    let prevRenderResult = null
+    instance.update = effect(() => {
+      const renderResult = render()
+      n2.children = [renderResult]
+      renderResult.parent = n2
+      patch(prevRenderResult, renderResult, container)
+      prevRenderResult = renderResult
+    })
+  } else {
+    // update...
+  }
+}
+```
+
+首先是 mount Component，需要在 VNode 上建立一个组件实例，用来存一些组件的东西，props 需要 reactive 一下，后面写 update Component 的时候就知道为什么了，然后获取 setup 返回的 render 函数，这里非常巧妙的就是组件的 update 方法是一个 effect 函数，这样对应他的状态和 props 改变时就可以自动去更新
+
+还有就是 render 和 prevRenderResult 我是通过闭包存的，并没有放到 instance 上面，因为后面并不会用到这两个，用闭包存就足够，当然在这里可以把 props 和 render 也用闭包存，然后就可以去掉 instance 了，更加轻便，但是可读性就会降低了，而且后面一些 API 的实现有个 instance 可能更好，同样是个取舍的问题而已
+
+我们来看组件的 update
+
+```js:title=runtime-core/renderer.js
+const processComponent = (n1, n2, container) => {
+  if (n1 == null) {
+    // mount...
+  } else {
+    const instance = n2.instance = n1.instance
+    // updateProps, 根据 vnode.props 修改 instance.props
+    Object.keys(n2.props).forEach(key => {
+      const newValue = n2.props[key]
+      const oldValue = instance.props[key]
+      if (newValue !== oldValue) {
+        instance.props[key] = newValue
+      }
+    })
+  }
+}
+```
+
+这里类似 `const node = n2.node = n1.node` 获取 instance，然后去 updateProps，这里就体现了之前 `reactive(props)` 的作用了，render 函数调用 JSX 得到的 props 每次都是新的，跟之前的 instance.props 并无关联，要是想 props 改变时也能使组件更新，就需要 JSX 的 props 和 instance.props 响应式的 props 进行关联，所以这里通过 updateProps 把 props 更新到 instance.props 上
+
+我们再来看 updateProps，只涉及到了 instance.props 第一层的更新，相当于是浅的，所以我们使用 shallowReactive 即可，得到更好一点的性能，但是之前我们没有实现 shallowReactive，这里就先用 reactive 替代
+
+不要忘了我们的 unmount 还只能 unmount Element，我们来完善 Component 的 unmount
+
+```js:title=runtime-core/renderer.js
+const remove = (child) => {
+  const parent = child.parentNode
+  if (parent) parent.removeChild(child)
+}
+
+const unmount = (vnode, doRemove = true) => {
+  const { type } = vnode
+  if (isObject(type)) {
+    vnode.children.forEach(c => unmount(c, doRemove))
+  } else if (isString(type)) {
+    vnode.children.forEach(c => unmount(c, false))
+    if (doRemove) remove(vnode.node)
+  } else if (isTextType(type)) {
+    if (doRemove) remove(vnode.node)
+  } else {
+    type.unmount(/* TODO */)
+  }
+}
+```
+
+类似于 patch，针对不同 type 进行 unmount，由于组件的 node 是 null，就直接将子节点进行 unmount
+
+注意这里的 deRemove 参数的作用，Element 的子节点可以不直接从 DOM 上移除，直接将该 Element 移除即可，但是 Element 子节点中可能有 Component，所以还是需要递归调用 unmount，触发 Component 的清理副作用（后面讲）和生命周期，解决方案就是加一个 deRemove 参数，Element unmount 时 doRemove 为 true，之后子节点的 doRemove 为 false
+
+最后还有清理副作用，生命周期就不提了，React 已经证明生命周期是可以不需要的，组件添加的 effect 在组件 unmount 后仍然存在，还没有清除，所以我们还需要在 unmount 中拿到组件所有的 effect，然后一一 stop，这时 stop 很简单，但如何拿到组件的 effect 就比较难
+
+其实 Vue 中并不会直接使用 Vue Reactivity 中的 API，从 Vue 中导出的 computed、watch、watchEffect 会把 effect 挂载到当前的组件实例上，用以之后清除 effect，我们只实现 computed 和简易的 watchEffect（不考虑 scheduler 对 watchEffect 的调度处理）
+
+```js:title=runtime-core/renderer.js {5,6}
+const unmount = (vnode, doRemove = true) => {
+  const { type } = vnode
+  if (isObject(type)) {
+    const instance = { vnode }
+    instance.effects.forEach(stop)
+    stop(instance.update)
+    vnode.children.forEach(c => unmount(c, doRemove))
+  } // ...
+}
+```
+
+```js:title=runtime-core/component.js
+let currentInstance
+export const getCurrentInstance = () => currentInstance
+export const setCurrentInstance = (instance) => currentInstance = instance
+
+export const recordInstanceBoundEffect = (effect) => {
+  if (currentInstance) currentInstance.effects.push(effect)
+}
+```
+
+```js:title=reactivity/renderer.js {6,8-10}
+const processComponent = (n1, n2, container, isSVG) => {
+  if (n1 == null) {
+    const instance = n2.instance = {
+      props: reactive(n2.props), // initProps
+      update: null,
+      effects: [],
+    }
+    setCurrentInstance(instance)
+    const render = n2.type.setup(instance.props)
+    setCurrentInstance(null)
+    // update effect...
+  } else {
+    // update...
+  }
+}
+```
+
+组件的 setup 只会调用一次，所以在这里调用 setCurrentInstance 即可，这是与 React.FC 的主要区别之一
+
+```js:title=reactivity/api-watch.js
+import { effect, stop } from '../reactivity'
+import { recordInstanceBoundEffect } from './component'
+
+export const watchEffect = (cb) => {
+  const e = effect(cb)
+  recordInstanceBoundEffect(e)
+  return () => stop(e)
+}
+```
+
+```js:title=reactivity/api-computed.js
+import { stop, computed as _computed } from '../reactivity'
+import { recordInstanceBoundEffect } from './component'
+
+export const computed = (options) => {
+  const ret = _computed(options)
+  recordInstanceBoundEffect(ret.effect)
+  return ret
+}
+```
+
+就是通过在 setup 调用时设置 currentInstance，然后把 setup 中的 effect 放到 currentInstance.effects 上，最后 unmount 时一一 stop
+
+现在写一个 demo 看看效果
+
+```jsx
+/** @jsx h */
+import { ref } from '../../packages/reactivity'
+import { h, createRenderer, watchEffect } from '../../packages/runtime-core'
+
+const Displayer = {
+  setup(props) {
+    return () => (
+      <div>{props.children}</div>
+    )
+  }
+}
+
+const App = {
+  setup(props) {
+    const count = ref(0)
+    const inc = () => count.value++
+
+    watchEffect(() => console.log(count.value))
+
+    return () => (
+      <div>
+        <button onClick={inc}> + </button>
+        {count.value % 2 ? <Displayer>{count.value}</Displayer> : null}
+      </div>
+    )
+  }
+}
+
+createRenderer().render(<App />, document.querySelector('#root'))
+```
+
+### key diff
