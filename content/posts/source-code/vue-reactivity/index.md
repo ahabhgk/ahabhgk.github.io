@@ -1,9 +1,9 @@
 ---
-title: vue/reactivity 响应式原理
+title: Vue Reactivity 响应式原理
 slug: /blogs/vue-reactivity-source-code
 date: 2020-08-28
 author: ahabhgk
-description: vue/reactivity 响应式原理
+description: Vue Reactivity 响应式原理
 tags:
   - SourceCode
 ---
