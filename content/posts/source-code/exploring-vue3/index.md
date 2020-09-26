@@ -64,7 +64,7 @@ export function createRenderer(options) {
 }
 ```
 
-通过 `createRenderer(nodeOps).render(<App />, document.querySelector('root'))` 调用，没错我就是抄 react 的，但是与 react 不同的在于 react 中调用 `<App />` 返回的是一个 ReactElement，这里我们直接返回 VNode，ReactElement 其实就是 `Partial<Fiber>`，react 中是通过 ReactElement 对 Fiber（VNode）进行 diff，我们直接 VNode 对比 VNode 也是可以的（实际上 Vue 和 Preact 都是这么做的）
+通过 `createRenderer(nodeOps).render(<App />, document.querySelector('root'))` 调用，没错我就是抄 React 的，但是与 React 不同的在于 React 中调用 `<App />` 返回的是一个 ReactElement，这里我们直接返回 VNode，ReactElement 其实就是 `Partial<Fiber>`，React 中是通过 ReactElement 对 Fiber（VNode）进行 diff，我们直接 VNode 对比 VNode 也是可以的（实际上 Vue 和 Preact 都是这么做的）
 
 ### VNode design
 
@@ -166,7 +166,7 @@ export function createRenderer(options) {
 }
 ```
 
-patch（也就是 diff）在 type 判断最后加一个“后门”，我们可以用它来实现一些深度定制的组件（抄 preact 的），我们甚至可以实现一套 Preact Component……
+patch（也就是 diff）在 type 判断最后加一个“后门”，我们可以用它来实现一些深度定制的组件（抄 Preact 的，Preact Compat 很多实现都是拿到组件实例 this 去 hack this 上的一些方法），我们甚至可以实现一套 Preact Component……
 
 diff 最主要的就是对于 Element 和 Text 的 diff，对应元素节点和文本节点，所以我们先实现这两个方法
 
@@ -353,7 +353,7 @@ const processComponent = (n1, n2, container) => {
 
 我们来看组件的 update
 
-```js:title=runtime-core/renderer.js
+```js:title=runtime-core/renderer.js {10}
 const processComponent = (n1, n2, container) => {
   if (n1 == null) {
     // mount...
@@ -373,7 +373,7 @@ const processComponent = (n1, n2, container) => {
 
 这里类似 `const node = n2.node = n1.node` 获取 instance，然后去 updateProps，这里就体现了之前 `reactive(props)` 的作用了，render 函数调用 JSX 得到的 props 每次都是新的，跟之前的 instance.props 并无关联，要是想 props 改变时也能使组件更新，就需要 JSX 的 props 和 instance.props 响应式的 props 进行关联，所以这里通过 updateProps 把 props 更新到 instance.props 上
 
-我们再来看 updateProps，只涉及到了 instance.props 第一层的更新，相当于是浅的，所以我们使用 shallowReactive 即可，得到更好一点的性能，但是之前我们没有实现 shallowReactive，这里就先用 reactive 替代
+我们再来看 updateProps，只涉及到了 instance.props 第一层的更新，相当于是做了层浅比较，内部实现了 React 的 PureComponent，阻断与更新无关子节点的更新，同时这里使用 shallowReactive 即可，得到更好一点的性能，但是之前我们没有实现 shallowReactive，这里就先用 reactive 替代
 
 不要忘了我们的 unmount 还只能 unmount Element，我们来完善 Component 的 unmount
 
@@ -405,6 +405,8 @@ const unmount = (vnode, doRemove = true) => {
 最后还有清理副作用，生命周期就不提了，React 已经证明生命周期是可以不需要的，组件添加的 effect 在组件 unmount 后仍然存在，还没有清除，所以我们还需要在 unmount 中拿到组件所有的 effect，然后一一 stop，这时 stop 很简单，但如何拿到组件的 effect 就比较难
 
 其实 Vue 中并不会直接使用 Vue Reactivity 中的 API，从 Vue 中导出的 computed、watch、watchEffect 会把 effect 挂载到当前的组件实例上，用以之后清除 effect，我们只实现 computed 和简易的 watchEffect（不考虑 scheduler 对 watchEffect 的调度处理）
+
+> update 的 effect 在 Vue 中通过 scheduler 实现了异步更新，watchEffect 的回调函数执行时机 flush 也是通过 scheduler 实现，简单来说就是 scheduler 创建了三个队列，分别存 pre Callbacks、sync Callbacks 和 post Callbacks，这三个队列中任务的执行都是通过 promise.then 放到微任务队列中，都是异步执行的，组件的 update 放在 sync 队列中，sync 指的是同步 DOM 更新（Vue 中 VNode 更新和 DOM 更新是同步的），pre 指的是在 DOM 更新之前，post 指的是在 DOM 更新之后，所以 pre 得不到更新后的 DOM 信息，而 post 可以得到
 
 ```js:title=runtime-core/renderer.js {5,6}
 const unmount = (vnode, doRemove = true) => {
@@ -464,9 +466,9 @@ import { stop, computed as _computed } from '../reactivity'
 import { recordInstanceBoundEffect } from './component'
 
 export const computed = (options) => {
-  const ret = _computed(options)
-  recordInstanceBoundEffect(ret.effect)
-  return ret
+  const computedRef = _computed(options)
+  recordInstanceBoundEffect(computedRef.effect) // computed 内部实现也用到了 effect 哦
+  return computedRef
 }
 ```
 
