@@ -51,7 +51,7 @@ createApp(App).mount('#app');
 
 先看入口 createApp，翻翻源码可以看出做的事是根据 rendererOptions 创建 renderer，然后创建 app 对象，最后调用 app.mount 进行渲染，mount 里也是调用的 render
 
-我们写简单一点，去掉 app 的创建，因为创建 app 其实类似于一个作用于，app 的插件和指令等只对该 app 下的组件起作用
+我们写简单一点，去掉 app 的创建，因为创建 app 其实类似于一个作用域，app 的插件和指令等只对该 app 下的组件起作用
 
 ```js:title=runtime-core/renderer.js
 export function createRenderer(options) {
