@@ -131,6 +131,8 @@ export const isText = (v) => typeof v === 'string' || typeof v === 'number'
 ```js:title=runtime-core/component.js
 export const Text = Symbol('Text')
 export const isTextType = (v) => v === Text
+
+export const isSetupComponent = (c) => isObject(c) && 'setup' in c
 ```
 
 ```js:title=runtime-core/vnode.js
@@ -140,7 +142,7 @@ export const isSameVNodeType = (n1, n2) => n1.type === n2.type && n1.key === n2.
 
 ```js:title=runtime-core/renderer.js
 import { isObject, isString, isArray, isText } from '../shared'
-import { Text, isTextType } from './component'
+import { Text, isTextType, isSetupComponent } from './component'
 import { isSameVNodeType, h } from './vnode'
 
 export function createRenderer(options) {
@@ -151,14 +153,14 @@ export function createRenderer(options) {
     }
 
     const { type } = n2
-    if (isObject(type)) {
+    if (isSetupComponent(type)) {
       processComponent(n1, n2, container)
     } else if (isString(type)) {
       processElement(n1, n2, container)
     } else if (isTextType(type)) {
       processText(n1, n2, container)
     } else {
-      type.process(/* TODO */)
+      type.patch(/* TODO */)
     }
   }
 
@@ -166,7 +168,7 @@ export function createRenderer(options) {
 }
 ```
 
-patch（也就是 diff）在 type 判断最后加一个“后门”，我们可以用它来实现一些深度定制的组件（抄 Preact 的，Preact Compat 很多实现都是拿到组件实例 this 去 hack this 上的一些方法），我们甚至可以实现一套 Preact Component……
+patch（也就是 diff）在 type 判断最后加一个“后门”，我们可以用它来实现一些深度定制的组件，比如 setupComponent 就可以放到这里实现，或者还可以实现 Hooks（抄 Preact 的，Preact Compat 很多实现都是拿到组件实例 this 去 hack this 上的一些方法），这里我们甚至可以实现一套 Preact Component……
 
 diff 最主要的就是对于 Element 和 Text 的 diff，对应元素节点和文本节点，所以我们先实现这两个方法
 
@@ -385,7 +387,7 @@ const remove = (child) => {
 
 const unmount = (vnode, doRemove = true) => {
   const { type } = vnode
-  if (isObject(type)) {
+  if (isSetupComponent(type)) {
     vnode.children.forEach(c => unmount(c, doRemove))
   } else if (isString(type)) {
     vnode.children.forEach(c => unmount(c, false))
@@ -404,7 +406,7 @@ const unmount = (vnode, doRemove = true) => {
 
 最后还有清理副作用，生命周期就不提了，React 已经证明生命周期是可以不需要的，组件添加的 effect 在组件 unmount 后仍然存在，还没有清除，所以我们还需要在 unmount 中拿到组件所有的 effect，然后一一 stop，这时 stop 很简单，但如何拿到组件的 effect 就比较难
 
-其实 Vue 中并不会直接使用 Vue Reactivity 中的 API，从 Vue 中导出的 computed、watch、watchEffect 会把 effect 挂载到当前的组件实例上，用以之后清除 effect，我们只实现 computed 和简易的 watchEffect（不考虑 scheduler 对 watchEffect 的调度处理）
+其实 Vue 中并不会直接使用 Vue Reactivity 中的 API，从 Vue 中导出的 computed、watch、watchEffect 会把 effect 挂载到当前的组件实例上，用以之后清除 effect，我们只实现 computed 和简易的 watchEffect（不考虑 flush 为 post 和 pre 的情况）
 
 > update 的 effect 在 Vue 中通过 scheduler 实现了异步更新，watchEffect 的回调函数执行时机 flush 也是通过 scheduler 实现，简单来说就是 scheduler 创建了三个队列，分别存 pre Callbacks、sync Callbacks 和 post Callbacks，这三个队列中任务的执行都是通过 promise.then 放到微任务队列中，都是异步执行的，组件的 update 放在 sync 队列中，sync 指的是同步 DOM 更新（Vue 中 VNode 更新和 DOM 更新是同步的），pre 指的是在 DOM 更新之前，post 指的是在 DOM 更新之后，所以 pre 得不到更新后的 DOM 信息，而 post 可以得到
 
@@ -452,12 +454,24 @@ const processComponent = (n1, n2, container, isSVG) => {
 
 ```js:title=reactivity/api-watch.js
 import { effect, stop } from '../reactivity'
-import { recordInstanceBoundEffect } from './component'
+import { recordInstanceBoundEffect, getCurrentInstance } from './component'
 
-export const watchEffect = (cb) => {
-  const e = effect(cb)
+export const watchEffect = (cb, { onTrack, onTrigger } = {}) => {
+  const e = effect(cb, {
+    onTrack,
+    onTrigger,
+  })
   recordInstanceBoundEffect(e)
-  return () => stop(e)
+  const instance = getCurrentInstance()
+
+  return () => {
+    stop(e)
+    if (instance) {
+      const { effects } = instance
+      const i = effects.indexOf(e)
+      if (i > -1) effects.splice(i, 1) // 清除 effect 时也要把 instance 上的去掉
+    }
+  }
 }
 ```
 
@@ -474,7 +488,51 @@ export const computed = (options) => {
 
 就是通过在 setup 调用时设置 currentInstance，然后把 setup 中的 effect 放到 currentInstance.effects 上，最后 unmount 时一一 stop
 
-现在写一个 demo 看看效果
+最后我们再实现组件和 watchEffect 的异步调用
+
+```js:title=reactivity/scheduler.js
+const resolvedPromise = Promise.resolve()
+const syncQueue = [] // 相对于 DOM 更新是同步的
+
+export const queueSyncJob = (job) => {
+  syncQueue.push(job)
+  resolvedPromise.then(() => { // syncQueue 中的 callbacks 还是会加入到微任务中执行
+    const deduped = [...new Set(syncQueue)]
+    syncQueue.length = 0
+    deduped.forEach(job => job())
+  })
+}
+```
+
+```js:title=reactivity/renderer.js {6}
+const processComponent = (n1, n2, container, isSVG) => {
+  if (n1 == null) {
+    // createInstance, setup...
+    instance.update = effect(() => {
+      // patch...
+    }, { scheduler: queueSyncJob })
+  } else {
+    // update...
+  }
+}
+```
+
+```js
+import { queueSyncJob } from './scheduler'
+
+export const watchEffect = (cb, { onTrack, onTrigger } = {}) => {
+  const e = effect(cb, {
+    onTrack,
+    onTrigger,
+    scheduler: queueSyncJob,
+  })
+  // bind effect on instance, return cleanup...
+}
+```
+
+其实就是创建一个队列，然后把更新和 watchEffect 的回调函数放到队列中，之后队列中的函数会通过 promise.then 放到微任务队列中去执行，实现异步更新
+
+现在基本完成了！写一个 demo 看看效果～
 
 ```jsx
 /** @jsx h */
@@ -508,4 +566,4 @@ const App = {
 createRenderer().render(<App />, document.querySelector('#root'))
 ```
 
-### key diff
+## key diff
