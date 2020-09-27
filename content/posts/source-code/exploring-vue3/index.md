@@ -129,6 +129,8 @@ export const isText = (v) => typeof v === 'string' || typeof v === 'number'
 ```
 
 ```js:title=runtime-core/component.js
+import { isObject } from '../shared'
+
 export const Text = Symbol('Text')
 export const isTextType = (v) => v === Text
 
@@ -141,7 +143,7 @@ export const isSameVNodeType = (n1, n2) => n1.type === n2.type && n1.key === n2.
 ```
 
 ```js:title=runtime-core/renderer.js
-import { isObject, isString, isArray, isText } from '../shared'
+import { isString, isArray, isText } from '../shared'
 import { Text, isTextType, isSetupComponent } from './component'
 import { isSameVNodeType, h } from './vnode'
 
@@ -212,13 +214,13 @@ const patchProps = (oldProps, newProps, node) => {
   // remove old props
   Object.keys(oldProps).forEach((propName) => {
     if (propName !== 'children' && propName !== 'key' && !(propName in newProps)) {
-      options.setProperty(node, propName, null, oldProps[propName]);
+      setProperty(node, propName, null, oldProps[propName]);
     }
   });
   // update old props
   Object.keys(newProps).forEach((propName) => {
     if (propName !== 'children' && propName !== 'key' && oldProps[propName] !== newProps[propName]) {
-      options.setProperty(node, propName, newProps[propName], oldProps[propName]);
+      setProperty(node, propName, newProps[propName], oldProps[propName]);
     }
   });
 }
@@ -457,10 +459,24 @@ import { effect, stop } from '../reactivity'
 import { recordInstanceBoundEffect, getCurrentInstance } from './component'
 
 export const watchEffect = (cb, { onTrack, onTrigger } = {}) => {
-  const e = effect(cb, {
+  let cleanup
+  const onInvalidate = (fn) => cleanup = e.options.onStop = fn
+  const getter = () => {
+    if (cleanup) {
+      cleanup()
+    }
+    return cb(onInvalidate)
+  }
+
+  const e = effect(getter, {
     onTrack,
     onTrigger,
+    // 这里我们写成 lazy 主要是为了 onInvalidate 正常运行
+    // 不 lazy 的话 onInvalidate 会在 e 定义好之前运行，onInvalidate 中有使用了 e，就会报错
+    lazy: true,
   })
+  e()
+
   recordInstanceBoundEffect(e)
   const instance = getCurrentInstance()
 
@@ -474,6 +490,42 @@ export const watchEffect = (cb, { onTrack, onTrigger } = {}) => {
   }
 }
 ```
+
+watchEffect 的回调函数还可以传入一个 onInvalidate 方法用于**注册**失效时的回调，执行时机是副作用即将重新执行时和侦听器被停止（如果在 setup() 中使用了 watchEffect, 则在卸载组件时），相当于 React.useEffect 返回的 cleanup 函数，至于为什么不设计成与 React.useEffect 一样返回 cleanup，是因为 watchEffect 被设计成支持参数传入异步函数的
+
+```js
+const useLogger = () => {
+  let id
+  return {
+    logger: (v, time = 2000) => new Promise(resolve => {
+      id = setTimeout(() => {
+        console.log(v)
+        resolve()
+      }, time)
+    }),
+    cancel: () => {
+      clearTimeout(id)
+      id = null
+    },
+  }
+}
+
+const App = {
+  setup(props) {
+    const count = ref(0)
+    const { logger, cancel } = useLogger()
+
+    watchEffect(async (onInvalidate) => {
+      onInvalidate(cancel)
+      await logger(count.value)
+    })
+
+    return () => <button onClick={() => count.value++}>log</button>
+  }
+}
+```
+
+继续看 computed 怎么绑定 effect
 
 ```js:title=reactivity/api-computed.js
 import { stop, computed as _computed } from '../reactivity'
@@ -492,13 +544,13 @@ export const computed = (options) => {
 
 ```js:title=reactivity/scheduler.js
 const resolvedPromise = Promise.resolve()
-const syncQueue = [] // 相对于 DOM 更新是同步的
+const queue = [] // 相对于 DOM 更新是同步的
 
-export const queueSyncJob = (job) => {
-  syncQueue.push(job)
+export const queueJob = (job) => {
+  queue.push(job)
   resolvedPromise.then(() => { // syncQueue 中的 callbacks 还是会加入到微任务中执行
-    const deduped = [...new Set(syncQueue)]
-    syncQueue.length = 0
+    const deduped = [...new Set(queue)]
+    queue.length = 0
     deduped.forEach(job => job())
   })
 }
@@ -510,25 +562,32 @@ const processComponent = (n1, n2, container, isSVG) => {
     // createInstance, setup...
     instance.update = effect(() => {
       // patch...
-    }, { scheduler: queueSyncJob })
+    }, { scheduler: queueJob })
   } else {
     // update...
   }
 }
 ```
 
-```js
-import { queueSyncJob } from './scheduler'
+```js:title=reactivity/api-watch.js
+import { queueJob } from './scheduler'
 
+const afterPaint = requestAnimationFrame
 export const watchEffect = (cb, { onTrack, onTrigger } = {}) => {
-  const e = effect(cb, {
+  // onInvalidate...
+  const scheduler = (job) => queueJob(() => afterPaint(job))
+  const e = effect(getter, {
+    lazy: true,
     onTrack,
     onTrigger,
-    scheduler: queueSyncJob,
+    scheduler,
   })
+  scheduler(e) // init run
   // bind effect on instance, return cleanup...
 }
 ```
+
+> 这里 watchEffect 进入微任务中又加到 afterPaint 是模仿了 React.useEffect 的调用时机，源码中并不是这样的，源码中实现了 `flush: 'pre' | 'sync' | 'post'` 这三种模式，我们这里为了简单做了一些修改
 
 其实就是创建一个队列，然后把更新和 watchEffect 的回调函数放到队列中，之后队列中的函数会通过 promise.then 放到微任务队列中去执行，实现异步更新
 
