@@ -1,22 +1,22 @@
 ---
-title: Exploring Vue3.0
-slug: /blogs/exploring-vue3
+title: Let's build a Vue3 runtime
+slug: /blogs/let-us-build-a-vue3-runtime
 date: 2020-09-24
 author: ahabhgk
-description: exploring vue3
+description: Let's build a Vue3 runtime
 tags:
   - SourceCode
 ---
 
 > **drafting**
 
-接上一篇 [Vue Reactivity 响应式原理](https://ahabhgk.github.io/blogs/vue-reactivity-source-code)，一起探索 Vue3.0 的一些新特性
+接上一篇 [Vue Reactivity 响应式原理](https://ahabhgk.github.io/blogs/vue-reactivity-source-code)
 
-首先，我们会一起写一个简易的 runtime，对于 Vue 如何运行的有一个大致的了解，当然我们实现的会和源码本身有一些不同，会简化很多，主要学习思想。然后看一看其它周边特性的源码，简单了解
+我们会一起写一个简易的 runtime，对于 Vue 如何运行的有一个大致的了解，当然我们实现的会和源码本身有一些不同，会简化很多，主要学习思想
 
 本篇文章并不是为了深入 Vue3 源码，而是对 Vue3 核心 VDOM 和新特性的简单了解，适合作为深入 Vue3 源码的**入门**文章
 
-## 🥳 Let's build a VDOM runtime
+## 👀 Vue3 Entry
 
 我们先看一下 Vue3 的 JSX 组件怎么写，因为我们只是造一个 runtime，所以不会涉及到 Vue 的模版编译，直接用 JSX 就很方便
 
@@ -66,7 +66,7 @@ export function createRenderer(options) {
 
 通过 `createRenderer(nodeOps).render(<App />, document.querySelector('root'))` 调用，没错我就是抄 React 的，但是与 React 不同的在于 React 中调用 `<App />` 返回的是一个 ReactElement，这里我们直接返回 VNode，ReactElement 其实就是 `Partial<Fiber>`，React 中是通过 ReactElement 对 Fiber（VNode）进行 diff，我们直接 VNode 对比 VNode 也是可以的（实际上 Vue 和 Preact 都是这么做的）
 
-### VNode design
+## 🌟 VNode Design
 
 接下来我们来设计 VNode，因为 VNode 很大程度上决定了内部 runtime 如何去 diff
 
@@ -100,7 +100,7 @@ export function h(type, props, ...children) {
 
 Vue3 的 JSX 语法已经跟 React 很像了，除了 props.children 是通过 Slots 实现以外，基本都一样，这里我们并不打算实现 Slots，因为 Slots 实现的 children 也是一种 props，是一段 JSX 而已，并不算特殊，毕竟你随便写个 props 不叫 children 然后传 JSX 也是可以的。Vue 专门弄一个 Slots 是为了兼容它的 template 语法
 
-### patchElement & patchText
+## ☄️ patchElement & patchText
 
 ```js:title=runtime-core/renderer.js
 export function createRenderer(options) {
@@ -162,7 +162,7 @@ export function createRenderer(options) {
     } else if (isTextType(type)) {
       processText(n1, n2, container)
     } else {
-      type.patch(/* TODO */)
+      type.patch(/* ... */)
     }
   }
 
@@ -181,14 +181,16 @@ const processText = (n1, n2, container) => {
     container.appendChild(node)
   } else {
     const node = n2.node = n1.node
-    node.nodeValue = n2.props.nodeValue
+    if (node.nodeValue !== n2.props.nodeValue) {
+      node.nodeValue !== n2.props.nodeValue
+    }
   }
 }
 
 const processElement = (n1, n2, container) => {
   if (n1 == null) {
     const node = n2.node = document.createElement(n2.type)
-    patchChildren(null, n2, node)
+    mountChildren(n2, node)
     patchProps(null, n2.props, node)
     container.appendChild(node)
   } else {
@@ -197,13 +199,32 @@ const processElement = (n1, n2, container) => {
     patchProps(n1.props, n2.props, node)
   }
 }
+
+const mountChildren = (vnode, container) => {
+  let children = vnode.props.children
+  children = isArray(children) ? children : [children]
+  vnode.children = []
+  for (let i = 0; i < children.length; i++) {
+    let child = children[i]
+    if (child == null) continue
+    child = isText(child) ? h(Text, { nodeValue: child }) : child
+    vnode.children[i] = child
+    patch(null, child, container)
+  }
+}
 ```
 
 可以看到对于 DOM 平台的操作是直接写上去的，并没有通过 options 传入，我们先这样耦合起来，后面再分离到 options 中
 
-processText 的逻辑很简单，processElement 与 processText 类似，只不过多了 patchChildren 和 patchProps，patchProps 一看就知道是用来更新 props 的，很简单，patchChildren 就是对于两个 VNode 的子节点的 diff，它与 patch 的不同在于 patchChildren 可以处理子节点是 VNode 数组的情况，对于子节点**如何 patch** 做了处理（指 key diff），而 patch 就是简简单单对于两个 VNode 节点的 diff
+processText 的逻辑很简单，processElement 与 processText 类似，只不过多了 patchChildren / mountChildren 和 patchProps
 
-所以对于 Element 的子节点会调用 patchChildren 处理，因为 Element 子节点可以是多个的，而对于 Component 的子节点会调用 patch 处理，因为 Component 子节点都仅有一个（Fragment 是有多个子节点的，对于它我们可以通过 compat 处理），当然 Component 的子节点也可以调用 patchChildren 处理，Preact 就是这样做的，这样 Preact 就不用对 Fragment 单独处理了（这里关键不在于怎样处理，而在于设计的 Component 子节点可不可以是多的，做对应处理即可）
+patchProps 一看就知道是用来更新 props 的
+
+mountChildren 就是对子节点处理下 Text 然后一一 patch
+
+patchChildren 就是对于两个 VNode 的子节点的 diff，它与 patch 的不同在于 patchChildren 可以处理子节点是 VNode 数组的情况，对于子节点**如何 patch** 做了处理（指 key diff），而 patch 就是简简单单对于两个 VNode 节点的 diff
+
+所以对于 Element 的子节点会调用 patchChildren / mountChildren 处理，因为 Element 子节点可以是多个的，而对于 Component 的子节点会调用 patch 处理，因为 Component 子节点都仅有一个（Fragment 是有多个子节点的，对于它我们可以通过 compat 处理），当然 Component 的子节点也可以调用 patchChildren 处理，Preact 就是这样做的，这样 Preact 就不用对 Fragment 单独处理了（这里关键不在于怎样处理，而在于设计的 Component 子节点可不可以是多的，做对应处理即可）
 
 接下来我们看一下 patchProps
 
@@ -258,11 +279,11 @@ function eventProxy(e) {
 
 值得注意的是第 35 行对于 `newValue === false` 的处理，是直接 removeAttribute 的，这是为了表单的一些属性。还有对于事件的监听，我们通过一个 eventProxy 代理，这样不仅方便移除事件监听，还减少了与 DOM 的通信，修改了事件监听方法直接修改代理即可，不至于与 DOM 通信移除旧的事件再添加新的事件
 
-接下来看 diff 算法的核心：patchChildren，我们先实现一个简易版的 key diff，后面会再次提到完整的 key diff，Vue3 的 key diff 也有比较亮眼的更新，后面会一起说
+接下来看 diff 算法的核心：patchChildren，我们先实现一个简易版的 key diff，不考虑节点的移动，后面会有完整的 key diff
 
 ```js:title=runtime-core/renderer.js {18,24}
 const patchChildren = (n1, n2, container) => {
-  const oldChildren = n1 ? n1.children : [] // 拿到旧的 VNode[]
+  const oldChildren = n1.children // 拿到旧的 VNode[]
   let newChildren = n2.props.children // 新的 children
   newChildren = isArray(newChildren) ? newChildren : [newChildren]
   n2.children = [] // 新的 VNode[]
@@ -325,7 +346,7 @@ setInterval(() => {
 }, 300)
 ```
 
-### patchComponent
+## 💥 patchComponent
 
 下面实现 Component 的 patch
 
@@ -335,15 +356,16 @@ const processComponent = (n1, n2, container) => {
     const instance = n2.instance = {
       props: reactive(n2.props), // initProps
       update: null,
+      subTree: null
     }
     const render = n2.type.setup(instance.props)
-    let prevRenderResult = null
-    instance.update = effect(() => {
+
+    instance.update = effect(() => { // component update 的入口，n2 是更新的根组件的 newVNode
       const renderResult = render()
       n2.children = [renderResult]
       renderResult.parent = n2
-      patch(prevRenderResult, renderResult, container)
-      prevRenderResult = renderResult
+      patch(instance.subTree, renderResult, container)
+      instance.subTree = renderResult
     })
   } else {
     // update...
@@ -353,7 +375,9 @@ const processComponent = (n1, n2, container) => {
 
 首先是 mount Component，需要在 VNode 上建立一个组件实例，用来存一些组件的东西，props 需要 reactive 一下，后面写 update Component 的时候就知道为什么了，然后获取 setup 返回的 render 函数，这里非常巧妙的就是组件的 update 方法是一个 effect 函数，这样对应他的状态和 props 改变时就可以自动去更新
 
-还有就是 render 和 prevRenderResult 我是通过闭包存的，并没有放到 instance 上面，因为后面并不会用到这两个，用闭包存就足够，当然在这里可以把 props 和 render 也用闭包存，然后就可以去掉 instance 了，更加轻便，但是可读性就会降低了，而且后面一些 API 的实现有个 instance 可能更好，同样是个取舍的问题而已
+还有就是 render 我是通过闭包存的，并没有放到 instance 上面，因为后面并不会用到这个，用闭包存就足够
+
+> 闭包是穷人的对象，对象是穷人的闭包
 
 我们来看组件的 update
 
@@ -397,7 +421,7 @@ const unmount = (vnode, doRemove = true) => {
   } else if (isTextType(type)) {
     if (doRemove) remove(vnode.node)
   } else {
-    type.unmount(/* TODO */)
+    type.unmount(/* ... */)
   }
 }
 ```
@@ -407,6 +431,8 @@ const unmount = (vnode, doRemove = true) => {
 注意这里的 deRemove 参数的作用，Element 的子节点可以不直接从 DOM 上移除，直接将该 Element 移除即可，但是 Element 子节点中可能有 Component，所以还是需要递归调用 unmount，触发 Component 的清理副作用（后面讲）和生命周期，解决方案就是加一个 deRemove 参数，Element unmount 时 doRemove 为 true，之后子节点的 doRemove 为 false
 
 最后还有清理副作用，生命周期就不提了，React 已经证明生命周期是可以不需要的，组件添加的 effect 在组件 unmount 后仍然存在，还没有清除，所以我们还需要在 unmount 中拿到组件所有的 effect，然后一一 stop，这时 stop 很简单，但如何拿到组件的 effect 就比较难
+
+## 💫 Scheduler
 
 其实 Vue 中并不会直接使用 Vue Reactivity 中的 API，从 Vue 中导出的 computed、watch、watchEffect 会把 effect 挂载到当前的组件实例上，用以之后清除 effect，我们只实现 computed 和简易的 watchEffect（不考虑 flush 为 post 和 pre 的情况）
 
@@ -434,12 +460,13 @@ export const recordInstanceBoundEffect = (effect) => {
 }
 ```
 
-```js:title=reactivity/renderer.js {6,8-10}
-const processComponent = (n1, n2, container, isSVG) => {
+```js:title=reactivity/renderer.js {7,9-11}
+const processComponent = (n1, n2, container) => {
   if (n1 == null) {
     const instance = n2.instance = {
       props: reactive(n2.props), // initProps
       update: null,
+      subTree: null,
       effects: [],
     }
     setCurrentInstance(instance)
@@ -454,7 +481,7 @@ const processComponent = (n1, n2, container, isSVG) => {
 
 组件的 setup 只会调用一次，所以在这里调用 setCurrentInstance 即可，这是与 React.FC 的主要区别之一
 
-```js:title=reactivity/api-watch.js
+```js:title=reactivity/api-watch.js {6,11}
 import { effect, stop } from '../reactivity'
 import { recordInstanceBoundEffect, getCurrentInstance } from './component'
 
@@ -493,7 +520,7 @@ export const watchEffect = (cb, { onTrack, onTrigger } = {}) => {
 
 watchEffect 的回调函数还可以传入一个 onInvalidate 方法用于**注册**失效时的回调，执行时机是副作用即将重新执行时和侦听器被停止（如果在 setup() 中使用了 watchEffect, 则在卸载组件时），相当于 React.useEffect 返回的 cleanup 函数，至于为什么不设计成与 React.useEffect 一样返回 cleanup，是因为 watchEffect 被设计成支持参数传入异步函数的
 
-```js
+```js {22-25}
 const useLogger = () => {
   let id
   return {
@@ -516,7 +543,7 @@ const App = {
     const { logger, cancel } = useLogger()
 
     watchEffect(async (onInvalidate) => {
-      onInvalidate(cancel)
+      onInvalidate(cancel) // 异步调用之前就注册失效时的回调
       await logger(count.value)
     })
 
@@ -557,7 +584,7 @@ export const queueJob = (job) => {
 ```
 
 ```js:title=reactivity/renderer.js {6}
-const processComponent = (n1, n2, container, isSVG) => {
+const processComponent = (n1, n2, container) => {
   if (n1 == null) {
     // createInstance, setup...
     instance.update = effect(() => {
@@ -569,7 +596,7 @@ const processComponent = (n1, n2, container, isSVG) => {
 }
 ```
 
-```js:title=reactivity/api-watch.js
+```js:title=reactivity/api-watch.js {3,6}
 import { queueJob } from './scheduler'
 
 const afterPaint = requestAnimationFrame
@@ -582,7 +609,7 @@ export const watchEffect = (cb, { onTrack, onTrigger } = {}) => {
     onTrigger,
     scheduler,
   })
-  scheduler(e) // init run
+  scheduler(e) // init run, run by scheduler (effect 的 lazy 为 false 时，即使有 scheduler 它的 init run 也不会通过 schduler 运行)
   // bind effect on instance, return cleanup...
 }
 ```
@@ -591,7 +618,7 @@ export const watchEffect = (cb, { onTrack, onTrigger } = {}) => {
 
 其实就是创建一个队列，然后把更新和 watchEffect 的回调函数放到队列中，之后队列中的函数会通过 promise.then 放到微任务队列中去执行，实现异步更新
 
-现在基本完成了！写一个 demo 看看效果～
+现在终于完成了！写一个 demo 看看效果～
 
 ```jsx
 /** @jsx h */
@@ -625,4 +652,125 @@ const App = {
 createRenderer().render(<App />, document.querySelector('#root'))
 ```
 
-## key diff
+## ⚡️ key diff
+
+这里我们只给出简单版的实现（React 使用的 key diff，相比 Vue 使用的少了些优化，但是简单易懂），具体讲解可以看这篇[渲染器的核心 Diff 算法](http://hcysun.me/vue-design/zh/renderer-diff.html)，是一位 Vue Team Member 写的，应该没有文章讲的比这篇更清晰易懂了
+
+```js:title=runtime-core/renderer.js {7,15,21,25-30,34-40}
+const patchChildren = (n1, n2, container) => {
+  const oldChildren = n1.children
+  let newChildren = n2.props.children
+  newChildren = isArray(newChildren) ? newChildren : [newChildren]
+  n2.children = []
+
+  let lastIndex = 0 // 存上一次 j 的值
+  for (let i = 0; i < newChildren.length; i++) {
+    if (newChildren[i] == null) continue
+    let newChild = newChildren[i]
+    newChild = isText(newChild) ? h(Text, { nodeValue: newChild }) : newChild
+    n2.children[i] = newChild
+    newChild.parent = n2
+
+    let find = false
+    for (let j = 0; j < oldChildren.length; j++) {
+      if (oldChildren[j] == null) continue
+      if (isSameVNodeType(oldChildren[j], newChild)) { // update
+        const oldChild = oldChildren[j]
+        oldChildren[j] = null
+        find = true
+
+        patch(oldChild, newChild, container)
+
+        if (j < lastIndex) { // j 在上一次 j 之前，需要移动
+          const refNode = newChildren[i - 1].node.nextSibling // 目前组件的 VNode.node 为 null，后面我们会 fix
+          container.insertBefore(oldChild.node, refNode)
+        } else { // no need to move
+          lastIndex = j
+        }
+        break
+      }
+    }
+    // mount
+    if (!find) {
+      const refNode = i - 1 < 0
+        ? oldChildren[0].node
+        : newChildren[i - 1].node.nextSibling
+      patch(null, newChild, container, refNode)
+    }
+  }
+
+  for (let oldChild of oldChildren) {
+    if (oldChild != null) unmount(oldChild)
+  }
+}
+```
+
+之前是不涉及节点移动的，不管有没有节点一律 appendChild，现在需要加上节点移动的情况，就需要处理没有节点时新添加节点的 mount，对于移动的节点需要找到要移动到的位置（refNode 前面）
+
+现在 mount 新节点时进行插入需要向 patch 传入 refNode，相应的更改之前的 patch
+
+```js:runtime-core/renderer.js {1,22-23,28,36,45}
+const patch = (n1, n2, container, anchor = null) => { // insertBefore(node, null) 就相当于 appendChild(node)
+  // unmount...
+
+  const { type } = n2
+  if (isSetupComponent(type)) {
+    processComponent(n1, n2, container, anchor)
+  } else if (isString(type)) {
+    processElement(n1, n2, container, anchor)
+  } else if (isTextType(type)) {
+    processText(n1, n2, container, anchor)
+  } else {
+    type.patch(/* ... */)
+  }
+}
+
+const processComponent = (n1, n2, container, anchor) => {
+  if (n1 == null) {
+    // ...
+
+    instance.update = effect(() => { // component update 的入口
+      // ...
+      patch(instance.subTree, renderResult, container, anchor)
+      n2.node = renderResult.node // mount 时给 component 添加 node，就是 render 得到子树的 node
+      instance.subTree = renderResult
+    }, { scheduler: queueJob })
+  } else {
+    const instance = n2.instance = n1.instance
+    n2.node = n1.node // 更新 node
+    // updateProps...
+  }
+}
+
+const processElement = (n1, n2, container, anchor) => {
+  if (n1 == null) {
+    // ...
+    container.insertBefore(node, anchor)
+  } else {
+    // ...
+  }
+}
+
+const processText = (n1, n2, container, anchor) => {
+  if (n1 == null) {
+    // ...
+    container.insertBefore(node, anchor)
+  } else {
+    // ...
+  }
+}
+```
+
+## 🎨 Renderer
+
+现在我们的 runtime 基本完成了，之前为了写起来方便并没有抽离出来平台操作，现在我们抽离出来
+
+```js:runtime-dom/index.js
+
+```
+
+## 😃 ramble
+
+
+
+> [simple-vue/runtime-core 实现完整代码](https://github.com/ahabhgk/simple-vue3/tree/master/packages/runtime-core)
