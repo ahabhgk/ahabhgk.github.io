@@ -6,7 +6,6 @@ author: ahabhgk
 description: Let's build a Vue3 runtime
 tags:
   - SourceCode
-  - Vue3
   - Front End Framework
 ---
 
@@ -682,7 +681,9 @@ const patchChildren = (n1, n2, container) => {
         patch(oldChild, newChild, container)
 
         if (j < lastIndex) { // j 在上一次 j 之前，需要移动
-          const refNode = newChildren[i - 1].node.nextSibling // 目前组件的 VNode.node 为 null，后面我们会 fix
+          // 1. 目前组件的 VNode.node 为 null，后面我们会 fix
+          // 2. newChildren[i - 1] 因为在上一轮已经 patch 过了，所以 node 不为 null
+          const refNode = newChildren[i - 1].node.nextSibling
           container.insertBefore(oldChild.node, refNode)
         } else { // no need to move
           lastIndex = j

@@ -1,14 +1,14 @@
 ---
-title: Promise 原理
-slug: /blogs/promise-source-code
+title: JavaScript
+slug: /notes/accumulator/javascript
 date: 2020-05-14
 author: ahabhgk
-description: promise 源码分析
+description: JavaScript
 tags:
-  - SourceCode
+  - Note
 ---
 
-先放出来简单实现的，更深刻的参考[工业聚：100 行代码实现 Promises/A+ 规范](https://zhuanlan.zhihu.com/p/83965949)，之后的一些深入的以后再补
+参考[工业聚：100 行代码实现 Promises/A+ 规范](https://zhuanlan.zhihu.com/p/83965949)
 
 ```js
 const isFunction = obj => typeof obj === 'function'
