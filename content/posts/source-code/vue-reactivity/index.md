@@ -6,6 +6,8 @@ author: ahabhgk
 description: Vue Reactivity 响应式原理
 tags:
   - SourceCode
+  - Vue3
+  - Front End Framework
 ---
 
 ![reactivity](./images/reactivity.png)

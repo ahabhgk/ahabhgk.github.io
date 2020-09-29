@@ -1,14 +1,14 @@
 ---
-title: Let's build a Vue3 runtime
-slug: /blogs/let-us-build-a-vue3-runtime
+title: Let's build a Vue3 runtime (1)
+slug: /blogs/let-us-build-a-vue3-runtime-1
 date: 2020-09-24
 author: ahabhgk
-description: Let's build a Vue3 runtime
+description: Let's build a Vue3 runtime (1)
 tags:
   - SourceCode
+  - Vue3
+  - Front End Framework
 ---
-
-> **drafting**
 
 接上一篇 [Vue Reactivity 响应式原理](https://ahabhgk.github.io/blogs/vue-reactivity-source-code)
 
@@ -54,7 +54,7 @@ createApp(App).mount('#app');
 我们写简单一点，去掉 app 的创建，因为创建 app 其实类似于一个作用域，app 的插件和指令等只对该 app 下的组件起作用
 
 ```js:title=runtime-core/renderer.js
-export function createRenderer(options) {
+export function createRenderer(renderOptions) {
 
   return {
     render(rootVNode, container) {
@@ -103,7 +103,7 @@ Vue3 的 JSX 语法已经跟 React 很像了，除了 props.children 是通过 S
 ## ☄️ patchElement & patchText
 
 ```js:title=runtime-core/renderer.js
-export function createRenderer(options) {
+export function createRenderer(renderOptions) {
   return {
     render(vnode, container) {
       if (vnode == null) {
@@ -147,7 +147,7 @@ import { isString, isArray, isText } from '../shared'
 import { Text, isTextType, isSetupComponent } from './component'
 import { isSameVNodeType, h } from './vnode'
 
-export function createRenderer(options) {
+export function createRenderer(renderOptions) {
   const patch = (n1, n2, container) => {
     if (n1 && !isSameVNodeType(n1, n2)) {
       unmount(n1)
@@ -214,7 +214,7 @@ const mountChildren = (vnode, container) => {
 }
 ```
 
-可以看到对于 DOM 平台的操作是直接写上去的，并没有通过 options 传入，我们先这样耦合起来，后面再分离到 options 中
+可以看到对于 DOM 平台的操作是直接写上去的，并没有通过 renderOptions 传入，我们先这样耦合起来，后面再分离到 renderOptions 中
 
 processText 的逻辑很简单，processElement 与 processText 类似，只不过多了 patchChildren / mountChildren 和 patchProps
 
@@ -709,7 +709,7 @@ const patchChildren = (n1, n2, container) => {
 
 现在 mount 新节点时进行插入需要向 patch 传入 refNode，相应的更改之前的 patch
 
-```js:runtime-core/renderer.js {1,22-23,28,36,45}
+```js:title=runtime-core/renderer.js {1,22-23,28,36,45}
 const patch = (n1, n2, container, anchor = null) => { // insertBefore(node, null) 就相当于 appendChild(node)
   // unmount...
 
@@ -763,14 +763,88 @@ const processText = (n1, n2, container, anchor) => {
 
 ## 🎨 Renderer
 
-现在我们的 runtime 基本完成了，之前为了写起来方便并没有抽离出来平台操作，现在我们抽离出来
+现在我们的 runtime 基本完成了，之前为了写起来方便并没有抽离出来平台操作，现在我们抽离出来，然后把原来的从传入的 renderOptions 引入即可
 
-```js:runtime-dom/index.js
+```js:title=runtime-dom/index.js
+import { createRenderer, h } from '../runtime-core'
 
+const nodeOps = {
+  querySelector: (sel) => document.querySelector(sel),
+
+  insert: (child, parent, anchor) => {
+    parent.insertBefore(child, anchor ?? null)
+  },
+
+  remove: child => {
+    const parent = child.parentNode
+    if (parent) {
+      parent.removeChild(child)
+    }
+  },
+
+  createElement: (tag) => document.createElement(tag),
+
+  createText: text => document.createTextNode(text),
+
+  nextSibling: node => node.nextSibling,
+
+  setProperty: (node, propName, newValue, oldValue) => {
+    if (propName[0] === 'o' && propName[1] === 'n') {
+      const eventType = propName.toLowerCase().slice(2);
+  
+      if (!node.listeners) node.listeners = {};
+      node.listeners[eventType] = newValue;
+  
+      if (newValue) {
+        if (!oldValue) {
+          node.addEventListener(eventType, eventProxy);
+        }
+      } else {
+        node.removeEventListener(eventType, eventProxy);
+      }
+    } else if (newValue !== oldValue) {
+      if (propName in node) {
+        node[propName] = newValue == null ? '' : newValue
+      } else if (newValue == null || newValue === false) {
+        node.removeAttribute(propName)
+      } else {
+        node.setAttribute(propName, newValue)
+      }
+    }
+  },
+}
+
+function eventProxy(e) {
+  // this: node
+  this.listeners[e.type](e)
+}
+
+export const createApp = (rootComponent) => ({
+  mount: (rootSel) =>
+    createRenderer(nodeOps).render(h(rootComponent), nodeOps.querySelector(rootSel))
+})
+```
+
+```js:title=runtime-core/renderer.js
+export function createRenderer(renderOptions) {
+  const {
+    createText: hostCreateText,
+    createElement: hostCreateElement,
+    insert: hostInsert,
+    nextSibling: hostNextSibling,
+    setProperty: hostSetProperty,
+    remove: hostRemove,
+  } = renderOptions
+  // ...
+}
 ```
 
 ## 😃 ramble
 
+1. 之前 Vue2 的时候一直对 Vue 不太感兴趣，觉得没 React 精简好用，而且那时候 React 已经有 Hooks 了，后来 Vue Reactivity 和 Composition API 出现后，同时越发觉得 Hooks 有很重的心智负担，才逐渐想去深入了解 Vue，从之前写 Reactivity 解析到现在写 runtime，发现 Vue3 的心智负担并没有想象中的那么少，但还是抵挡不住它的简单好用
 
+2. 对 Vue 的越来越深入也让我越发觉得 Vue 和 React 很多地方是一样的，也发现了它们核心部分的不同，Vue 就是 Proxy 实现的响应式 + VDOM runtime + 模版 complier，React 因为是一遍一遍的刷新，所以是偏向函数式的 Hooks + VDOM runtime (Fiber) + Scheduler，所以总结来说一个前端框架的核心就是数据层（reactivity、hooks、ng service）和视图连接层（VDOM、complier）
+
+3. 本来想一篇写完的，包括 Teleport、Suspense 这些，但是已经写太长了，于是分成两篇，下一篇会讲这些，同时简单看看 Vue3 做了哪些编译优化，就不专门写模版编译的文章了
 
 > [simple-vue/runtime-core 实现完整代码](https://github.com/ahabhgk/simple-vue3/tree/master/packages/runtime-core)
