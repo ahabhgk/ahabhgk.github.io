@@ -1,9 +1,9 @@
 ---
-title: Let's build a Vue3 runtime (1)
-slug: /blogs/let-us-build-a-vue3-runtime-1
+title: Let's build a Vue3 runtime
+slug: /blogs/let-us-build-a-vue3-runtime
 date: 2020-09-24
 author: ahabhgk
-description: Let's build a Vue3 runtime (1)
+description: Let's build a Vue3 runtime
 tags:
   - SourceCode
   - Vue3
@@ -845,6 +845,6 @@ export function createRenderer(renderOptions) {
 
 2. 对 Vue 的越来越深入也让我越发觉得 Vue 和 React 很多地方是一样的，也发现了它们核心部分的不同，Vue 就是 Proxy 实现的响应式 + VDOM runtime + 模版 complier，React 因为是一遍一遍的刷新，所以是偏向函数式的 Hooks + VDOM runtime (Fiber) + Scheduler，所以总结来说一个前端框架的核心就是数据层（reactivity、hooks、ng service）和视图连接层（VDOM、complier）
 
-3. 本来想一篇写完的，包括 Teleport、Suspense 这些，但是已经写太长了，于是分成两篇，下一篇会讲这些，同时简单看看 Vue3 做了哪些编译优化，就不专门写模版编译的文章了
+3. 没有处理 svg，但是也很简单，这篇写的时候改了很多次，感觉已经写的很复杂了，所以在有的地方做了简化，更完整的可以看这个仓库
 
 > [simple-vue/runtime-core 实现完整代码](https://github.com/ahabhgk/simple-vue3/tree/master/packages/runtime-core)
