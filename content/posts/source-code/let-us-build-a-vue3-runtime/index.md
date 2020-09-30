@@ -440,7 +440,7 @@ const unmount = (vnode, doRemove = true) => {
 ```js:title=runtime-core/renderer.js {5,6}
 const unmount = (vnode, doRemove = true) => {
   const { type } = vnode
-  if (isObject(type)) {
+  if (isSetupComponent(type)) {
     const instance = { vnode }
     instance.effects.forEach(stop)
     stop(instance.update)
@@ -655,7 +655,7 @@ createRenderer().render(<App />, document.querySelector('#root'))
 
 这里我们只给出简单版的实现（React 使用的 key diff，相比 Vue 使用的少了些优化，但是简单易懂），具体讲解可以看这篇[渲染器的核心 Diff 算法](http://hcysun.me/vue-design/zh/renderer-diff.html)，是一位 Vue Team Member 写的，应该没有文章讲的比这篇更清晰易懂了
 
-```js:title=runtime-core/renderer.js {7,15,21,25-30,34-40}
+```js:title=runtime-core/renderer.js {7,15,21,25-32,36-42}
 const patchChildren = (n1, n2, container) => {
   const oldChildren = n1.children
   let newChildren = n2.props.children
