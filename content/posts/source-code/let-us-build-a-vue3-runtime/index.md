@@ -9,8 +9,6 @@ tags:
   - Front End Framework
 ---
 
-接上一篇 [Vue Reactivity 响应式原理](https://ahabhgk.github.io/blogs/vue-reactivity-source-code)
-
 我们会一起写一个简易的 runtime，对于 Vue 如何运行的有一个大致的了解，当然我们实现的会和源码本身有一些不同，会简化很多，主要学习思想
 
 本篇文章并不是为了深入 Vue3 源码，而是对 Vue3 核心 VDOM 和新特性的简单了解，适合作为深入 Vue3 源码的**入门**文章

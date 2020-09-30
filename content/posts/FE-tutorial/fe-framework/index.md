@@ -6,6 +6,7 @@ author: ahabhgk
 description: Redrock 前端暑期培训，前端框架通识
 tags:
   - FE Tutorial
+  - Front End Framework
 ---
 
 ![frontend evolution](./images/frontend-evolution.png)
