@@ -121,15 +121,16 @@ export function createRenderer(renderOptions) {
 ```js:title=shared/index.js
 export const isObject = (value) => typeof value === 'object' && value !== null
 export const isString = (value) => typeof value === 'string'
+export const isNumber = (value) => typeof value === 'number'
+export const isText = (v) => isString(v) || isNumber(v)
 export const isArray = Array.isArray
-export const isText = (v) => typeof v === 'string' || typeof v === 'number'
 ```
 
 ```js:title=runtime-core/component.js
 import { isObject } from '../shared'
 
-export const Text = Symbol('Text')
-export const isTextType = (v) => v === Text
+export const TextType = Symbol('TextType')
+export const isTextType = (v) => v === TextType
 
 export const isSetupComponent = (c) => isObject(c) && 'setup' in c
 ```
@@ -141,7 +142,7 @@ export const isSameVNodeType = (n1, n2) => n1.type === n2.type && n1.key === n2.
 
 ```js:title=runtime-core/renderer.js
 import { isString, isArray, isText } from '../shared'
-import { Text, isTextType, isSetupComponent } from './component'
+import { TextType, isTextType, isSetupComponent } from './component'
 import { isSameVNodeType, h } from './vnode'
 
 export function createRenderer(renderOptions) {
@@ -167,7 +168,7 @@ export function createRenderer(renderOptions) {
 }
 ```
 
-patch（也就是 diff）在 type 判断最后加一个“后门”，我们可以用它来实现一些深度定制的组件，比如 setupComponent 就可以放到这里实现，或者还可以实现 Hooks（抄 Preact 的，Preact Compat 很多实现都是拿到组件实例 this 去 hack this 上的一些方法），这里我们甚至可以实现一套 Preact Component……
+patch（也就是 diff）在 type 判断最后加一个“后门”，我们可以用它来实现一些深度定制的组件，比如 setupComponent 就可以放到这里实现，或者还可以实现 Hooks（抄 Preact 的，Preact Compat 很多实现都是拿到组件实例 this 去 hack this 上的一些方法，或者再拿内部的一些方法去处理，比如 diff、diffChildren……），这里我们甚至可以实现一套 Preact Component……
 
 diff 最主要的就是对于 Element 和 Text 的 diff，对应元素节点和文本节点，所以我们先实现这两个方法
 
@@ -204,7 +205,7 @@ const mountChildren = (vnode, container) => {
   for (let i = 0; i < children.length; i++) {
     let child = children[i]
     if (child == null) continue
-    child = isText(child) ? h(Text, { nodeValue: child }) : child
+    child = isText(child) ? h(TextType, { nodeValue: child }) : child
     vnode.children[i] = child
     patch(null, child, container)
   }
@@ -289,7 +290,7 @@ const patchChildren = (n1, n2, container) => {
     if (newChildren[i] == null) continue
     let newChild = newChildren[i]
     // 处理 Text，Text 也会建立 VNode，Text 不直接暴露给开发者，而是在内部处理
-    newChild = isText(newChild) ? h(Text, { nodeValue: newChild }) : newChild
+    newChild = isText(newChild) ? h(TextType, { nodeValue: newChild }) : newChild
     n2.children[i] = newChild
     newChild.parent = n2 // 与 n2.children 建立内部 VNode Tree
 
@@ -664,7 +665,7 @@ const patchChildren = (n1, n2, container) => {
   for (let i = 0; i < newChildren.length; i++) {
     if (newChildren[i] == null) continue
     let newChild = newChildren[i]
-    newChild = isText(newChild) ? h(Text, { nodeValue: newChild }) : newChild
+    newChild = isText(newChild) ? h(TextType, { nodeValue: newChild }) : newChild
     n2.children[i] = newChild
     newChild.parent = n2
 
@@ -681,8 +682,8 @@ const patchChildren = (n1, n2, container) => {
         if (j < lastIndex) { // j 在上一次 j 之前，需要移动
           // 1. 目前组件的 VNode.node 为 null，后面我们会 fix
           // 2. newChildren[i - 1] 因为在上一轮已经 patch 过了，所以 node 不为 null
-          const refNode = newChildren[i - 1].node.nextSibling
-          container.insertBefore(oldChild.node, refNode)
+          const refNode = getNextSibling(newChildren[i - 1])
+          move(oldChild, container, refNode)
         } else { // no need to move
           lastIndex = j
         }
@@ -692,8 +693,8 @@ const patchChildren = (n1, n2, container) => {
     // mount
     if (!find) {
       const refNode = i - 1 < 0
-        ? oldChildren[0].node
-        : newChildren[i - 1].node.nextSibling
+        ? getNode(oldChildren[0])
+        : getNextSibling(newChildren[i - 1])
       patch(null, newChild, container, refNode)
     }
   }
@@ -706,7 +707,9 @@ const patchChildren = (n1, n2, container) => {
 
 之前是不涉及节点移动的，不管有没有节点一律 appendChild，现在需要加上节点移动的情况，就需要处理没有节点时新添加节点的 mount，对于移动的节点需要找到要移动到的位置（refNode 前面）
 
-现在 mount 新节点时进行插入需要向 patch 传入 refNode，相应的更改之前的 patch
+现在 mount 新节点时进行插入需要向 patch 传入 refNode，需要相应的更改之前的 patch，同时取 refNode 和 move 时会根据 type 不同操作也不同，我们这里将这几个操作进行封装
+
+> 现在根据 type 不同封装出的操作有这些，patch 用来进入 VNode 更新，getNode 用于插入新 VNode 时取 oldChildren[0] 的 node，getNextSibling 用于取移动 VNode 时取 nextSibling，move 用来移动节点，unmount 用来移除 VNode，这些操作都是在该 diff 算法下会根据 type 不同有不同操作的一个封装，此外再算上 mountChildren、patchChildren 和 renderOptions，作为 internals 传入 type 的这五个方法中（剩余的方法可以通过以上方法调用到，所以不用暴露出去），用于深度定制组件，下一篇会详细讲 Vue3 Compat，表示 Vue3 中周边组件和一些其他新特性的实现原理，作为本篇的补充
 
 ```js:title=runtime-core/renderer.js {1,22-23,28,36,45}
 const patch = (n1, n2, container, anchor = null) => { // insertBefore(node, null) 就相当于 appendChild(node)
@@ -724,20 +727,29 @@ const patch = (n1, n2, container, anchor = null) => { // insertBefore(node, null
   }
 }
 
-const processComponent = (n1, n2, container, anchor) => {
-  if (n1 == null) {
-    // ...
+const getNode = (vnode) => { // patchChildren 在插入新 VNode 时调用 getNode(oldChildren[0])
+  if (!vnode) return null // oldChildren[0] 为 null 是返回 null 相当于 appendChild
+  const { type } = vnode
+  if (isSetupComponent(type)) return getNode(vnode.instance.subTree)
+  if (isString(type) || isTextType(type)) return vnode.node
+  return type.getNode(internals, { vnode })
+}
 
-    instance.update = effect(() => { // component update 的入口
-      // ...
-      patch(instance.subTree, renderResult, container, anchor)
-      n2.node = renderResult.node // mount 时给 component 添加 node，就是 render 得到子树的 node
-      instance.subTree = renderResult
-    }, { scheduler: queueJob })
+const getNextSibling = (vnode) => { // patchChildren 在进行移动 VNode 前获得 refNode 调用
+  const { type } = vnode
+  if (isSetupComponent(type)) return getNextSibling(vnode.instance.subTree)
+  if (isString(type) || isTextType(type)) return hostNextSibling(vnode.node)
+  return type.getNextSibling(internals, { vnode })
+}
+
+const move = (vnode, container, anchor) => { // patchChildren 中用于移动 VNode
+  const { type } = vnode
+  if (isSetupComponent(type)) {
+    move(vnode.instance.subTree, container, anchor)
+  } else if (isString(type) || isTextType(type)) {
+    hostInsert(vnode.node, container, anchor)
   } else {
-    const instance = n2.instance = n1.instance
-    n2.node = n1.node // 更新 node
-    // updateProps...
+    type.move(internals, { vnode, container, anchor })
   }
 }
 
@@ -756,6 +768,14 @@ const processText = (n1, n2, container, anchor) => {
     container.insertBefore(node, anchor)
   } else {
     // ...
+  }
+}
+
+const mountChildren = (vnode, container, isSVG, anchor) => {
+  // ...
+  for (/* ... */) {
+    // ...
+    patch(null, child, container, isSVG, anchor)
   }
 }
 ```
