@@ -353,18 +353,23 @@ const processComponent = (n1, n2, container) => {
   if (n1 == null) {
     const instance = n2.instance = {
       props: reactive(n2.props), // initProps
+      render: null,
       update: null,
-      subTree: null
+      subTree: null,
+      vnode: n2,
     }
-    const render = n2.type.setup(instance.props)
+    const render = instance.render = n2.type.setup(instance.props)
+    setupRenderEffect(instance, n2, container, anchor)
 
-    instance.update = effect(() => { // component update 的入口，n2 是更新的根组件的 newVNode
-      const renderResult = render()
-      n2.children = [renderResult]
-      renderResult.parent = n2
-      patch(instance.subTree, renderResult, container)
-      instance.subTree = renderResult
-    })
+    function setupRenderEffect(instance, vnode, container, anchor) {
+      instance.update = effect(() => { // component update 的入口，n2 是更新的根组件的 newVNode
+        const renderResult = render()
+        vnode.children = [renderResult]
+        renderResult.parent = vnode
+        patch(instance.subTree, renderResult, container, anchor)
+        instance.subTree = renderResult
+      })
+    }
   } else {
     // update...
   }
@@ -372,10 +377,6 @@ const processComponent = (n1, n2, container) => {
 ```
 
 首先是 mount Component，需要在 VNode 上建立一个组件实例，用来存一些组件的东西，props 需要 reactive 一下，后面写 update Component 的时候就知道为什么了，然后获取 setup 返回的 render 函数，这里非常巧妙的就是组件的 update 方法是一个 effect 函数，这样对应他的状态和 props 改变时就可以自动去更新
-
-还有就是 render 我是通过闭包存的，并没有放到 instance 上面，因为后面并不会用到这个，用闭包存就足够
-
-> 闭包是穷人的对象，对象是穷人的闭包
 
 我们来看组件的 update
 
@@ -463,12 +464,14 @@ const processComponent = (n1, n2, container) => {
   if (n1 == null) {
     const instance = n2.instance = {
       props: reactive(n2.props), // initProps
+      render: null,
       update: null,
       subTree: null,
-      effects: [],
+      vnode: n2,
+      effects: [], // 用来存 setup 中调用 watchEffect 和 computed 的 effect
     }
     setCurrentInstance(instance)
-    const render = n2.type.setup(instance.props)
+    const render = instance.render = n2.type.setup(instance.props)
     setCurrentInstance(null)
     // update effect...
   } else {
@@ -583,14 +586,11 @@ export const queueJob = (job) => {
 
 ```js:title=reactivity/renderer.js {6}
 const processComponent = (n1, n2, container) => {
-  if (n1 == null) {
-    // createInstance, setup...
-    instance.update = effect(() => {
-      // patch...
-    }, { scheduler: queueJob })
-  } else {
-    // update...
-  }
+  // createInstance, setup...
+      instance.update = effect(() => {
+        // patch...
+      }, { scheduler: queueJob }) // 没有 lazy，mount 时没必要通过异步调用
+  // ...
 }
 ```
 
@@ -750,6 +750,16 @@ const move = (vnode, container, anchor) => { // patchChildren 中用于移动 VN
     hostInsert(vnode.node, container, anchor)
   } else {
     type.move(internals, { vnode, container, anchor })
+  }
+}
+
+const processComponent = (n1, n2, container, anchor) => {
+  if (n1 == null) {
+    // ...
+        patch(instance.subTree, renderResult, container, anchor)
+    // ...
+  } else {
+    // ...
   }
 }
 
