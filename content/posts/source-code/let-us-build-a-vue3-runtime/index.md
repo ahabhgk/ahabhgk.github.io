@@ -359,17 +359,13 @@ const processComponent = (n1, n2, container) => {
       vnode: n2,
     }
     const render = instance.render = n2.type.setup(instance.props)
-    setupRenderEffect(instance, n2, container, anchor)
-
-    function setupRenderEffect(instance, vnode, container, anchor) {
-      instance.update = effect(() => { // component update 的入口，n2 是更新的根组件的 newVNode
-        const renderResult = render()
-        vnode.children = [renderResult]
-        renderResult.parent = vnode
-        patch(instance.subTree, renderResult, container, anchor)
-        instance.subTree = renderResult
-      })
-    }
+    instance.update = effect(() => { // component update 的入口，n2 是更新的根组件的 newVNode
+      const renderResult = render()
+      n2.children = [renderResult]
+      renderResult.parent = n2
+      patch(instance.subTree, renderResult, container)
+      instance.subTree = renderResult
+    })
   } else {
     // update...
   }
@@ -587,9 +583,9 @@ export const queueJob = (job) => {
 ```js:title=reactivity/renderer.js {6}
 const processComponent = (n1, n2, container) => {
   // createInstance, setup...
-      instance.update = effect(() => {
-        // patch...
-      }, { scheduler: queueJob }) // 没有 lazy，mount 时没必要通过异步调用
+    instance.update = effect(() => {
+      // patch...
+    }, { scheduler: queueJob }) // 没有 lazy，mount 时没必要通过异步调用
   // ...
 }
 ```
@@ -756,7 +752,7 @@ const move = (vnode, container, anchor) => { // patchChildren 中用于移动 VN
 const processComponent = (n1, n2, container, anchor) => {
   if (n1 == null) {
     // ...
-        patch(instance.subTree, renderResult, container, anchor)
+      patch(instance.subTree, renderResult, container, anchor)
     // ...
   } else {
     // ...
