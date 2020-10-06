@@ -545,7 +545,7 @@ export const defineAsyncComponent = (options) => {
 
 我们目前写的不能实现的一种情况是 suspensible 为 false 但是有 parentSuspense
 
-```js
+```jsx
 const ProfileDetails = defineAsyncComponent({
   loader: () => import('./async.jsx'),
   loadingComponent: defineComponent(() => () => <h1>Loading...</h1>),

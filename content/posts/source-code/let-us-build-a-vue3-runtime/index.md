@@ -518,7 +518,7 @@ export const watchEffect = (cb, { onTrack, onTrigger } = {}) => {
 
 watchEffect 的回调函数还可以传入一个 onInvalidate 方法用于**注册**失效时的回调，执行时机是副作用即将重新执行时和侦听器被停止（如果在 setup() 中使用了 watchEffect, 则在卸载组件时），相当于 React.useEffect 返回的 cleanup 函数，至于为什么不设计成与 React.useEffect 一样返回 cleanup，是因为 watchEffect 被设计成支持参数传入异步函数的
 
-```js {22-25}
+```jsx {22-25}
 const useLogger = () => {
   let id
   return {
