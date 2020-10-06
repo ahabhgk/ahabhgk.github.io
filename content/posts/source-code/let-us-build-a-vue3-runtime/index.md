@@ -382,6 +382,7 @@ const processComponent = (n1, n2, container) => {
     // mount...
   } else {
     const instance = n2.instance = n1.instance
+    instance.vnode = n2
     // updateProps, 根据 vnode.props 修改 instance.props
     Object.keys(n2.props).forEach(key => {
       const newValue = n2.props[key]
