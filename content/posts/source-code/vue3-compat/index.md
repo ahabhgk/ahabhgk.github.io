@@ -135,7 +135,7 @@ export const Teleport = {
 
 ```js:title=runtime-core/inject.js {12,14,23}
 import { isFunction } from '../shared'
-import { getCurrentInstance, getParentInstance } from './component'
+import { getCurrentInstance } from './component'
 
 export const provide = (key, value) => {
   const currentInstance = getCurrentInstance()
@@ -184,15 +184,15 @@ const processComponent = (n1, n2, container, isSVG, anchor) => {
       parent: null,
       provides: null,
     }
-    const parentInstance = instance.parent = getParentInstance(instance)
+    const parentInstance = instance.parent = getParentInstance(n2)
     instance.provides = parentInstance ? parentInstance.provides : Object.create(null) // 没有 parentInstance 说明是根组件，它的 provides 我们初始化成空对象
   } // ...
 }
 ```
 
 ```js:title=runtime/component.js {4}
-export const getParentInstance = (instance) => {
-  let parentVNode = instance.vnode.parent
+export const getParentInstance = (vnode) => {
+  let parentVNode = vnode.parent
   while (parentVNode != null) {
     if (parentVNode.instance != null) return parentVNode.instance
     parentVNode = parentVNode.parent
@@ -567,6 +567,83 @@ const App = {
 
 ## KeepAlive
 
+建立一个 Map 作为缓存，以子节点的 key 或 type 作为缓存的 key（`const key = vnode.key == null ? vnode.type : vnode.key`）；KeepAlive 的 render function 被调用时，也就是 KeepAlive 被渲染时，会根据 props 的 includes 和 excludes 规则判断 children 是否可以被缓存，不可以就直接渲染，可以就在缓存里找，如果缓存里有就用缓存中的进行渲染，children 的状态都是旧的在缓存中的，否则用新的 children 并进行缓存
+
+```js {11-13,17-19}
+if (cachedVNode) {
+  // copy over mounted state
+  vnode.el = cachedVNode.el
+  vnode.component = cachedVNode.component
+  if (vnode.transition) {
+    // recursively update transition hooks on subTree
+    setTransitionHooks(vnode, vnode.transition!)
+  }
+  // avoid vnode being mounted as fresh
+  vnode.shapeFlag |= ShapeFlags.COMPONENT_KEPT_ALIVE
+  // make this key the freshest
+  keys.delete(key)
+  keys.add(key)
+} else {
+  keys.add(key)
+  // prune oldest entry
+  if (max && keys.size > parseInt(max as string, 10)) {
+    pruneCacheEntry(keys.values().next().value)
+  }
+}
+```
+
+源码中 KeepAlive 的缓存用到了 LRU 算法，keys 是一个 Set，可以看到每次使用缓存时会刷新一下缓存，变成新鲜的，如果再来新缓存时，缓存超过了 max，就删去最陈旧的缓存，利用 Set 对 LRU 进行了简易的实现
+
 ## Transition
+
+## Ref
+
+ref（指 runtime 的 ref）是用来拿到宿主环境的节点实例或者组件实例的
+
+```js:title=runtime-core/renderer.js {7,19,20}
+const setRef = (ref, oldRef, vnode) => {
+  // unset old ref
+  if (oldRef != null && oldRef !== ref) {
+    if (isRef(oldRef)) oldRef.value = null
+  }
+  // set new ref
+  const value = getRefValue(vnode)
+  if (isRef(ref)) {
+    ref.value = value
+  } else if (isFunction(ref)) {
+    callWithErrorHandling(ref, getParentInstance(vnode), [value])
+  } else {
+    console.warn('Invalid ref type:', value, `(${typeof value})`)
+  }
+}
+
+const getRefValue = (vnode) => {
+  const { type } = vnode
+  if (isSetupComponent(type)) return vnode.instance
+  if (isString(type) || isTextType(type)) return vnode.node
+  return type.getRefValue(internals, { vnode })
+}
+```
+
+ref 的更新由于传入的 ref（指响应式 ref 用来接收实例）可能不同（`<img ref={num % 2 ? imgRef1 : imgRef2} />`），所以要先清空 oldRef，再赋值 newRef
+
+```js:title=runtime-core/renderer.js
+const patch = (n1, n2, container, isSVG, anchor = null) => {
+  // ...
+  if (n2.ref != null) {
+    setRef(n2.ref, n1?.ref ?? null, n2)
+  }
+}
+
+const unmount = (vnode, doRemove = true) => {
+  const { type, ref } = vnode
+  if (ref != null) {
+    setRef(ref, null, vnode)
+  }
+  // ...
+}
+```
+
+ref 的更新主要在两个地方，一个是在 patch 之后，也就是更新 DOM 节点或组件实例之后，保证拿到最新的值，另一个是在 unmount 移除节点之前
 
 ## block tree & patch flag
