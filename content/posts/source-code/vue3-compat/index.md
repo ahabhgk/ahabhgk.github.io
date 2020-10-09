@@ -9,8 +9,6 @@ tags:
   - Front End Framework
 ---
 
-> drafting
-
 Vue3 中内置组件和一些其他新特性的实现原理，作为上一篇的补充
 
 ## Fragment
@@ -596,6 +594,119 @@ if (cachedVNode) {
 
 ## Transition
 
+Transition 是通过给 DOM 节点在合适时机添加移除 CSS 类名实现的，对于不同平台有不同的实现方法，Transiton 是针对浏览器平台对 BaseTransition 的封装
+
+```ts
+// DOM Transition is a higher-order-component based on the platform-agnostic
+// base Transition component, with DOM-specific logic.
+export const Transition: FunctionalComponent<TransitionProps> = (
+  props,
+  { slots }
+) => h(BaseTransition, resolveTransitionProps(props), slots)
+
+export function resolveTransitionProps(
+  rawProps: TransitionProps
+): BaseTransitionProps<Element> {
+  // 拿到对应的 CSS 类名
+  let {
+    name = 'v',
+    type,
+    css = true,
+    duration,
+    enterFromClass = `${name}-enter-from`,
+    enterActiveClass = `${name}-enter-active`,
+    enterToClass = `${name}-enter-to`,
+    appearFromClass = enterFromClass,
+    appearActiveClass = enterActiveClass,
+    appearToClass = enterToClass,
+    leaveFromClass = `${name}-leave-from`,
+    leaveActiveClass = `${name}-leave-active`,
+    leaveToClass = `${name}-leave-to`
+  } = rawProps
+  // ...
+  // 重写 hooks 回调函数，根据对应的添加或移除 CSS 类名
+  return extend(baseProps, {
+    onBeforeEnter(el) {
+      onBeforeEnter && onBeforeEnter(el)
+      addTransitionClass(el, enterActiveClass)
+      addTransitionClass(el, enterFromClass)
+    },
+    onBeforeAppear(el) {
+      onBeforeAppear && onBeforeAppear(el)
+      addTransitionClass(el, appearActiveClass)
+      addTransitionClass(el, appearFromClass)
+    },
+    // ...
+  } as BaseTransitionProps<Element>)
+}
+```
+
+BaseTransition 做的就是从 props 传入的 hooks 通过 resolveTransitionHooks 进一步进行封装，封装成针对 diff 阶段各个时机进行调用的 hooks（beforeEnter、enter、leave、afterLeave、delayLeave、clone），setTransitionHooks 就是把这些 hooks 放到 vnode 上，以便在 diff 过程中进行调用
+
+```ts {29-35,45-52}
+const BaseTransitionImpl = {
+  name: `BaseTransition`,
+
+  props: {
+    // ...
+  },
+
+  setup(props: BaseTransitionProps, { slots }: SetupContext) {
+    const instance = getCurrentInstance()!
+    const state = useTransitionState()
+    // ...
+
+    return () => {
+      const children =
+        slots.default && getTransitionRawChildren(slots.default(), true)
+      // ...
+
+      // at this point children has a guaranteed length of 1.
+      const child = children[0]
+      // ...
+
+      // in the case of <transition><keep-alive/></transition>, we need to
+      // compare the type of the kept-alive children.
+      const innerChild = getKeepAliveChild(child)
+      if (!innerChild) {
+        return emptyPlaceholder(child)
+      }
+
+      const enterHooks = resolveTransitionHooks(
+        innerChild,
+        rawProps,
+        state,
+        instance
+      )
+      setTransitionHooks(innerChild, enterHooks)
+
+      const oldChild = instance.subTree
+      const oldInnerChild = oldChild && getKeepAliveChild(oldChild)
+      // ...
+      if (
+        oldInnerChild &&
+        oldInnerChild.type !== Comment &&
+        (!isSameVNodeType(innerChild, oldInnerChild) || transitionKeyChanged)
+      ) {
+        const leavingHooks = resolveTransitionHooks(
+          oldInnerChild,
+          rawProps,
+          state,
+          instance
+        )
+        // update old tree's hooks in case of dynamic transition
+        setTransitionHooks(oldInnerChild, leavingHooks)
+        // ...
+      }
+
+      return child
+    }
+  }
+}
+```
+
+调用的时机就是有关 vnode 节点位置改变的时候，分别是 mount、move 和 unmount。mount 时就调用 BeforeEnter，并注册 enter 到 post 任务队列中；unmount 时就调用 leave 和 afterLeave，并注册 delayLeave 到 post 任务队列中；move 根据 moveType 的不同调用的也不同，比如 Suspense 中 resolve 时是把 children 从 hiddContainer 移到 container 中，相当于 mount，KeepAlive 的 activate 相当于 mount，deactivate 相当于 unmount
+
 ## Ref
 
 ref（指 runtime 的 ref）是用来拿到宿主环境的节点实例或者组件实例的
@@ -646,4 +757,242 @@ const unmount = (vnode, doRemove = true) => {
 
 ref 的更新主要在两个地方，一个是在 patch 之后，也就是更新 DOM 节点或组件实例之后，保证拿到最新的值，另一个是在 unmount 移除节点之前
 
-## block tree & patch flag
+## Complier 优化
+
+没有比 [Vue3 Compiler 优化细节，如何手写高性能渲染函数](https://zhuanlan.zhihu.com/p/150732926)这篇写的更好的了
+
+这里简单说一下原理
+
+1. **Block Tree 和 PatchFlags**
+
+    编译时生成的代码会打上 patchFlags，用来标记动态部分的信息
+
+    ```ts
+    export const enum PatchFlags {
+      // Indicates an element with dynamic textContent (children fast path)
+      TEXT = 1,
+
+      // Indicates an element with dynamic class binding.
+      CLASS = 1 << 1,
+
+      // Indicates an element with dynamic style
+      STYLE = 1 << 2,
+
+      // Indicates an element that has non-class/style dynamic props.
+      // Can also be on a component that has any dynamic props (includes
+      // class/style). when this flag is present, the vnode also has a dynamicProps
+      // array that contains the keys of the props that may change so the runtime
+      // can diff them faster (without having to worry about removed props)
+      PROPS = 1 << 3,
+
+      // Indicates an element with props with dynamic keys. When keys change, a full
+      // diff is always needed to remove the old key. This flag is mutually
+      // exclusive with CLASS, STYLE and PROPS.
+      FULL_PROPS = 1 << 4,
+
+      // Indicates an element with event listeners (which need to be attached during hydration)
+      HYDRATE_EVENTS = 1 << 5,
+
+      // Indicates a fragment whose children order doesn't change.
+      STABLE_FRAGMENT = 1 << 6,
+
+      // Indicates a fragment with keyed or partially keyed children
+      KEYED_FRAGMENT = 1 << 7,
+
+      // Indicates a fragment with unkeyed children.
+      UNKEYED_FRAGMENT = 1 << 8,
+
+      // ...
+    }
+    ```
+
+    创建的 Block 也会有 dynamicProps、dynamicChildren 表示动态的部分，Block 也是一个 VNode，只不过它有这些动态部分的信息
+
+    dynamicChildren 中即包含 children 中动态的部分，也包含 children 中的 Block，这样 Block 层层连接形成 Block Tree，在更新的时候只更新动态的那一部分
+
+    ```ts {29-33,37-39,47-58,63-67,74}
+    const patchElement = (
+      n1: VNode,
+      n2: VNode,
+      parentComponent: ComponentInternalInstance | null,
+      parentSuspense: SuspenseBoundary | null,
+      isSVG: boolean,
+      optimized: boolean
+    ) => {
+      const el = (n2.el = n1.el!)
+      let { patchFlag, dynamicChildren, dirs } = n2
+      // #1426 take the old vnode's patch flag into account since user may clone a
+      // compiler-generated vnode, which de-opts to FULL_PROPS
+      patchFlag |= n1.patchFlag & PatchFlags.FULL_PROPS
+      const oldProps = n1.props || EMPTY_OBJ
+      const newProps = n2.props || EMPTY_OBJ
+      // ...
+
+      if (patchFlag > 0) {
+        // the presence of a patchFlag means this element's render code was
+        // generated by the compiler and can take the fast path.
+        // in this path old node and new node are guaranteed to have the same shape
+        // (i.e. at the exact same position in the source template)
+        if (patchFlag & PatchFlags.FULL_PROPS) {
+          // element props contain dynamic keys, full diff needed
+          patchProps(el, n2, oldProps, newProps, parentComponent, parentSuspense, isSVG)
+        } else {
+          // class
+          // this flag is matched when the element has dynamic class bindings.
+          if (patchFlag & PatchFlags.CLASS) {
+            if (oldProps.class !== newProps.class) {
+              hostPatchProp(el, 'class', null, newProps.class, isSVG)
+            }
+          }
+
+          // style
+          // this flag is matched when the element has dynamic style bindings
+          if (patchFlag & PatchFlags.STYLE) {
+            hostPatchProp(el, 'style', oldProps.style, newProps.style, isSVG)
+          }
+
+          // props
+          // This flag is matched when the element has dynamic prop/attr bindings
+          // other than class and style. The keys of dynamic prop/attrs are saved for
+          // faster iteration.
+          // Note dynamic keys like :[foo]="bar" will cause this optimization to
+          // bail out and go through a full diff because we need to unset the old key
+          if (patchFlag & PatchFlags.PROPS) {
+            // if the flag is present then dynamicProps must be non-null
+            const propsToUpdate = n2.dynamicProps!
+            for (let i = 0; i < propsToUpdate.length; i++) {
+              const key = propsToUpdate[i]
+              const prev = oldProps[key]
+              const next = newProps[key]
+              if (next !== prev || (hostForcePatchProp && hostForcePatchProp(el, key))) {
+                hostPatchProp(el, key, prev, next, isSVG, n1.children as VNode[], parentComponent, parentSuspense, unmountChildren)
+              }
+            }
+          }
+        }
+
+        // text
+        // This flag is matched when the element has only dynamic text children.
+        if (patchFlag & PatchFlags.TEXT) {
+          if (n1.children !== n2.children) {
+            hostSetElementText(el, n2.children as string)
+          }
+        }
+      } else if (!optimized && dynamicChildren == null) {
+        // unoptimized, full diff
+        patchProps(el, n2, oldProps, newProps, parentComponent, parentSuspense, isSVG)
+      }
+
+      if (dynamicChildren) {
+        patchBlockChildren(n1.dynamicChildren!, dynamicChildren, el, parentComponent, parentSuspense)
+      } else if (!optimized) {
+        // full diff
+        patchChildren(n1, n2, el, null, parentComponent, parentSuspense)
+      }
+
+      // ...
+    }
+    ```
+
+2. **静态提升**
+
+    以下是 [Vue 3 Template Explorer](https://vue-next-template-explorer.netlify.app/) 选上 hoistStatic 这个选项后编译出的代码
+
+    ```html
+    <div>
+      <p>text</p>
+    </div>
+    ```
+
+    ```js
+    import { createVNode as _createVNode, openBlock as _openBlock, createBlock as _createBlock } from "vue"
+
+    const _hoisted_1 = /*#__PURE__*/_createVNode("p", null, "text", -1 /* HOISTED */)
+
+    export function render(_ctx, _cache, $props, $setup, $data, $options) {
+      return (_openBlock(), _createBlock("div", null, [
+        _hoisted_1
+      ]))
+    }
+    ```
+
+    可以看到 `<p>text</p>` 生成的是 _hoisted_1 变量，在 render 作用域外面，这样每次 render 函数调用是就可以服用 _hoisted_1，减少 VNode 创建的性能消耗
+
+3. 预字符串化
+
+    ```html
+    <div>
+      <p>text</p>
+      <p>text</p>
+      <p>text</p>
+      <p>text</p>
+      <p>text</p>
+      <p>text</p>
+      <p>text</p>
+      <p>text</p>
+      <p>text</p>
+      <p>text</p>
+    </div>
+    ```
+
+    ```js
+    import { createVNode as _createVNode, createStaticVNode as _createStaticVNode, openBlock as _openBlock, createBlock as _createBlock } from "vue"
+
+    const _hoisted_1 = /*#__PURE__*/_createStaticVNode("<p>text</p><p>text</p><p>text</p><p>text</p><p>text</p><p>text</p><p>text</p><p>text</p><p>text</p><p>text</p>", 10)
+
+    export function render(_ctx, _cache, $props, $setup, $data, $options) {
+      return (_openBlock(), _createBlock("div", null, [
+        _hoisted_1
+      ]))
+    }
+    ```
+
+    当有大量连续的静态的节点时，相比静态提升，预字符串化会进一步进行优化，通过字符串创建 Static VNode
+
+    ```ts {16-20,30}
+    const patch: PatchFn = (
+      n1,
+      n2,
+      container,
+      anchor = null,
+      parentComponent = null,
+      parentSuspense = null,
+      isSVG = false,
+      optimized = false
+    ) => {
+      // ...
+      const { type, ref, shapeFlag } = n2
+      switch (type) {
+        // ...
+        case Static:
+          if (n1 == null) {
+            mountStaticNode(n2, container, anchor, isSVG)
+          } else if (__DEV__) {
+            patchStaticNode(n1, n2, container, isSVG)
+          }
+          break
+        // ...
+      }
+      // ...
+    }
+
+    const mountStaticNode = (n2: VNode, container: RendererElement, anchor: RendererNode | null, isSVG: boolean) => {
+      // static nodes are only present when used with compiler-dom/runtime-dom
+      // which guarantees presence of hostInsertStaticContent.
+      ;[n2.el, n2.anchor] = hostInsertStaticContent!(n2.children as string, container, anchor, isSVG)
+    }
+    ```
+
+    Static VNode 会在 patch 是直接插入到 container 中，生产环节下不进行更新
+
+    预字符串化的好处有**生成代码的体积减少、减少创建 VNode 的开销、减少内存占用**
+
+## 😃 ramble
+
+Vue3 源码系列结束！
+
+Vue3 目前写的只是它的响应式系统和运行时，还有很大的一个部分 complier，这一部分由于我对编译目前还没有太多的了解，而且对于理解 Vue3 核心原理影响并不大，所以就没有写，以后可能会写一写吧
+
+之后就是 React 的源码了，至于我为什么热衷于看源码，不仅是因为自己的学习习惯，也是因为这些框架的源码相当于前端的“边界”，不仅代表着挑战也代表着我这一技术方向的深度
+
+> [simple-vue 实现完整代码](https://github.com/ahabhgk/simple-vue3)
