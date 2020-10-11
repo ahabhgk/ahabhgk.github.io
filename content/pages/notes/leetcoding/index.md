@@ -54,7 +54,7 @@ slug: /notes/leetcoding
 | [226. 翻转二叉树](https://leetcode-cn.com/problems/invert-binary-tree/) | ✅ | ✅ | |
 | [98. 验证二叉搜索树](https://leetcode-cn.com/problems/validate-binary-search-tree/) | ✅ | ✅ | |
 | [104. 二叉树的最大深度](https://leetcode-cn.com/problems/maximum-depth-of-binary-tree/) | ✅ | ✅ | |
-| [111. 二叉树的最小深度](https://leetcode-cn.com/problems/minimum-depth-of-binary-tree/) | ✅ | ✅ | |
+| [111. 二叉树的最小深度](https://leetcode-cn.com/problems/minimum-depth-of-binary-tree/) | ✅ | ✅ | ✅ |
 
 > 22 号 ✌️ 去拿电脑了，生产力回来了，LJ 去超市跟零食告别 👋
 >
@@ -81,20 +81,21 @@ slug: /notes/leetcoding
 | 2020-08-20 | 2020- | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
 | [169. 多数元素](https://leetcode-cn.com/problems/majority-element/) | | | | |
-| [51. N皇后](https://leetcode-cn.com/problems/n-queens/) | | | | |
+| [51. N 皇后](https://leetcode-cn.com/problems/n-queens/) | | | | |
 | [17. 电话号码的字母组合](https://leetcode-cn.com/problems/letter-combinations-of-a-phone-number/) | | | | |
 
 | 2020-08-21 | 2020- | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
 | [102. 二叉树的层序遍历](https://leetcode-cn.com/problems/binary-tree-level-order-traversal/) | | | | |
-| [515. 在每个树行中找最大值](https://leetcode-cn.com/problems/find-largest-value-in-each-tree-row/submissions/) | | | | |
+| [515. 在每个树行中找最大值](https://leetcode-cn.com/problems/find-largest-value-in-each-tree-row/) | | | | |
 
-<!-- | 2020- | 2020- | 2020- | 2020- | 2020- |
+> Vue3 源码看完了，继续刷题，准备面试
+
+| 2020-10-11 | 2020- | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
-| []() | | | | |
-| []() | | | | |
-| []() | | | | |
-| []() | | | | | -->
+| [752. 打开转盘锁](https://leetcode-cn.com/problems/open-the-lock/) | | | | |
+| [433. 最小基因变化](https://leetcode-cn.com/problems/minimum-genetic-mutation/) | | | | |
+| [127. 单词接龙](https://leetcode-cn.com/problems/word-ladder/) | | | | |
 
 ## 数组、链表、跳表
 
@@ -173,11 +174,11 @@ slug: /notes/leetcoding
 
 - [144. 二叉树的前序遍历](https://leetcode-cn.com/problems/binary-tree-preorder-traversal/)
 
-- [590. N叉树的后序遍历](https://leetcode-cn.com/problems/n-ary-tree-postorder-traversal/)
+- [590. N 叉树的后序遍历](https://leetcode-cn.com/problems/n-ary-tree-postorder-traversal/)
 
-- [589. N叉树的前序遍历](https://leetcode-cn.com/problems/n-ary-tree-preorder-traversal/)
+- [589. N 叉树的前序遍历](https://leetcode-cn.com/problems/n-ary-tree-preorder-traversal/)
 
-- [429. N叉树的层序遍历](https://leetcode-cn.com/problems/n-ary-tree-level-order-traversal/)
+- [429. N 叉树的层序遍历](https://leetcode-cn.com/problems/n-ary-tree-level-order-traversal/)
 
 - **[22. 括号生成](https://leetcode-cn.com/problems/generate-parentheses/)：回溯（DFS）、BFS、动态规划**
 
@@ -209,9 +210,19 @@ slug: /notes/leetcoding
 
 - **[169. 多数元素](https://leetcode-cn.com/problems/majority-element/)：哈希表、分治、投票**
 
-- [51. N皇后](https://leetcode-cn.com/problems/n-queens/)：回溯
+- [51. N 皇后](https://leetcode-cn.com/problems/n-queens/)：回溯
 
 - [17. 电话号码的字母组合](https://leetcode-cn.com/problems/letter-combinations-of-a-phone-number/)：回溯
+
+- [102. 二叉树的层序遍历](https://leetcode-cn.com/problems/binary-tree-level-order-traversal/)
+
+- [515. 在每个树行中找最大值](https://leetcode-cn.com/problems/find-largest-value-in-each-tree-row/)
+
+- [752. 打开转盘锁](https://leetcode-cn.com/problems/open-the-lock/)：BFS、DFS
+
+- [433. 最小基因变化](https://leetcode-cn.com/problems/minimum-genetic-mutation/)：BFS、DFS
+
+- [127. 单词接龙](https://leetcode-cn.com/problems/word-ladder/)：BFS、DFS（超时）
 
 ## 动态规划
 
