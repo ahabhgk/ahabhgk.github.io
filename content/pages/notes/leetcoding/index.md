@@ -97,132 +97,80 @@ slug: /notes/leetcoding
 | [433. 最小基因变化](https://leetcode-cn.com/problems/minimum-genetic-mutation/) | | | | |
 | [127. 单词接龙](https://leetcode-cn.com/problems/word-ladder/) | | | | |
 
+| 2020-10-12 | 2020- | 2020- | 2020- | 2020- |
+|--|:--:|:--:|:--:|:--:|
+| [200. 岛屿数量](https://leetcode-cn.com/problems/number-of-islands/) | | | | |
+| [529. 扫雷游戏](https://leetcode-cn.com/problems/minesweeper/) | | | | |
+
+| 2020-10-13 | 2020- | 2020- | 2020- | 2020- |
+|--|:--:|:--:|:--:|:--:|
+| [455. 分发饼干](https://leetcode-cn.com/problems/assign-cookies/) | | | | |
+| [860. 柠檬水找零](https://leetcode-cn.com/problems/lemonade-change/) | | | | |
+
 ## 数组、链表、跳表
 
 - [283. 移动零](https://leetcode-cn.com/problems/move-zeroes/)：双指针
-
 - [11. 盛最多水的容器](https://leetcode-cn.com/problems/container-with-most-water/)：双指针，left > right 时，如果 left 不论右移多少，都比原来小，所以可以从两边双指针试
-
 - [1. 两数之和](https://leetcode-cn.com/problems/two-sum/)：利用 Map 对一遍历过的数进行存储，如果 `map.get(target - nums[i]) != null` 就得到结果
-
 - [15. 三数之和](https://leetcode-cn.com/problems/3sum/)：先排序，排序是为了去重，`nums[i] === nums[i - 1]` 就 continue，然后对于 `i + 1` 和 `nums.length - 1` 做双指针，当三数之和为 0 时就移动双指针，sum < 0 时就移动左指针，sum > 0 时就移动右指针
-
-    ```ts
-    function threeSum(nums: number[]): number[][] {
-      let res: number[][] = []
-      if (nums.length < 3) return res
-      nums.sort((a, b) => a - b)
-      for (let i = 0; i < nums.length - 2; i++) {
-        if (nums[i] > 0) break // 最小的数大于 0 就可以直接结束了，三个大于 0 的数之和必大于 0
-        if (nums[i] === nums[i - 1]) continue // 去重
-        let left = i + 1
-        let right = nums.length - 1
-        while (left < right) {
-          let sum = nums[i] + nums[left] + nums[right]
-          if (sum === 0) {
-            res.push([nums[i], nums[left], nums[right]])
-            while (left < right && nums[left + 1] === nums[left]) left += 1 // 去重
-            while (left < right && nums[right - 1] === nums[right]) right -= 1 // 去重
-            left += 1
-            right -= 1
-          } else if (sum < 0) {
-            left += 1
-          } else if (sum > 0) {
-            right -= 1
-          }
-        }
-      }
-      return res
-    };
-    ```
-
 - [206. 反转链表](https://leetcode-cn.com/problems/reverse-linked-list/)：迭代、递归
-
 - [92. 反转链表 II](https://leetcode-cn.com/problems/reverse-linked-list-ii/)：迭代，双指针保留 m 和 m - 1，m 到 n 反转后进行连接
-
 - [24. 两两交换链表中的节点](https://leetcode-cn.com/problems/swap-nodes-in-pairs/)：迭代、递归
-
 - [141. 环形链表](https://leetcode-cn.com/problems/linked-list-cycle/)：双指针、哈希表
-
 - [142. 环形链表 II](https://leetcode-cn.com/problems/linked-list-cycle-ii/)：双指针、哈希表
-
 - [25. K 个一组翻转链表](https://leetcode-cn.com/problems/reverse-nodes-in-k-group/)：迭代、递归
 
 ## 栈、队列
 
 - [20. 有效的括号](https://leetcode-cn.com/problems/valid-parentheses/)
-
 - [155. 最小栈](https://leetcode-cn.com/problems/min-stack/)
-
 - [622. 设计循环队列](https://leetcode-cn.com/problems/design-circular-queue/)
-
 - [641. 设计循环双端队列](https://leetcode-cn.com/problems/design-circular-deque/)
-
 - [84. 柱状图中最大的矩形](https://leetcode-cn.com/problems/largest-rectangle-in-histogram/)：单调栈
-
 - [239. 滑动窗口最大值](https://leetcode-cn.com/problems/sliding-window-maximum/)
 
 ## 哈希表
 
 - [242. 有效的字母异位词](https://leetcode-cn.com/problems/valid-anagram/)
-
 - [49. 字母异位词分组](https://leetcode-cn.com/problems/group-anagrams/)
 
 ## 树
 
 - [94. 二叉树的中序遍历](https://leetcode-cn.com/problems/binary-tree-inorder-traversal/)
-
 - [144. 二叉树的前序遍历](https://leetcode-cn.com/problems/binary-tree-preorder-traversal/)
-
 - [590. N 叉树的后序遍历](https://leetcode-cn.com/problems/n-ary-tree-postorder-traversal/)
-
 - [589. N 叉树的前序遍历](https://leetcode-cn.com/problems/n-ary-tree-preorder-traversal/)
-
 - [429. N 叉树的层序遍历](https://leetcode-cn.com/problems/n-ary-tree-level-order-traversal/)
-
-- **[22. 括号生成](https://leetcode-cn.com/problems/generate-parentheses/)：回溯（DFS）、BFS、动态规划**
-
 - [226. 翻转二叉树](https://leetcode-cn.com/problems/invert-binary-tree/)：迭代、递归
-
 - [98. 验证二叉搜索树](https://leetcode-cn.com/problems/validate-binary-search-tree/)：递归、中序遍历
-
 - [104. 二叉树的最大深度](https://leetcode-cn.com/problems/maximum-depth-of-binary-tree/)
-
 - [111. 二叉树的最小深度](https://leetcode-cn.com/problems/minimum-depth-of-binary-tree/)：递归（DFS）、迭代（BFS 层序遍历、DFS）
-
 - [297. 二叉树的序列化与反序列化](https://leetcode-cn.com/problems/serialize-and-deserialize-binary-tree/)：前序遍历、JSON 偷懒
-
 - [235. 二叉搜索树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-search-tree/)
-
 - [236. 二叉树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-tree/)：分治
-
 - [105. 从前序与中序遍历序列构造二叉树](https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/)
 
+## 回溯
+
+- **[22. 括号生成](https://leetcode-cn.com/problems/generate-parentheses/)：回溯（DFS）、BFS、动态规划**
 - [77. 组合](https://leetcode-cn.com/problems/combinations/)：回溯
-
 - [46. 全排列](https://leetcode-cn.com/problems/permutations/)：回溯
-
 - **[47. 全排列 II](https://leetcode-cn.com/problems/permutations-ii/)：回溯（dfs）+ 剪枝**
-
 - [78. 子集](https://leetcode-cn.com/problems/subsets/)：回溯
-
 - [50. Pow(x, n)](https://leetcode-cn.com/problems/powx-n/)：快速幂
-
 - **[169. 多数元素](https://leetcode-cn.com/problems/majority-element/)：哈希表、分治、投票**
-
 - [51. N 皇后](https://leetcode-cn.com/problems/n-queens/)：回溯
-
 - [17. 电话号码的字母组合](https://leetcode-cn.com/problems/letter-combinations-of-a-phone-number/)：回溯
 
+## DFS、BFS
+
 - [102. 二叉树的层序遍历](https://leetcode-cn.com/problems/binary-tree-level-order-traversal/)
-
 - [515. 在每个树行中找最大值](https://leetcode-cn.com/problems/find-largest-value-in-each-tree-row/)
-
 - [752. 打开转盘锁](https://leetcode-cn.com/problems/open-the-lock/)：BFS、DFS
-
 - [433. 最小基因变化](https://leetcode-cn.com/problems/minimum-genetic-mutation/)：BFS、DFS
-
 - [127. 单词接龙](https://leetcode-cn.com/problems/word-ladder/)：BFS、DFS（超时）
+- [200. 岛屿数量](https://leetcode-cn.com/problems/number-of-islands/)：BFS、DFS、并查集
+- [529. 扫雷游戏](https://leetcode-cn.com/problems/minesweeper/)：BFS、DFS
 
 ## 动态规划
 
