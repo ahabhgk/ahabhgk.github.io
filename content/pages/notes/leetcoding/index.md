@@ -62,9 +62,9 @@ slug: /notes/leetcoding
 
 | 2020-07-28 | 2020-08-09 | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
-| [297. 二叉树的序列化与反序列化](https://leetcode-cn.com/problems/serialize-and-deserialize-binary-tree/) | ✅ | | | |
-| [235. 二叉搜索树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-search-tree/) | ✅ | | | |
-| [236. 二叉树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-tree/) | ✅ | | | |
+| [297. 二叉树的序列化与反序列化](https://leetcode-cn.com/problems/serialize-and-deserialize-binary-tree/) | ✅ | ✅ | | |
+| [235. 二叉搜索树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-search-tree/) | ✅ | ✅ | | |
+| [236. 二叉树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-tree/) | ✅ | ✅ | | |
 
 | 2020-07-29 | 2020-08-09 | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
@@ -171,6 +171,11 @@ slug: /notes/leetcoding
 - [127. 单词接龙](https://leetcode-cn.com/problems/word-ladder/)：BFS、DFS（超时）
 - [200. 岛屿数量](https://leetcode-cn.com/problems/number-of-islands/)：BFS、DFS、并查集
 - [529. 扫雷游戏](https://leetcode-cn.com/problems/minesweeper/)：BFS、DFS
+
+## 贪心
+
+- [455. 分发饼干](https://leetcode-cn.com/problems/assign-cookies/)
+- [860. 柠檬水找零](https://leetcode-cn.com/problems/lemonade-change/)
 
 ## 动态规划
 
