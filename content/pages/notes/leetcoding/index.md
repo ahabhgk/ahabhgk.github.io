@@ -75,8 +75,8 @@ slug: /notes/leetcoding
 
 | 2020-08-19 | 2020- | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
-| [78. 子集](https://leetcode-cn.com/problems/subsets/) | | | | |
-| [50. Pow(x, n)](https://leetcode-cn.com/problems/powx-n/) | | | | |
+| [78. 子集](https://leetcode-cn.com/problems/subsets/) | ✅ | | | |
+| [50. Pow(x, n)](https://leetcode-cn.com/problems/powx-n/) | ✅ | | | |
 
 | 2020-08-20 | 2020- | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
@@ -106,6 +106,11 @@ slug: /notes/leetcoding
 |--|:--:|:--:|:--:|:--:|
 | [455. 分发饼干](https://leetcode-cn.com/problems/assign-cookies/) | | | | |
 | [860. 柠檬水找零](https://leetcode-cn.com/problems/lemonade-change/) | | | | |
+
+| 2020-10-15 | 2020- | 2020- | 2020- | 2020- |
+|--|:--:|:--:|:--:|:--:|
+| [121. 买卖股票的最佳时机](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock/) | | | | |
+| [122. 买卖股票的最佳时机 II](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-ii/) | | | | |
 
 ## 数组、链表、跳表
 
@@ -176,6 +181,8 @@ slug: /notes/leetcoding
 
 - [455. 分发饼干](https://leetcode-cn.com/problems/assign-cookies/)
 - [860. 柠檬水找零](https://leetcode-cn.com/problems/lemonade-change/)
+- [121. 买卖股票的最佳时机](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock/)
+- [122. 买卖股票的最佳时机 II](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-ii/)
 
 ## 动态规划
 
