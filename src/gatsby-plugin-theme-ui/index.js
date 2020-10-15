@@ -13,7 +13,7 @@ require("prismjs/components/prism-scala.min.js")
 require("prismjs/components/prism-erlang.min.js")
 require("prismjs/components/prism-clojure.min.js")
 require("prismjs/components/prism-haskell.min.js")
-require("prismjs/components/prism-lisp.min.js")
+require("prismjs/components/prism-scheme.min.js")
 require("prismjs/components/prism-rust.min.js")
 require("prismjs/components/prism-swift.min.js")
 

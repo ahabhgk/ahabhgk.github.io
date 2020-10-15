@@ -39,7 +39,7 @@ tags:
   (sqrt (add (sub endx startx) (sub endy starty))))
 ```
 
-```bash
+```text
 -----( 图形程序 )-----
 图形、对图形的操作
 -----( 线 )------
@@ -66,6 +66,19 @@ cons car cdr...
 ```
 
 cons 返回一个过程，car cdr 对过程进行了操作，有序对的数据结构其实是一种过程，模糊“过程”和“数据”的划分
+
+```scheme
+(define (cons x y)
+  (lambda (m) (m x y)))
+
+(define (car z)
+  (z (lambda (x y) x)))
+
+(define (car z)
+  (z (lambda (x y) y)))
+```
+
+[丘奇计数](https://sicp.readthedocs.io/en/latest/chp2/6.html)
 
 ## 层次性数据和闭包性质
 
@@ -118,6 +131,21 @@ list 是一个过程，返回 `(1 2 3 4)` 表
       count
       (iter (cdr ls) (+ count 1))))
   (iter ls 0))
+
+; 添加
+(define (append list1 list2)
+  (if (null? list1)
+    list2
+    (cons (car list1) (append (cdr list1) list2))))
+
+; 反转
+(define (reverse lst)
+  (define (iter remained-items result)
+    (if (null? remained-items)
+      result
+      (iter (cdr remained-items)
+        (cons (car remained-items) result))))
+  (iter lst '()))
 ```
 
 对表的映射：
@@ -135,6 +163,13 @@ list 是一个过程，返回 `(1 2 3 4)` 表
 > ```scheme
 > (map + (list 1 2 3) (list 40 50 60) (list 700 800 900)) ; (741 852 963)
 > ```
+
+剩余参数：
+
+```scheme
+(define (f x y . z) (display z))
+(f 1 2 3 4 5) ; (3 4 5)
+```
 
 ### 层次性结构
 
