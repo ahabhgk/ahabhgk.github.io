@@ -60,7 +60,7 @@ slug: /notes/leetcoding
 >
 > 开始写项目了，后面随缘刷题了，等写好项目再好好刷
 
-| 2020-07-28 | 2020-08-09 | 2020- | 2020- | 2020- |
+| 2020-07-28 | 2020-08-09 | 2020-10-14 | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
 | [297. 二叉树的序列化与反序列化](https://leetcode-cn.com/problems/serialize-and-deserialize-binary-tree/) | ✅ | ✅ | | |
 | [235. 二叉搜索树的最近公共祖先](https://leetcode-cn.com/problems/lowest-common-ancestor-of-a-binary-search-tree/) | ✅ | ✅ | | |
@@ -73,21 +73,21 @@ slug: /notes/leetcoding
 | [46. 全排列](https://leetcode-cn.com/problems/permutations/) | ✅ | | | |
 | [47. 全排列 II](https://leetcode-cn.com/problems/permutations-ii/) | ✅ | | | |
 
-| 2020-08-19 | 2020- | 2020- | 2020- | 2020- |
+| 2020-08-19 | 2020-10-15 | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
 | [78. 子集](https://leetcode-cn.com/problems/subsets/) | ✅ | | | |
 | [50. Pow(x, n)](https://leetcode-cn.com/problems/powx-n/) | ✅ | | | |
 
-| 2020-08-20 | 2020- | 2020- | 2020- | 2020- |
+| 2020-08-20 | 2020-10-16 | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
-| [169. 多数元素](https://leetcode-cn.com/problems/majority-element/) | | | | |
+| [169. 多数元素](https://leetcode-cn.com/problems/majority-element/) | ✅ | | | |
 | [51. N 皇后](https://leetcode-cn.com/problems/n-queens/) | | | | |
 | [17. 电话号码的字母组合](https://leetcode-cn.com/problems/letter-combinations-of-a-phone-number/) | | | | |
 
 | 2020-08-21 | 2020- | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
-| [102. 二叉树的层序遍历](https://leetcode-cn.com/problems/binary-tree-level-order-traversal/) | | | | |
-| [515. 在每个树行中找最大值](https://leetcode-cn.com/problems/find-largest-value-in-each-tree-row/) | | | | |
+| [102. 二叉树的层序遍历](https://leetcode-cn.com/problems/binary-tree-level-order-traversal/) | ✅ | | | |
+| [515. 在每个树行中找最大值](https://leetcode-cn.com/problems/find-largest-value-in-each-tree-row/) | ✅ | | | |
 
 > Vue3 源码看完了，继续刷题，准备面试
 
@@ -111,6 +111,16 @@ slug: /notes/leetcoding
 |--|:--:|:--:|:--:|:--:|
 | [121. 买卖股票的最佳时机](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock/) | | | | |
 | [122. 买卖股票的最佳时机 II](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-ii/) | | | | |
+
+| 2020-10-16 | 2020- | 2020- | 2020- | 2020- |
+|--|:--:|:--:|:--:|:--:|
+| [55. 跳跃游戏](https://leetcode-cn.com/problems/jump-game/) | | | | |
+| [45. 跳跃游戏 II](https://leetcode-cn.com/problems/jump-game-ii/) | | | | |
+
+| 2020-10-17 | 2020- | 2020- | 2020- | 2020- |
+|--|:--:|:--:|:--:|:--:|
+| [69. x 的平方根](https://leetcode-cn.com/problems/sqrtx/) | | | | |
+| [367. 有效的完全平方数](https://leetcode-cn.com/problems/valid-perfect-square/) | | | | |
 
 ## 数组、链表、跳表
 
@@ -183,6 +193,24 @@ slug: /notes/leetcoding
 - [860. 柠檬水找零](https://leetcode-cn.com/problems/lemonade-change/)
 - [121. 买卖股票的最佳时机](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock/)
 - [122. 买卖股票的最佳时机 II](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-ii/)
+- [55. 跳跃游戏](https://leetcode-cn.com/problems/jump-game/)
+- [45. 跳跃游戏 II](https://leetcode-cn.com/problems/jump-game-ii/)
+
+## 二分查找
+
+- [69. x 的平方根](https://leetcode-cn.com/problems/sqrtx/)：牛顿法、二分法
+
+    牛顿法：$$y=x^2-C$$ 的正的零点就是 $$C$$ 的平方根
+
+    ![sqrtx](./images/sqrtx.png)
+
+    ```js
+    var mySqrt = function(x) { // x 就是 C
+      let res = x // res 从 x 开始逼近
+      while (res * res > x) res = Math.floor((res + x / res) / 2)
+      return res
+    };
+    ```
 
 ## 动态规划
 
