@@ -180,7 +180,7 @@ const processText = (n1, n2, container) => {
   } else {
     const node = n2.node = n1.node
     if (node.nodeValue !== n2.props.nodeValue) {
-      node.nodeValue !== n2.props.nodeValue
+      node.nodeValue = n2.props.nodeValue
     }
   }
 }
@@ -424,7 +424,7 @@ const unmount = (vnode, doRemove = true) => {
 
 类似于 patch，针对不同 type 进行 unmount，由于组件的 node 是 null，就直接将子节点进行 unmount
 
-注意这里的 deRemove 参数的作用，Element 的子节点可以不直接从 DOM 上移除，直接将该 Element 移除即可，但是 Element 子节点中可能有 Component，所以还是需要递归调用 unmount，触发 Component 的清理副作用（后面讲）和生命周期，解决方案就是加一个 deRemove 参数，Element unmount 时 doRemove 为 true，之后子节点的 doRemove 为 false
+注意这里的 doRemove 参数的作用，Element 的子节点可以不直接从 DOM 上移除，直接将该 Element 移除即可，但是 Element 子节点中可能有 Component，所以还是需要递归调用 unmount，触发 Component 的清理副作用（后面讲）和生命周期，解决方案就是加一个 doRemove 参数，Element unmount 时 doRemove 为 true，之后子节点的 doRemove 为 false
 
 最后还有清理副作用，生命周期就不提了，React 已经证明生命周期是可以不需要的，组件添加的 effect 在组件 unmount 后仍然存在，还没有清除，所以我们还需要在 unmount 中拿到组件所有的 effect，然后一一 stop，这时 stop 很简单，但如何拿到组件的 effect 就比较难
 

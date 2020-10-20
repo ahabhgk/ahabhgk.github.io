@@ -70,8 +70,8 @@ slug: /notes/leetcoding
 |--|:--:|:--:|:--:|:--:|
 | [105. 从前序与中序遍历序列构造二叉树](https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/) | ✅ | | | |
 | [77. 组合](https://leetcode-cn.com/problems/combinations/) | ✅ | ✅ | | |
-| [46. 全排列](https://leetcode-cn.com/problems/permutations/) | ✅ | | | |
-| [47. 全排列 II](https://leetcode-cn.com/problems/permutations-ii/) | ✅ | | | |
+| [46. 全排列](https://leetcode-cn.com/problems/permutations/) | ✅ | ✅ | | |
+| [47. 全排列 II](https://leetcode-cn.com/problems/permutations-ii/) | ✅ |✅ | | |
 
 | 2020-08-19 | 2020-10-15 | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
@@ -81,8 +81,8 @@ slug: /notes/leetcoding
 | 2020-08-20 | 2020-10-16 | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
 | [169. 多数元素](https://leetcode-cn.com/problems/majority-element/) | ✅ | | | |
-| [51. N 皇后](https://leetcode-cn.com/problems/n-queens/) | | | | |
-| [17. 电话号码的字母组合](https://leetcode-cn.com/problems/letter-combinations-of-a-phone-number/) | | | | |
+| [51. N 皇后](https://leetcode-cn.com/problems/n-queens/) | ✅ | | | |
+| [17. 电话号码的字母组合](https://leetcode-cn.com/problems/letter-combinations-of-a-phone-number/) | ✅ | | | |
 
 | 2020-08-21 | 2020- | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
@@ -93,9 +93,9 @@ slug: /notes/leetcoding
 
 | 2020-10-11 | 2020- | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
-| [752. 打开转盘锁](https://leetcode-cn.com/problems/open-the-lock/) | | | | |
-| [433. 最小基因变化](https://leetcode-cn.com/problems/minimum-genetic-mutation/) | | | | |
-| [127. 单词接龙](https://leetcode-cn.com/problems/word-ladder/) | | | | |
+| [752. 打开转盘锁](https://leetcode-cn.com/problems/open-the-lock/) | ✅ | | | |
+| [433. 最小基因变化](https://leetcode-cn.com/problems/minimum-genetic-mutation/) | ✅ | | | |
+| [127. 单词接龙](https://leetcode-cn.com/problems/word-ladder/) | ✅ | | | |
 
 | 2020-10-12 | 2020- | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
@@ -121,6 +121,12 @@ slug: /notes/leetcoding
 |--|:--:|:--:|:--:|:--:|
 | [69. x 的平方根](https://leetcode-cn.com/problems/sqrtx/) | | | | |
 | [367. 有效的完全平方数](https://leetcode-cn.com/problems/valid-perfect-square/) | | | | |
+
+| 2020-10-20 | 2020- | 2020- | 2020- | 2020- |
+|--|:--:|:--:|:--:|:--:|
+| [33. 搜索旋转排序数组](https://leetcode-cn.com/problems/search-in-rotated-sorted-array/) | | | | |
+| [34. 在排序数组中查找元素的第一个和最后一个位置](https://leetcode-cn.com/problems/find-first-and-last-position-of-element-in-sorted-array/) | | | | |
+| [74. 搜索二维矩阵](https://leetcode-cn.com/problems/search-a-2d-matrix/) | | | | |
 
 ## 数组、链表、跳表
 
@@ -211,6 +217,10 @@ slug: /notes/leetcoding
       return res
     };
     ```
+
+- [367. 有效的完全平方数](https://leetcode-cn.com/problems/valid-perfect-square/)
+- [33. 搜索旋转排序数组](https://leetcode-cn.com/problems/search-in-rotated-sorted-array/)
+- [34. 在排序数组中查找元素的第一个和最后一个位置](https://leetcode-cn.com/problems/find-first-and-last-position-of-element-in-sorted-array/)：[lower_bound](https://www.zhihu.com/question/36132386/answer/530313852)
 
 ## 动态规划
 
