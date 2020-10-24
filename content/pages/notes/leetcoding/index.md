@@ -99,12 +99,12 @@ slug: /notes/leetcoding
 
 | 2020-10-12 | 2020- | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
-| [200. 岛屿数量](https://leetcode-cn.com/problems/number-of-islands/) | | | | |
+| [200. 岛屿数量](https://leetcode-cn.com/problems/number-of-islands/) | ✅ | | | |
 | [529. 扫雷游戏](https://leetcode-cn.com/problems/minesweeper/) | | | | |
 
 | 2020-10-13 | 2020- | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
-| [455. 分发饼干](https://leetcode-cn.com/problems/assign-cookies/) | | | | |
+| [455. 分发饼干](https://leetcode-cn.com/problems/assign-cookies/) | ✅ | | | |
 | [860. 柠檬水找零](https://leetcode-cn.com/problems/lemonade-change/) | | | | |
 
 | 2020-10-15 | 2020- | 2020- | 2020- | 2020- |
@@ -127,6 +127,23 @@ slug: /notes/leetcoding
 | [33. 搜索旋转排序数组](https://leetcode-cn.com/problems/search-in-rotated-sorted-array/) | | | | |
 | [34. 在排序数组中查找元素的第一个和最后一个位置](https://leetcode-cn.com/problems/find-first-and-last-position-of-element-in-sorted-array/) | | | | |
 | [74. 搜索二维矩阵](https://leetcode-cn.com/problems/search-a-2d-matrix/) | | | | |
+
+| 2020-10-22 | 2020- | 2020- | 2020- | 2020- |
+|--|:--:|:--:|:--:|:--:|
+| [62. 不同路径](https://leetcode-cn.com/problems/unique-paths/) | | | | |
+| [63. 不同路径 II](https://leetcode-cn.com/problems/unique-paths-ii/) | | | | |
+| [1143. 最长公共子序列](https://leetcode-cn.com/problems/longest-common-subsequence/) | | | | |
+
+| 2020-10-23 | 2020- | 2020- | 2020- | 2020- |
+|--|:--:|:--:|:--:|:--:|
+| [120. 三角形最小路径和](https://leetcode-cn.com/problems/triangle/) | | | | |
+| [53. 最大子序和](https://leetcode-cn.com/problems/maximum-subarray/) | | | | |
+| [152. 乘积最大子数组](https://leetcode-cn.com/problems/maximum-product-subarray/) | | | | |
+
+| 2020-10-24 | 2020- | 2020- | 2020- | 2020- |
+|--|:--:|:--:|:--:|:--:|
+| [198. 打家劫舍](https://leetcode-cn.com/problems/house-robber/) | | | | |
+| [337. 打家劫舍 III](https://leetcode-cn.com/problems/house-robber-iii/) | | | | |
 
 ## 数组、链表、跳表
 
@@ -190,7 +207,7 @@ slug: /notes/leetcoding
 - [752. 打开转盘锁](https://leetcode-cn.com/problems/open-the-lock/)：BFS、DFS
 - [433. 最小基因变化](https://leetcode-cn.com/problems/minimum-genetic-mutation/)：BFS、DFS
 - [127. 单词接龙](https://leetcode-cn.com/problems/word-ladder/)：BFS、DFS（超时）
-- [200. 岛屿数量](https://leetcode-cn.com/problems/number-of-islands/)：BFS、DFS、并查集
+- [200. 岛屿数量](https://leetcode-cn.com/problems/number-of-islands/)：BFS、DFS、[并查集](https://zh.wikipedia.org/wiki/%E5%B9%B6%E6%9F%A5%E9%9B%86)
 - [529. 扫雷游戏](https://leetcode-cn.com/problems/minesweeper/)：BFS、DFS
 
 ## 贪心
@@ -224,6 +241,9 @@ slug: /notes/leetcoding
 
 ## 动态规划
 
+- [62. 不同路径](https://leetcode-cn.com/problems/unique-paths/)
+- [63. 不同路径 II](https://leetcode-cn.com/problems/unique-paths-ii/)
+- [1143. 最长公共子序列](https://leetcode-cn.com/problems/longest-common-subsequence/)
 - [322. 零钱兑换](https://leetcode-cn.com/problems/coin-change/)
 
     递归法：自上而下，会有重复的计算
