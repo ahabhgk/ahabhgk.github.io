@@ -1,6 +1,6 @@
 ---
 title: 异步 I/O
-slug: /notes/a-simple-explanation-of-rxjs/async-io
+slug: /notes/a-simple-explanation-of-nodejs/async-io
 date: 2020-10-21
 description: 《深入浅出 NodeJS》读书笔记
 tags:
@@ -68,7 +68,7 @@ deps/uv/unix/fs.c  ( uv_fs_open() )
 
 **每个阶段都有一个 FIFO 队列**来执行回调
 
-```cpp
+```c
 // [uv_run 事件循环源码](https://github.com/nodejs/node/blob/master/deps/uv/src/unix/core.c#L365)
 while (r != 0 && loop->stop_flag == 0) {
   uv__update_time(loop);
@@ -92,11 +92,11 @@ while (r != 0 && loop->stop_flag == 0) {
 }
 ```
 
-uv__io_poll 之前会调用 uv_backend_timeout 回去 timeout，uv_backend_timeout 中检测 uv__has_active_handles、uv__has_active_reqs、idle_handles、pending_queue、closing_handles 都没有就返回 0，否则 uv__next_timeout 获取 timeout
+uv\_\_io\_poll 之前会调用 uv\_backend\_timeout 回去 timeout，uv\_backend\_timeout 中检测 uv\_\_has\_active\_handles、uv\_\_has\_active\_reqs、idle\_handles、pending\_queue、closing\_handles 都没有就返回 0，否则 uv\_\_next\_timeout 获取 timeout
 
-uv__next_timeout 中获取**距离此时此刻最先到期的一个 timer 的时间**，如果大于根据系统设置的 INT_MAX 就返回 INT_MAX，否则返回这个相差的时间
+uv\_\_next\_timeout 中获取**距离此时此刻最先到期的一个 timer 的时间**，如果大于根据系统设置的 INT\_MAX 就返回 INT\_MAX，否则返回这个相差的时间
 
-之后 uv__io_poll 调用时获得这个 timeout（有被注册的任务没有完成的时存在），uv__io_poll 执行时会阻塞 timeout 时间等待这段时间内会不会有任务完成，当 timeout 是最先到期的一个 timer 的时间时，就会在这段时间完成这个 timer，直接执行 timer 的回调函数（实现一旦轮询队列为空，事件循环将查看**已达到时间阈值的计时器**。如果一个或多个计时器已准备就绪，则事件循环将绕回计时器阶段以执行这些计时器的回调）
+之后 uv\_\_io\_poll 调用时获得这个 timeout（有被注册的任务没有完成的时存在），uv\_\_io\_poll 执行时会阻塞 timeout 时间等待这段时间内会不会有任务完成，当 timeout 是最先到期的一个 timer 的时间时，就会在这段时间完成这个 timer，直接执行 timer 的回调函数（实现一旦轮询队列为空，事件循环将查看**已达到时间阈值的计时器**。如果一个或多个计时器已准备就绪，则事件循环将绕回计时器阶段以执行这些计时器的回调）
 
 ## process.nextTick 和 setImmediate 区别
 
