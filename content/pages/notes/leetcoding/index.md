@@ -109,8 +109,8 @@ slug: /notes/leetcoding
 
 | 2020-10-15 | 2020- | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
-| [121. 买卖股票的最佳时机](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock/) | | | | |
-| [122. 买卖股票的最佳时机 II](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-ii/) | | | | |
+| [121. 买卖股票的最佳时机](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock/) | ✅ | | | |
+| [122. 买卖股票的最佳时机 II](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-ii/) | ✅ | | | |
 
 | 2020-10-16 | 2020- | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
@@ -144,6 +144,11 @@ slug: /notes/leetcoding
 |--|:--:|:--:|:--:|:--:|
 | [198. 打家劫舍](https://leetcode-cn.com/problems/house-robber/) | | | | |
 | [337. 打家劫舍 III](https://leetcode-cn.com/problems/house-robber-iii/) | | | | |
+
+| 2020-10-25 | 2020- | 2020- | 2020- | 2020- |
+|--|:--:|:--:|:--:|:--:|
+| [714. 买卖股票的最佳时机含手续费](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/) | | | | |
+| [309. 最佳买卖股票时机含冷冻期](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/) | | | | |
 
 ## 数组、链表、跳表
 
@@ -244,6 +249,13 @@ slug: /notes/leetcoding
 - [62. 不同路径](https://leetcode-cn.com/problems/unique-paths/)
 - [63. 不同路径 II](https://leetcode-cn.com/problems/unique-paths-ii/)
 - [1143. 最长公共子序列](https://leetcode-cn.com/problems/longest-common-subsequence/)
+- [120. 三角形最小路径和](https://leetcode-cn.com/problems/triangle/)
+- [53. 最大子序和](https://leetcode-cn.com/problems/maximum-subarray/)
+- [152. 乘积最大子数组](https://leetcode-cn.com/problems/maximum-product-subarray/)
+- [198. 打家劫舍](https://leetcode-cn.com/problems/house-robber/)
+- [337. 打家劫舍 III](https://leetcode-cn.com/problems/house-robber-iii/)
+- [714. 买卖股票的最佳时机含手续费](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/)
+- **[309. 最佳买卖股票时机含冷冻期](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/)**
 - [322. 零钱兑换](https://leetcode-cn.com/problems/coin-change/)
 
     递归法：自上而下，会有重复的计算

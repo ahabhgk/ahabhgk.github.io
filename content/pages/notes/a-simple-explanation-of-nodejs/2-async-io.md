@@ -1,7 +1,7 @@
 ---
 title: 异步 I/O
 slug: /notes/a-simple-explanation-of-nodejs/async-io
-date: 2020-10-21
+date: 2020-10-24
 description: 《深入浅出 NodeJS》读书笔记
 tags:
   - Note
@@ -112,3 +112,8 @@ nextTick 的回调函数保存在数组上，setImmediate 的回调函数保存�
 nextTick 在 idle 阶段，setImmediate 在 check 阶段，优先级 idle > poll > check
 
 实际上这两个名字换一下更合适，但这是过去遗留问题不能随意改变
+
+## 浏览器上的事件循环
+
+- [深入解析你不知道的 EventLoop 和浏览器渲染、帧动画、空闲回调（动图演示）](https://juejin.im/post/6844904165462769678)
+- [WHATWG spec](https://html.spec.whatwg.org/multipage/webappapis.html#event-loops)
