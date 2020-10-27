@@ -150,6 +150,17 @@ slug: /notes/leetcoding
 | [714. 买卖股票的最佳时机含手续费](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-transaction-fee/) | | | | |
 | [309. 最佳买卖股票时机含冷冻期](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/) | | | | |
 
+| 2020-10-26 | 2020- | 2020- | 2020- | 2020- |
+|--|:--:|:--:|:--:|:--:|
+| [208. 实现 Trie (前缀树)](https://leetcode-cn.com/problems/implement-trie-prefix-tree/) | | | | |
+| [212. 单词搜索 II](https://leetcode-cn.com/problems/word-search-ii/) | | | | |
+| [79. 单词搜索](https://leetcode-cn.com/problems/word-search/) | | | | |
+
+| 2020-10-26 | 2020- | 2020- | 2020- | 2020- |
+|--|:--:|:--:|:--:|:--:|
+| [547. 朋友圈](https://leetcode-cn.com/problems/friend-circles/) | | | | |
+| [130. 被围绕的区域](https://leetcode-cn.com/problems/surrounded-regions/) | | | | |
+
 ## 数组、链表、跳表
 
 - [283. 移动零](https://leetcode-cn.com/problems/move-zeroes/)：双指针
@@ -212,8 +223,10 @@ slug: /notes/leetcoding
 - [752. 打开转盘锁](https://leetcode-cn.com/problems/open-the-lock/)：BFS、DFS
 - [433. 最小基因变化](https://leetcode-cn.com/problems/minimum-genetic-mutation/)：BFS、DFS
 - [127. 单词接龙](https://leetcode-cn.com/problems/word-ladder/)：BFS、DFS（超时）
-- [200. 岛屿数量](https://leetcode-cn.com/problems/number-of-islands/)：BFS、DFS、[并查集](https://zh.wikipedia.org/wiki/%E5%B9%B6%E6%9F%A5%E9%9B%86)
+- **[200. 岛屿数量](https://leetcode-cn.com/problems/number-of-islands/)：BFS、DFS、[并查集](https://zh.wikipedia.org/wiki/%E5%B9%B6%E6%9F%A5%E9%9B%86)**
 - [529. 扫雷游戏](https://leetcode-cn.com/problems/minesweeper/)：BFS、DFS
+- [212. 单词搜索 II](https://leetcode-cn.com/problems/word-search-ii/)
+- **[79. 单词搜索](https://leetcode-cn.com/problems/word-search/)**
 
 ## 贪心
 
@@ -436,3 +449,12 @@ slug: /notes/leetcoding
     ![qpow](./images/qpow.png)
 
     因为取余是为了防溢出，所以 JS 也可以使用 BigInt，最后取余（具体类似于前两个代码块版本，只不过 number 全都变为 BigInt，最后再取余）
+
+## 字典树
+
+- [208. 实现 Trie (前缀树)](https://leetcode-cn.com/problems/implement-trie-prefix-tree/)
+
+## 并查集
+
+- **[547. 朋友圈](https://leetcode-cn.com/problems/friend-circles/)**
+- [130. 被围绕的区域](https://leetcode-cn.com/problems/surrounded-regions/)

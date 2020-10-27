@@ -12,6 +12,9 @@ tags:
 
 发布订阅模式是低级接口，Promise 是高级接口
 
+[Ryan Dahl: Node JS - JSConf EU 2009](https://youtu.be/EeYvFl7li9E?list=PL37ZVnwpeshGNXb77ObNUbvax-VQ_DWJe&t=1529)
+[Ryan Dahl: 我对 Node.js 遗憾的十件事 - JSConf EU 2018](https://youtu.be/M3BM9TB-8yA?t=306)
+
 ```js
 const { EventEmitter } = require('events')
 

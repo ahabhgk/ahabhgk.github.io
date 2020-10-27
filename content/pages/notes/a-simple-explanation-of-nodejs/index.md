@@ -8,3 +8,7 @@ slug: /notes/a-simple-explanation-of-nodejs
 - [异步 I/O](/notes/a-simple-explanation-of-nodejs/async-io)
 
 - [异步编程](/notes/a-simple-explanation-of-nodejs/async-programming)
+
+- [内存控制](/notes/a-simple-explanation-of-nodejs/memory-control)
+
+- [理解 Buffer](/notes/a-simple-explanation-of-nodejs/buffer)
