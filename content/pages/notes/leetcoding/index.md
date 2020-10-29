@@ -156,10 +156,14 @@ slug: /notes/leetcoding
 | [212. 单词搜索 II](https://leetcode-cn.com/problems/word-search-ii/) | | | | |
 | [79. 单词搜索](https://leetcode-cn.com/problems/word-search/) | | | | |
 
-| 2020-10-26 | 2020- | 2020- | 2020- | 2020- |
+| 2020-10-27 | 2020- | 2020- | 2020- | 2020- |
 |--|:--:|:--:|:--:|:--:|
 | [547. 朋友圈](https://leetcode-cn.com/problems/friend-circles/) | | | | |
 | [130. 被围绕的区域](https://leetcode-cn.com/problems/surrounded-regions/) | | | | |
+
+| 2020-10-29 | 2020- | 2020- | 2020- | 2020- |
+|--|:--:|:--:|:--:|:--:|
+| [146. LRU 缓存机制](https://leetcode-cn.com/problems/lru-cache/) | | | | |
 
 ## 数组、链表、跳表
 
@@ -458,3 +462,7 @@ slug: /notes/leetcoding
 
 - **[547. 朋友圈](https://leetcode-cn.com/problems/friend-circles/)**
 - [130. 被围绕的区域](https://leetcode-cn.com/problems/surrounded-regions/)
+
+## LRU
+
+- [146. LRU 缓存机制](https://leetcode-cn.com/problems/lru-cache/)

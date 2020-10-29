@@ -16,5 +16,6 @@ require("prismjs/components/prism-haskell.min.js")
 require("prismjs/components/prism-scheme.min.js")
 require("prismjs/components/prism-rust.min.js")
 require("prismjs/components/prism-swift.min.js")
+require("prismjs/components/prism-http.min.js")
 
 export default merge(blogTheme, wavesTheme)
