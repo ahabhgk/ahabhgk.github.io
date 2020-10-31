@@ -33,7 +33,7 @@ tags:
 
 ![基于 libuv 的架构图](./images/node-libuv.png)
 
-libuv 在 *uix 和 Windows 上都是通过线程池实现的异步 I/O
+libuv 在 *uix 和 Windows 上都是通过线程池实现的异步 I/O，所以 Node 并不是单线程架构
 
 ```text
 lib/fs.js          ( fs.open()    )
