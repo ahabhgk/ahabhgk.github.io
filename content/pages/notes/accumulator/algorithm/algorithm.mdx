@@ -140,50 +140,80 @@ function selectSort(arr) {
 // O(n)
 // 稳定
 function mergeSort(arr) {
-  function slice(arr) {
-    if (arr.length === 1) return arr
-    let mid = Math.floor(arr.length / 2)
-    let leftArr = arr.slice(0, mid)
-    let rightArr = arr.slice(mid)
-    return sortAndMerge(slice(leftArr), slice(rightArr))
+  return slice(0, arr.length - 1)
+
+  function slice(left, right) {
+    if (left >= right) return
+    let mid = Math.floor((left + right) / 2)
+    slice(left, mid)
+    slice(mid + 1, right)
+    merge(left, mid, right)
   }
-  function sortAndMerge(leftArr, rightArr) {
-    let res = []
-    while (leftArr.length && rightArr.length) {
-      if (leftArr[0] < rightArr[0]) {
-        res.push(leftArr.shift())
-      } else {
-        res.push(rightArr.shift())
-      }
+  function merge(left, mid, right) {
+    let tmp = []
+    let i = left, j = mid + 1
+    while (i <= mid && j <= right) {
+      tmp.push(arr[i] < arr[j] ? arr[i++] : arr[j++])
     }
-    while (leftArr.length) res.push(leftArr.shift())
-    while (rightArr.length) res.push(rightArr.shift())
-    return res
+    while (i <= mid) tmp.push(arr[i++])
+    while (j <= right) tmp.push(arr[j++])
+    for (let k = 0; k < tmp.length; k++) {
+      arr[left + k] = tmp[k]
+    }
   }
-  return slice(arr)
 }
 
 // min: O(nlogn), max: O(n^2), ava: O(nlogn)
 // O(logn)
 // 不稳定
-function quickSort(arr, left = 0, right = arr.length - 1) {
-  function partition(arr, left, right) {
-    let pivotValue = arr[left]
-    while (left < right) {
-      while (left < right && pivotValue <= arr[right]) right -= 1
-      ;[arr[right], arr[left]] = [arr[left], arr[right]]
-      while (left < right && arr[left] <= pivotValue) left += 1
-      ;[arr[right], arr[left]] = [arr[left], arr[right]]
-    }
-    return left
-  }
+function quickSort(arr) {
+  return sort(0, arr.length - 1)
 
-  if (left < right) {
-    let pivot = partition(arr, left, right)
-    quickSort(arr, left, pivot - 1)
-    quickSort(arr, pivot + 1, right)
+  function sort(begin, end) {
+    if (begin > end) return
+    let pivot = partition(begin, end)
+    sort(begin, pivot - 1)
+    sort(pivot + 1, end)
   }
-  return arr
+  function partition(begin, end) {
+    let counter = begin, pivot = end
+    for (let i = begin; i < end; i++) {
+      if (arr[i] < arr[pivot]) {
+        ;[arr[counter], arr[i]] = [arr[i], arr[counter]]
+        counter++
+      }
+    }
+    ;[arr[counter], arr[pivot]] = [arr[pivot], arr[counter]]
+    return counter
+  }
+}
+
+// O(nlogn)
+// O(1)
+// not stable
+function heapSort(arr) {
+  if (arr.length === 0) return
+  for (let i = Math.floor(arr.length / 2) - 1; i >= 0; i--) {
+    heapify(arr, arr.length, i)
+  }
+  for (let i = arr.length - 1; i >= 0; i--) {
+    ;[arr[0], arr[i]] = [arr[i], arr[0]]
+    heapify(arr, arr.length, i)
+  }
+  function heapify(arr, len, i) {
+    let left = 2 * i + 1, right = 2 * i + 2
+    let largest = i
+    if (left < len && arr[left] > arr[largest]) {
+      largest = left
+    }
+    if (right < len && arr[right] > arr[largest]) {
+      largest = right
+    }
+    if (largest !== i) {
+      ;[arr[largest], arr[i]] = [arr[i], arr[largest]]
+      heapify(arr, len, largest)
+    }
+  }
 }
 
 // max: O(nlogn) 一个桶, min: O(n) n 个桶
