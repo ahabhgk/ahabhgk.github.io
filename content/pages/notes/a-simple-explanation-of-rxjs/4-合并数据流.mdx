@@ -52,7 +52,7 @@ const source3$ = time(1000, 1000)
 merge(source1$, source2$, source3$, 2).subscribe(console.log)
 ```
 
-这样 source3$ 就不会进行订阅，除非 source1$ 或 source2$ complete
+这样 source3\$ 就不会进行订阅，除非 source1\$ 或 source2\$ complete
 
 例子：因为在移动设备上 touchend 事件出现得比 click 更早，这两个事件的处理是一模一样的但是 fromEvent 不能同时获得两个事件的数据流，这时候就要借助 merge 的力量
 
