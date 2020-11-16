@@ -173,6 +173,19 @@ slug: /notes/leetcoding
 |--|:--:|:--:|:--:|:--:|
 | [56. 合并区间](https://leetcode-cn.com/problems/merge-intervals/) | | | | |
 
+| 2020-11-14 | 2020- | 2020- | 2020- | 2020- |
+|--|:--:|:--:|:--:|:--:|
+| [771. 宝石与石头](https://leetcode-cn.com/problems/jewels-and-stones/) | | | | |
+| [8. 字符串转换整数 (atoi)](https://leetcode-cn.com/problems/string-to-integer-atoi/) | | | | |
+
+| 2020-11-16 | 2020- | 2020- | 2020- | 2020- |
+|--|:--:|:--:|:--:|:--:|
+| [541. 反转字符串 II](https://leetcode-cn.com/problems/reverse-string-ii/) | | | | |
+| [917. 仅仅反转字母](https://leetcode-cn.com/problems/reverse-only-letters/) | | | | |
+| [125. 验证回文串](https://leetcode-cn.com/problems/valid-palindrome/) | | | | |
+| [680. 验证回文字符串 Ⅱ](https://leetcode-cn.com/problems/valid-palindrome-ii/) | | | | |
+| [5. 最长回文子串](https://leetcode-cn.com/problems/longest-palindromic-substring/) | | | | |
+
 ## 数组、链表、跳表
 
 - [283. 移动零](https://leetcode-cn.com/problems/move-zeroes/)：双指针
