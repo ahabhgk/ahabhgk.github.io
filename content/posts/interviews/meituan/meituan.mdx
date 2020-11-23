@@ -278,6 +278,8 @@ tags:
 
 setState 的异步并不是真正的异步，没有产生宏任务微任务，只是 setState 之后再次访问 state 不会立即得到改变后的 state，表现的像是异步而已，由于有一个 batch 的过程，将多个 setState 合并（类似于 Object.assign）如果使用 setState 的 callback 则可以访问到改变后的 state
 
+[从源码角度讲 setState 是同步还是异步的？](https://juejin.cn/post/6895561392632365069)
+
 ### CommonJS 和 ES6 的模块化的差异
 
 - ES6 的是对值得引用，CommomJS 是对值的拷贝（会缓存）
@@ -285,6 +287,12 @@ setState 的异步并不是真正的异步，没有产生宏任务微任务，�
 - CommomJS 运行时加载，加载的是一个对象，ES6 的是编译时输出接口，在代码解析时生成的静态定义
 
 对服务器来说由于模块在本地同时启动后不会关会有缓存，同步加载没问题，所以 CommonJS 是同步加载，浏览器由于模块在服务器上，同步加载会阻塞所以不能同步加载，ES6 并没有强行指定同步或异步，但由于 `<script type="module" src="..."></script>` 等同于带有 defer 所以是异步加载的
+
+### Tree Shaking
+
+由于 ES6 模块是编译时输出接口，在代码解析时生成的静态定义，依赖关系是确定的，和运行时的状态无关，可以进行可靠的静态分析，所以可以进行 Tres Shaking
+
+[你的 Tree-Shaking 并没什么卵用](https://zhuanlan.zhihu.com/p/32831172)
 
 ### script 标签带有 defer 和 async 时的差异
 
