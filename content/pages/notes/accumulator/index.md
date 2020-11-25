@@ -8,3 +8,5 @@ slug: /notes/accumulator
 - [HTTP](/notes/accumulator/http)
 
 - [Algorithm](/notes/accumulator/algorithm)
+
+- [Browser](/notes/accumulator/browser)
