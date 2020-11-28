@@ -92,9 +92,19 @@ tags:
         2. 浏览器进程中的 viz 组件接收命令后把页面内容绘制到内存，然后把这部分内存发送给显卡，系统拿到后显示到显示屏上
             - 显示屏固定的刷新频率，一般是 60 HZ，即 60 帧，也就是一秒更新 60 张图片，每次更新的图片都来自显卡的前缓冲区。而显卡接收到浏览器进程传来的页面后，会合成相应的图像，并将图像保存到后缓冲区，然后系统自动将前缓冲区和后缓冲区对换位置，如此循环更新（当某个动画大量占用内存的时候，浏览器生成图像的时候会变慢，图像传送给显卡就会不及时，而显示器还是以不变的频率刷新，因此会出现卡顿，也就是明显的掉帧现象）
 
+### 回流、重绘、合成
+
+![回流](./images/reflow.png)
+![重绘](./images/repaint.png)
+![合成](./images/composite.png)
+
 ### 如果下载 CSS 文件阻塞了，是否会阻塞 DOM 树合成和页面的显示
 
 看情况，如果在 CSS 文件下载时，JS 访问某个元素的样式，这时就需要等待 CSS 文件下载完才能继续执行
+
+JavaScript 引擎在解析 JS 之前，是不知道 JS 是否操纵了 CSSOM 的，所以渲染引擎在遇到 JS 脚本时，不管该脚本是否操纵了 CSSOM，都会执行 CSS 文件下载，解析操作，再执行 JS 脚本
+
+HTML 中的 JS 会阻塞 DOM，JS 脚本又依赖样式表
 
 ## JS
 
@@ -161,6 +171,89 @@ JavaScript 引擎需要用栈来维护程序执行期间上下文的状态，如
 
 ## 页面
 
+### 如何优化网络请求时间
+
+![网络请求时间线](./images/net-timeline.png)
+
+1. 排队（Queuing）时间过久：域名分片、升级 HTTP2
+2. 第一字节时间（TTFB）时间过久：服务器处理慢、低带宽、发送请求头时带上了多余的用户信息（Cookie）
+3. Content Download 时间过久：减少文件大小
+
+### 怎样减少白屏时间
+
+1. 优化网络请求时间
+2. 将一些不需要在解析 HTML 阶段使用的 JS 标记上 async 或者 defer
+3. 对于大的 CSS 文件，可以通过媒体查询属性，拆分为多个在特定的场景下加载特定的 CSS 文件
+
+```html
+<script src="foo.js" type="text/javascript"></script>
+<script defer src="foo.js" type="text/javascript"></script>
+<script async src="foo.js" type="text/javascript"></script>
+<link rel="stylesheet" type="text/css" href="foo.css" />
+<link rel="stylesheet" type="text/css" href="foo.css" media="screen"/>
+<link rel="stylesheet" type="text/css" href="foo.css" media="print" />
+<link rel="stylesheet" type="text/css" href="foo.css" media="orientation:landscape" />
+<link rel="stylesheet" type="text/css" href="foo.css" media="orientation:portrait" />
+```
+
+### 为什么 CSS 动画比 JS 高效
+
+CSS3 的 transform、opacity、filter 可以实现合成的效果（GPU 加速），在合成的情况下，会直接跳过布局和绘制流程，直接进入非主线程处理的部分，即直接交给合成线程处理
+
+合成线程生成位图的过程中会调用线程池，而且光栅化一般会通过 GPU 加速，GPU 擅长处理位图数据；没有占用主线程的资源，即使主线程卡住了，效果依然能够流畅地展示
+
+`will-change: auto | <animateable-feature>` 的作用是让渲染引擎为其单独实现一个图层，当这些变换发生时，仅仅只是利用合成线程去处理这些变换，而不牵扯到主线程
+
 ## 网络
+
+### HTTP/0.9 缺陷和 HTTP/1.0 的解决
+
+HTTP/0.9 仅支持 GET 请求，不支持请求头，只能传输纯文本内容，只支持 ASCII 字节码，典型的无状态连接
+
+| HTTP/0.9 | HTTP/1.0 |
+|:--:|:--:|
+| 没有途径告诉服务器更多的信息 | 引入头部和体，引入 GET、POST、HEAD |
+| 不支持多种类型文件、多种语言、多种压缩方式、多种编码 | `accept` 系列头和 `content` 系列头 |
+| 无法告诉浏览器服务器处理的情况 | 引入状态码 |
+| 没有缓存，服务器压力大 | 引入 `Expires`、`Last-Modified/If-Modified-Since` 字段 |
+| 无法统计客户端的基础信息 | 引入 `User-Agent` 字段 |
+| 不支持长连接 | 可手动开启 `Connection: keep-alive` 长连接 |
+
+### HTTP/1.0 缺陷和 HTTP/1.1 的解决
+
+| HTTP/1.0 | HTTP/1.1 |
+|:--:|:--:|
+| 默认短连接 | 默认开启 `Connection: keep-alive` 长连接 |
+| 浏览器服务器交流有限 | 引入 PUT、PATCH、OPTIONS、DELETE，增加 100 等一些状态码 |
+| 不支持虚拟主机（一个物理主机有多个虚拟主机，每个虚拟主机有单独的域名，都公用一个 IP 地址）| 增加 `Host` 字段表示当前的域名，供服务器处理 |
+| 不支持动态生成的内容 | 引入 `Transfer-Encoding: chunked` 字段 |
+| 缓存时间不精确 | 引入 `Cache-Control`、`ETag/If-None-Match` 字段 |
+| 网络效率低 | 浏览器为每个域名最多同时维护 6 个 TCP 长连接（规范是 2 个，后面改了）|
+
+### HTTP/1.1 缺陷和 HTTP/2 的解决
+
+| HTTP/1.1 | HTTP/2 |
+|:--:|:--:|
+| TCP 的慢启动，影响首屏 | 一个域名只使用一个 TCP 长连接来传输数据，只需一次慢启动 |
+| 多条 TCP 连接之间又不能协商让哪些关键资源优先下载 | 一个域名一个 TCP 长连接，且有请求的优先级（PRIORITY 帧） |
+| 队头阻塞 | 多路复用（引入二进制分帧层给帧加编号）|
+| 头部过大 | 头部压缩（Huffman 编码，客户端和服务器同时维护和更新一个包含之前见过的 header 的索引列表）|
+
+除此之外还有 HTTP/2 push，服务器接收到 HTML 请求后，可以把相关的 JS、CSS 一起发给客户端，优化首屏
+
+![HTTP/2 WireShark](./images/http2.png)
+
+### HTTP/2 缺陷和 HTTP/3 的解决
+
+| HTTP/2 | HTTP/3 |
+|:--:|:--:|
+| TCP 的队头阻塞 | QUIC |
+| TCP、TLS 握手需要 3-4 RTT | QUIC |
+
+HTTP/2 中多个请求是跑在一个 TCP 管道中的，如果其中任意一路数据流中出现了丢包的情况，那么就会阻塞该 TCP 连接中的所有请求。不同于 HTTP/1.1 浏览器为每个域名开启了 6 个 TCP 连接，如果其中的 1 个 TCP 连接发生了队头阻塞，那么其他的 5 个连接依然可以继续传输数据。所以随着丢包率的增加，HTTP/2 的传输效率也会越来越差。有测试数据表明，当系统达到了 2% 的丢包率时，HTTP/1.1 的传输效率反而比 HTTP/2 表现得更好
+
+![HTTP/2 多路复用](./images/http2-blocking.png)
+![QUIC 多路复用](./images/quic-block.png)
+![QUIC](./images/quic.png)
 
 ## 安全
