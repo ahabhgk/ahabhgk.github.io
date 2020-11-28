@@ -308,7 +308,7 @@ setState 的异步并不是真正的异步，没有产生宏任务微任务，�
 
 - 存储型：恶意脚本永久存储在目标服务器上
 
-防范：encodeURIComponent 转义 URL 链接、非 URL 将 " ' < > 进行转义、添加 CSP meta 标签或 Response header 控制页面能加载哪些资源、限制内容长度
+防范：encodeURIComponent 转义 URL 链接、非 URL 将 " ' < > 进行转义、添加 CSP meta 标签或 Response header 控制页面能加载哪些资源、限制内容长度、Cookie 加 HttpOnly
 
 > `Content-Security-Policy: default-src 'self'`
 >
@@ -318,7 +318,35 @@ setState 的异步并不是真正的异步，没有产生宏任务微任务，�
 
 在用户登录 A 网站后诱导其进入 B 网站，B 网站发送 A 网站的请求，会带上 Cookie，B 网站冒充用户完成了攻击
 
-防范：验证码、检测 Referer，但 Referer 可以被修改、token、SameSite Cookie
+```html
+<!-- GET -->
+<!DOCTYPE html>
+<html>
+  <body>
+    <h1>黑客的站点：CSRF攻击演示</h1>
+    <img src="https://bigbank.org/transfer?user=hacker&number=100">
+  </body>
+</html>
+```
+
+```html
+<!-- POST -->
+<!DOCTYPE html>
+<html>
+<body>
+  <h1>黑客的站点：CSRF攻击演示</h1>
+  <form id='hacker-form' action="https://bigbank.org/transfer" method=POST>
+    <input type="hidden" name="user" value="hacker" />
+    <input type="hidden" name="number" value="100" />
+  </form>
+  <script> document.getElementById('hacker-form').submit(); </script>
+</body>
+</html>
+```
+
+防范：验证码、验证 Referer，但 Referer 是浏览器提供，可能被修改、验证 Origin、token、SameSite Cookie
+
+![Post 请求时的 Origin 信息](./images/crsf-origin-referer.png)
 
 ### HTTPS
 

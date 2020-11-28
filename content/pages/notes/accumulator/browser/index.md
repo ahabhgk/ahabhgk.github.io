@@ -257,3 +257,18 @@ HTTP/2 中多个请求是跑在一个 TCP 管道中的，如果其中任意一�
 ![QUIC](./images/quic.png)
 
 ## 安全
+
+### 为什么要有同源策略
+
+同源策略表现在三个方面
+
+1. DOM：页面 A 打开页面 B，若 A、B 同源，B 可以通过 `opener` 对象操控 A；若 A、B 不同源，就不能操控，会报 `Uncaught DOMException: Blocked a frame with origin "https://zhuanlan.zhihu.com" from accessing a cross-origin frame.`
+2. 数据：同源策略限制了不同源的站点读取当前站点的 Cookie、IndexDB、LocalStorage 等数据，同源的站点可以通过 opener 操控
+3. 网络
+
+所以如果没有同源策略，就可以通过诱导用户从 A 打开 B……
+
+### 同源策略对安全和便利性的权衡
+
+1. 页面中可以嵌入第三方资源：所有资源都来自于同一个源会限制 CDN 等，所以 script、img 标签的 src 都没有限制的，这也导致 XSS 攻击，所以浏览器也引入了 CSP，让服务器决定浏览器能够加载哪些资源，让服务器决定浏览器是否能够执行内联 JavaScript 代码
+2. 跨域资源共享和跨文档消息机制：不同源两个网页的网络互通可以通过 CORS，数据和 DOM 互通可以通过 postMessage
