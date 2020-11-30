@@ -65,6 +65,7 @@ tags:
     4. 浏览器收到后，会更新浏览器界面状态（安全状态、地址栏的 URL、前进后退的历史状态）并更新页面
 
 ![渲染阶段](./images/render-page.png)
+<!-- markdownlint-disable MD029 -->
 5. 渲染阶段
     1. 构建 DOM 树
     2. 样式计算
@@ -112,7 +113,7 @@ HTML 中的 JS 会阻塞 DOM，JS 脚本又依赖样式表
 
 ```js
 ExecutionContext = {
-  'code evaluation state', // All Execution Contexts 都有。执行，暂停和恢复与此执行上下文关联的代码的评估所需的任何状态
+  code_evaluation_state, // All Execution Contexts 都有。执行，暂停和恢复与此执行上下文关联的代码的评估所需的任何状态
   Function, // All Execution Contexts 都有。如果此执行上下文正在执行函数对象的代码，则此组件的值就是该函数对象。如果上下文正在执行脚本或模块的代码，则该值为 null
   Realm, // All Execution Contexts 都有。关联记录从中访问 ECMAScript 资源的领域记录
   ScriptOrModule, // All Execution Contexts 都有
@@ -253,7 +254,7 @@ HTTP/0.9 仅支持 GET 请求，不支持请求头，只能传输纯文本内容
 HTTP/2 中多个请求是跑在一个 TCP 管道中的，如果其中任意一路数据流中出现了丢包的情况，那么就会阻塞该 TCP 连接中的所有请求。不同于 HTTP/1.1 浏览器为每个域名开启了 6 个 TCP 连接，如果其中的 1 个 TCP 连接发生了队头阻塞，那么其他的 5 个连接依然可以继续传输数据。所以随着丢包率的增加，HTTP/2 的传输效率也会越来越差。有测试数据表明，当系统达到了 2% 的丢包率时，HTTP/1.1 的传输效率反而比 HTTP/2 表现得更好
 
 ![HTTP/2 多路复用](./images/http2-blocking.png)
-![QUIC 多路复用](./images/quic-block.png)
+![QUIC 多路复用](./images/quic-blocking.png)
 ![QUIC](./images/quic.png)
 
 ## 安全
