@@ -10,3 +10,5 @@ slug: /notes/accumulator
 - [Algorithm](/notes/accumulator/algorithm)
 
 - [Browser](/notes/accumulator/browser)
+
+- [Net](/notes/accumulator/net)
