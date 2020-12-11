@@ -7,4 +7,4 @@ slug: /notes/learn-you-a-haskell
 
 - [Types and Typeclasses](/notes/learn-you-a-haskell/types-and-typeclasses)
 
-// TODO
+// TODO: Haskell 趣学指南
