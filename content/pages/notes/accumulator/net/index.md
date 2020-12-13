@@ -1,6 +1,6 @@
 ---
 title: Net
-slug: /notes/accumulator/net
+slug: /note/accumulator/net
 date: 2020-11-30
 description: Net
 tags:

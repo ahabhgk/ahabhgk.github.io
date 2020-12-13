@@ -1,12 +1,12 @@
 ---
-title: Notes - CSAPP
-slug: /notes/csapp
+title: Note - CSAPP
+slug: /note/csapp
 ---
 
-- [计算机系统漫游](/notes/csapp/roam)
+- [计算机系统漫游](/note/csapp/roam)
 
-- [信息的表示与处理](/notes/csapp/info)
+- [信息的表示与处理](/note/csapp/info)
 
-- [程序的机器级表示](/notes/csapp/asm)
+- [程序的机器级表示](/note/csapp/asm)
 
 // TODO: CSAPP

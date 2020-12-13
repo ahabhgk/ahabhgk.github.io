@@ -1,6 +1,6 @@
 ---
 title: Browser
-slug: /notes/accumulator/browser
+slug: /note/accumulator/browser
 date: 2020-11-25
 description: Browser
 tags:

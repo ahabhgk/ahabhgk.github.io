@@ -1,6 +1,6 @@
 ---
 title: 编译原理之美
-slug: /notes/compliers/the-beauty-of-complier
+slug: /note/compliers/the-beauty-of-complier
 date: 2020-12-11
 description: the-beauty-of-complier
 tags:

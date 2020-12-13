@@ -1,6 +1,6 @@
 ---
 title: 异步 I/O
-slug: /notes/a-simple-explanation-of-nodejs/async-io
+slug: /note/a-simple-explanation-of-nodejs/async-io
 date: 2020-10-24
 description: 《深入浅出 NodeJS》读书笔记
 tags:

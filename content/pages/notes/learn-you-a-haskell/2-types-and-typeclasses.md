@@ -1,6 +1,6 @@
 ---
 title: Types and Typeclasses
-slug: /notes/learn-you-a-haskell/types-and-typeclasses
+slug: /note/learn-you-a-haskell/types-and-typeclasses
 date: 2020-06-07
 description: 《Haskell 趣学指南》读书笔记
 tags:

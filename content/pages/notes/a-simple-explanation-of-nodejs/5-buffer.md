@@ -1,6 +1,6 @@
 ---
 title: 理解 Buffer
-slug: /notes/a-simple-explanation-of-nodejs/buffer
+slug: /note/a-simple-explanation-of-nodejs/buffer
 date: 2020-10-26
 description: 《深入浅出 NodeJS》读书笔记
 tags:

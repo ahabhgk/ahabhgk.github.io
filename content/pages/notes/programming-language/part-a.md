@@ -1,6 +1,6 @@
 ---
 title: Programming Language
-slug: /notes/programming-language/part-a
+slug: /note/programming-language/part-a
 date: 2020-08-20
 description: 《Programming Language》MOOC 笔记
 tags:

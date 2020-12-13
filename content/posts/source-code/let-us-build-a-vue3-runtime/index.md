@@ -1,6 +1,6 @@
 ---
 title: Let's build a Vue3 runtime
-slug: /blogs/let-us-build-a-vue3-runtime
+slug: /blog/let-us-build-a-vue3-runtime
 date: 2020-09-24
 author: ahabhgk
 description: Let's build a Vue3 runtime

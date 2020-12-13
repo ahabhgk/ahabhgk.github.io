@@ -23,16 +23,16 @@ module.exports = {
         mdx: false, // reload default setting for `gatsby-remark-katex`
         navigation: [
           {
-            title: `Blogs`,
-            slug: `/blogs`,
+            title: `Blog`,
+            slug: `/blog`,
           },
           {
-            title: `Notes`,
-            slug: `/notes`,
+            title: `Note`,
+            slug: `/note`,
           },
           {
-            title: `Projects`,
-            slug: `/projects`,
+            title: `Project`,
+            slug: `/project`,
           },
           // {
           //   title: `Timeline`,
@@ -61,7 +61,7 @@ module.exports = {
             url: `mailto:ahabhgk@gmail.com`,
           },
         ],
-        blogPath: '/blogs',
+        blogPath: '/blog',
       },
     },
     `gatsby-plugin-sitemap`,

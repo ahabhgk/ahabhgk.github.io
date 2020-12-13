@@ -1,14 +1,14 @@
 ---
-title: Notes - Accumulator
-slug: /notes/accumulator
+title: Note - Accumulator
+slug: /note/accumulator
 ---
 
-- [JavaScript](/notes/accumulator/javascript)
+- [JavaScript](/note/accumulator/javascript)
 
-- [HTTP](/notes/accumulator/http)
+- [HTTP](/note/accumulator/http)
 
-- [Algorithm](/notes/accumulator/algorithm)
+- [Algorithm](/note/accumulator/algorithm)
 
-- [Browser](/notes/accumulator/browser)
+- [Browser](/note/accumulator/browser)
 
-- [Net](/notes/accumulator/net)
+- [Net](/note/accumulator/net)

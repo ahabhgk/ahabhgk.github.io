@@ -1,6 +1,6 @@
 ---
 title: 异步编程
-slug: /notes/a-simple-explanation-of-nodejs/async-programming
+slug: /note/a-simple-explanation-of-nodejs/async-programming
 date: 2020-10-25
 description: 《深入浅出 NodeJS》读书笔记
 tags:

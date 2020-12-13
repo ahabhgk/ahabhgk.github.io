@@ -1,6 +1,6 @@
 ---
 title: Vue Reactivity in Depth
-slug: /blogs/vue-reactivity-in-depth
+slug: /blog/vue-reactivity-in-depth
 date: 2020-08-28
 author: ahabhgk
 description: Vue Reactivity in Depth

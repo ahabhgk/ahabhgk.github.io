@@ -1,6 +1,6 @@
 ---
 title: 模块机制
-slug: /notes/a-simple-explanation-of-nodejs/module
+slug: /note/a-simple-explanation-of-nodejs/module
 date: 2020-10-21
 description: 《深入浅出 NodeJS》读书笔记
 tags:

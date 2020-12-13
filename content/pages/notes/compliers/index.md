@@ -1,6 +1,6 @@
 ---
-title: Notes - Compliers
-slug: /notes/compliers
+title: Note - Compliers
+slug: /note/compliers
 ---
 
-- [编译原理之美](/notes/compliers/the-beauty-of-complier)
+- [编译原理之美](/note/compliers/the-beauty-of-complier)

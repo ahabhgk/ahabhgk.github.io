@@ -1,6 +1,6 @@
 ---
 title: 从零开始
-slug: /notes/learn-you-a-haskell/start
+slug: /note/learn-you-a-haskell/start
 date: 2020-06-01
 description: 《Haskell 趣学指南》读书笔记
 tags:

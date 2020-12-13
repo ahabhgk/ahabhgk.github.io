@@ -1,6 +1,6 @@
 ---
 title: 大学一年级总结
-slug: /blogs/summary-of-frashman
+slug: /blog/summary-of-frashman
 date: 2019-10-08
 description: 大学一年级总结
 tags:

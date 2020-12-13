@@ -1,6 +1,6 @@
 ---
 title: 玩转进程
-slug: /notes/a-simple-explanation-of-nodejs/process
+slug: /note/a-simple-explanation-of-nodejs/process
 date: 2020-10-29
 description: 《深入浅出 NodeJS》读书笔记
 tags:

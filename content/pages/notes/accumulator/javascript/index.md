@@ -1,6 +1,6 @@
 ---
 title: JavaScript
-slug: /notes/accumulator/javascript
+slug: /note/accumulator/javascript
 date: 2020-05-14
 author: ahabhgk
 description: JavaScript

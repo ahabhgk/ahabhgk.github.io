@@ -1,8 +1,8 @@
 ---
-title: Notes - Programming Language
-slug: /notes/programming-language
+title: Note - Programming Language
+slug: /note/programming-language
 ---
 
-- [Part A](/notes/programming-language/part-a)
+- [Part A](/note/programming-language/part-a)
 
 // TODO: Programming Language

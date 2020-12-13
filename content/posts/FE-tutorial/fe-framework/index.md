@@ -1,6 +1,6 @@
 ---
 title: 前端框架通识
-slug: /blogs/tutorial-of-fe-framework
+slug: /blog/tutorial-of-fe-framework
 date: 2020-07-07
 author: ahabhgk
 description: Redrock 前端暑期培训，前端框架通识
@@ -386,7 +386,7 @@ const store = new Vuex.Store({
 
 Vue 和 React 的数据流都是单向的，只能通过 props 从父组件传向子组件，这是为了保证数据流向的清晰，提高可读性可维护性。这种单向的数据流向模式我们叫它 flux，还有 MVC、MVP、MVVM，并不建议细扣什么是什么模式，没有太大意义，因为它们都是为了代码的可读性可维护性而存在
 
-> 自我推荐：[Redux 源码分析](https://ahabhgk.github.io/blogs/redux-source-code)，只有后一部分讲的源码，前一部分介绍了很多扩展知识
+> 自我推荐：[Redux 源码分析](https://ahabhgk.github.io/blog/redux-source-code)，只有后一部分讲的源码，前一部分介绍了很多扩展知识
 
 ### 4.1 接入型组件（Container）进行管理
 

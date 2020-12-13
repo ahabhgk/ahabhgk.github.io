@@ -1,6 +1,6 @@
 ---
 title: 内存控制
-slug: /notes/a-simple-explanation-of-nodejs/memory-control
+slug: /note/a-simple-explanation-of-nodejs/memory-control
 date: 2020-10-26
 description: 《深入浅出 NodeJS》读书笔记
 tags:
@@ -8,7 +8,7 @@ tags:
   - A Simple Explanation of NodeJS
 ---
 
-[美团面试下面有记过 V8 GC](https://ahabhgk.github.io/blogs/interview-of-meituan-internship)
+[美团面试下面有记过 V8 GC](https://ahabhgk.github.io/blog/interview-of-meituan-internship)
 
 ```shell
 node --trace_gc -e "var a = []; for (var i = 0; i < 1000000; i++) a.push(new Array(100));"
