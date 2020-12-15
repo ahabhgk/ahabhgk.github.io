@@ -1,6 +1,6 @@
----
+---==
 title: 记 2020-12 寒假实习面试
-# slug: /blog/interview-2020-12
+slug: /blog/interview-2020-12
 date: 2020-12-TODO
 description: 2020-12 寒假实习面试
 tags:
