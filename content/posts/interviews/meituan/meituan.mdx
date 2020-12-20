@@ -103,7 +103,7 @@ tags:
       map.set(obj, result) // 应该在这里处理，result 是引用类型
       for (const key in obj) {
         if (obj.hasOwnProperty(key)) {
-          result[key] = deepClone(obj[key])
+          result[key] = deepClone(obj[key], map)
         }
       }
       return result
@@ -136,7 +136,7 @@ tags:
 
 1. https 怎么进行加密
 
-    主要是三方面：加密、完整性验证、证书验证，一开始没想到第三点，后来提醒打上来了，之后深入的问 CA 各个级之间如何验证没答上来，相关加密算法也没答上来
+    主要是三方面：加密、完整性验证、证书验证，一开始没想到第三点，后来提醒答上来了，之后深入的问 CA 各个级之间如何验证没答上来，相关加密算法也没答上来
 
     > 详见 [Accumulator](https://ahabhgk.github.io/oip-accumulator) 中 HTTPS 部分
 
@@ -555,7 +555,7 @@ How to solve commits got trapped behind other larger commits or lower priority u
 
 - 第 3 层：网络层负责对子网间的数据包进行寻址和路由选择，还可以实现拥塞控制，网际互联等功能。网络层的协议包括：IP，IPX 等。
 
-- 第 2 层：数据链路层在不可靠的物理介质上提供可靠的传输，主要主要为：物理地址寻址、数据封装成帧、流量控制、数据校验、重发等。
+- 第 2 层：数据链路层在不可靠的物理介质上提供可靠的传输，主要为：物理地址寻址、数据封装成帧、流量控制、数据校验、重发等。
 
 - 第 1 层：物理层在局域网上传送数据帧，负责电脑通信设备与网络媒体之间的互通，包括针脚，电压，线缆规范，集线器，网卡，主机适配等。
 
@@ -617,7 +617,7 @@ UDP 是一个面向无连接的传输层协议
 
 2. POST 相对安全，GET 请求都包含在 URL 里
 
-3. URL有长度限制，会影响 Get 请求，大多是浏览器和服务器的原因（性能和安全）
+3. URL有长度限制，会影响 GET 请求，大多是浏览器和服务器的原因（性能和安全）
 
 4. GET 数据类型只允许 ASCII 字符，POST 没有限制，也允许二进制数据
 
