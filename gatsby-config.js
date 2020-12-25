@@ -62,6 +62,8 @@ module.exports = {
           },
         ],
         blogPath: '/blog',
+        feed: true,
+        feedTitle: `ahabhgk's blog`,
       },
     },
     `gatsby-plugin-sitemap`,
