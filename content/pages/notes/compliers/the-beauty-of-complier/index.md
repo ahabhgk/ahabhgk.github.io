@@ -29,8 +29,8 @@ RE ------------> NFA ----------> DFA -----------------> 最小化 DFA ------> �
 
 #### RE -> NFA
 
-- `e -> ɛ`
-![e -> ɛ](./images/e2null.png)
+- `e -> 𝛆`
+![e -> 𝛆](./images/e2null.png)
 - `e -> c`
 ![e -> c](./images/e2c.png)
 - `e -> e1 e2`
@@ -52,12 +52,12 @@ q0 <- eps_closure(n0)   // q0 = {n0}
 Q <- {q0}       // Q = {q0}
 workList <- q0     // workList = [q0, ...]
 while(workList != [])   
-    remove q from workList   // workList = [...]
-    foreach(character c)     // c = a
-        t <- e-closure(delta(q,c))   // delta(q0, a) = {n1}, t = {n1, n2, n3, n4, n6, n9}
-        D[q,c] <- t    //   q1 = t
-        if(t not in Q)    // Q = {q0, q1} , workList = [q1]
-            add t to Q and workList
+  remove q from workList   // workList = [...]
+  foreach(character c)     // c = a
+    t <- e-closure(delta(q,c))   // delta(q0, a) = {n1}, t = {n1, n2, n3, n4, n6, n9}
+    D[q,c] <- t    //   q1 = t
+    if(t not in Q)    // Q = {q0, q1} , workList = [q1]
+      add t to Q and workList
 ```
 
 `a(b|c)*` 进行转换可得
@@ -73,14 +73,14 @@ Hopcraft 最小化算法将 DFA 转化为最小化 DFA
 ```fakecode
 //基于等价类的思想
 split(S)
-    foreach(character c)
-        if(c can split s)
-            split s into T1, ..., Tk
+  foreach(character c)
+    if(c can split s)
+      split s into T1, ..., Tk
 
 hopcroft()
-    split all nodes into N, A
-    while(set is still changes)
-        split(s)
+  split all nodes into N, A
+  while(set is still changes)
+    split(s)
 ```
 
 ![fiee](./images/fiee.png)
@@ -204,19 +204,19 @@ V -> e
    | d
 
 parse_S()
-    parse_N()
-    parse_V()
-    parse_N()
+  parse_N()
+  parse_V()
+  parse_N()
 
 parse_N()
-    token = tokens[i++]
-    if(token == s || token == t || token == g || token == w)
-        return;
-    error("...")
+  token = tokens[i++]
+  if(token == s || token == t || token == g || token == w)
+    return;
+  error("...")
 
 parse_V()
-    token = tokens[i++]
-    ... //
+  token = tokens[i++]
+  ... //
 ```
 
 一般框架：
@@ -228,11 +228,116 @@ X -> β11 ... β1i
    | ...
 
 parse_X()
-    token = nextToken()
-    switch(token)
-        case ...:  // β11 ... β1i
-        case ...:  // β21 ... β2j
-        case ...:  // β31 ... β3k
-        ...
-        default: error("...");
+  token = nextToken()
+  switch(token)
+    case ...:  // β11 ... β1i
+    case ...:  // β21 ... β2j
+    case ...:  // β31 ... β3k
+    ...
+    default: error("...");
 ```
+
+#### LL(1) 分析算法
+
+从左（L）向右读入程序，最左（L）推导，采用一个（1）前看符号
+
+与回溯算法不同的在于，又一个分析表进行优化，时间复杂度 O(n)
+
+如何构造分析表就是关键，分别求出 NULLABLE 集合、FIRST 集合、FOLLOW 集合，然后推出 SELECT 集合，即预测分析表
+
+- NULLABLE 集合
+
+  ```fakecode
+  NULLABLE = {}
+  while (NULLABLE is still changing)
+    for (production p: X -> β)
+      if (β == 𝛆)
+        NULLABLE ⋃= {X}
+      if (β == Y1Y2...Yn)
+        if (Y1 ∈ NULLABLE && ... && Yn ∈ NULLABLE)
+          NULLABLE ⋃= {X}
+  ```
+
+- FIRST 集合
+
+  ```fakecode
+  for (noterminal N)
+    FIRST(N) = {}
+
+  while (some set is still changing)
+    for (production p: N -> β1β2...βn)
+      for (βi from β1 upto βn)
+        if (βi == a)
+          FIRST(N) ⋃= {a}
+          break
+        if (βi == M)
+          FIRST(N) ⋃= FIRST(M)
+          if (M is not in NULLABLE)
+            break
+  ```
+
+- FOLLOW 集合
+
+  ```fakecode
+  for (noterminal N)
+    FOLLOW(N) = {}
+
+  while (some set is still changing)
+    for (production p: N -> β1β2...βn)
+      tmp = FOLLOW(N)
+      for (βi from βn downto β1)
+        if (βi == a)
+          tmp = {a}
+        if (βi == M)
+          FOLLOW(M) ⋃= tmp
+          if (M is not in NULLABLE)
+            tmp = FIRST(M)
+          else
+            tmp ⋃= FIRST(M)
+  ```
+
+- SELECT 集合
+
+  ```fakecode
+  for (production p)
+    SELECT(p) = {}
+
+  for (production p: N -> β1β2...βn)
+    for (βi from β1 upto βn)
+      if (βi == a)
+        SELECT(p) ⋃= {a}
+        return
+      if (βi == M)
+        SELECT(p) ⋃= FIRST(M)
+          if (M is not in NULLABLE)
+            return
+    SELECT(p) ⋃= FOLLOW(N)
+  ```
+
+例子：
+
+```text
+Z -> d
+   | X Y Z
+Y -> c
+   | 𝛆
+X -> Y
+   | a
+
+NULLABLE = {Y, X}
+
+N\FIRST  0  1      2
+Z        {} {d}    {d, c, a}
+Y        {} {c}    {c}
+X        {} {c, a} {c, a}
+
+N\FOLLOW 0  1
+Z        {} {}
+Y        {} {d, c, a}
+X        {} {d, c, a}
+
+        Z -> d    Z -> X Y Z    Y -> c    Y -> 𝛆      X -> Y      X -> a
+SELECT  {d}       {d, c, a}     {c}       {d, c, a}   {d, c, a}   {a}
+```
+
+例子：// TODO: 作业预测分析表大题
