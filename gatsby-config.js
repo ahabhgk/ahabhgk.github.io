@@ -45,10 +45,6 @@ module.exports = {
         ],
         externalLinks: [
           {
-            name: `GitHub`,
-            url: `https://github.com/ahabhgk`,
-          },
-          {
             name: `Twitter`,
             url: `https://twitter.com/ahabhgk`,
           },
@@ -57,8 +53,16 @@ module.exports = {
             url: `https://www.zhihu.com/people/he-geng-kun-86`,
           },
           {
+            name: `GitHub`,
+            url: `https://github.com/ahabhgk`,
+          },
+          {
             name: `Mail`,
             url: `mailto:ahabhgk@gmail.com`,
+          },
+          {
+            name: `RSS`,
+            url: `https://ahabhgk.github.io/rss.xml`,
           },
         ],
         blogPath: '/blog',
