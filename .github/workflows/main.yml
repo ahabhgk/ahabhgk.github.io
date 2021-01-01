@@ -1,22 +1,15 @@
-name: CI
+name: Gatsby Publish
 
 on:
   push:
-    branches: [ dev ]
+    branches:
+      - dev
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "deploy"
-  deploy:
-    # The type of runner that the job will run on
+  build:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - uses: actions/checkout@v2
-
-    - name: Gatsby Publish
-      uses: enriikke/gatsby-gh-pages-action@v2.1.1
-      with:
-        access-token: ${{ secrets.GH_TOKEN }}
+      - uses: actions/checkout@v1
+      - uses: enriikke/gatsby-gh-pages-action@v2
+        with:
+          access-token: ${{ secrets.GH_TOKEN }}
