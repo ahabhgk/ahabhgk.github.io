@@ -155,7 +155,7 @@ const nextState = produce(state, (draft) => {
 
 ## 实现
 
-100 行左右的实现可以看 [ahabhgk/simple-immer](https://github.com/ahabhgk/simple-immer)，对 Immer 1.0.0 做了一些简化，原理更加清晰，支持柯里化和异步，难点会有注释，也有比较完善的测试，很容易上手调试
+100 行左右的实现可以看 [ahabhgk/simple-immer](https://github.com/ahabhgk/simple-immer)，对 Immer v1.0.0 做了一些简化，原理更加清晰，支持柯里化和异步，难点会有注释，也有比较完善的测试，很容易上手调试
 
 另外由于 Immer 支持柯里化，很容易就能实现 useImmer，可以直接在 Github 上看
 
