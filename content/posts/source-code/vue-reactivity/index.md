@@ -9,6 +9,13 @@ tags:
   - Front End Framework
 ---
 
+## Table of Contents
+
+```toc
+```
+
+## 序
+
 ![reactivity](./images/reactivity.png)
 
 首先一起实现一个简易的 reactivity 吧，穿插着会提到源码中的一些细节，建议先跟着写写，细节可以 clone 下来 vue-next 打开源码跟着看

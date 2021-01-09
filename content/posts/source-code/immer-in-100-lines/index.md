@@ -10,6 +10,13 @@ tags:
 
 <!-- markdownlint-disable no-inline-html -->
 
+## Table of Contents
+
+```toc
+```
+
+## 序
+
 [Immer](https://github.com/immerjs/immer) - Create the next immutable state by mutating the current one
 
 Immer 实现的就是通过 mutate 当前对象创建下一个 immutable 对象，比如我们在使用 React 时经常遇到 `memo` 中的浅比较判断失败导致的不更新或多余更新的问题，就可以通过 immer 解决

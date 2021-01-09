@@ -9,6 +9,11 @@ tags:
 
 <!-- markdownlint-disable no-duplicate-header -->
 
+## Table of Contents
+
+```toc
+```
+
 ## 腾讯 PCG
 
 官网投的，真的太慢了

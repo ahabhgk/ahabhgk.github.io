@@ -11,6 +11,13 @@ tags:
 
 <!-- markdownlint-disable no-inline-html -->
 
+## Table of Contents
+
+```toc
+```
+
+## 序
+
 <details>
 <summary>1. 核心部分<strong>小于 200 行</strong></summary>
 
@@ -29,7 +36,7 @@ Go deeper 部分就是框架原理入门
 Go deeper 链接中的链接中的链接……
 </details>
 
-## 1. VNode
+## VNode
 
 ```text
 [Virtual Node]
@@ -58,7 +65,7 @@ Go deeper 链接中的链接中的链接……
 }
 ```
 
-## 2. Diff
+## Diff
 
 ```text
     div                    diff
@@ -79,7 +86,7 @@ key diff 位于 diffChildren 这里，是 diff 算法最难的地方，代码中
 > Vue 使用的是递归式的 diff，React16 使用的是迭代式的 diff，区别在于递归式的不可打断，迭代式的可以打断，这也决定了两个框架 feature 的不同
 > 代码中因为参考的是 Vue3 的源码，边 diff 边 patch，所以命名是 patch，但实际上做的是 diff + patch
 
-## 3. Component
+## Component
 
 现在我们加入 Component 的 diff
 
@@ -125,7 +132,7 @@ export const createHooksComponent = (render) => ({ ...hooksComponent, render }) 
 enqueueRender(n2.instance.update)
 ```
 
-## 4. State
+## State
 
 组件的 State 我们通过 Hooks “钩”入
 
@@ -167,7 +174,7 @@ export function useEffect(effect, args) {
 
 > 两类 Reactivity 的处理方式：一种是以 Vue 为代表的 mutable + change tracking。即可变的数据结构，配合变更追踪，触发更新函数。另一种是以 React 为代表的 immutability + referential equality testing。即不可变的数据结构，配合反复执行的渲染函数，以及在函数执行过程中，通过数据的引用相等性判断，找出变更部分，只应用变化的部分到 UI 上。—— [工业聚：打破框架的范式之争](https://zhuanlan.zhihu.com/p/82958907)
 
-## 5. Go deeper
+## Go deeper
 
 - [HcySunYang/vue-design](https://github.com/HcySunYang/vue-design)
 - [ahabhgk/simple-preact](https://github.com/ahabhgk/simple-preact)

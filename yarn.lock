@@ -8049,6 +8049,17 @@ gatsby-recipes@^0.6.1:
     xstate "^4.9.1"
     yoga-layout-prebuilt "^1.9.6"
 
+gatsby-remark-autolink-headers@^2.9.0:
+  version "2.9.0"
+  resolved "https://registry.yarnpkg.com/gatsby-remark-autolink-headers/-/gatsby-remark-autolink-headers-2.9.0.tgz#737e8520b43b0d509a1fc22e5464f6ba499fed07"
+  integrity sha512-68Pb+BfUVj1OXwO0Llln5IN4oGbWoTBxK3CZYzzhxI43rskBGnfrocPHsyIf1ltKXJKbeIzTuJnXSAaLm50oPQ==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    github-slugger "^1.3.0"
+    lodash "^4.17.20"
+    mdast-util-to-string "^1.1.0"
+    unist-util-visit "^1.4.1"
+
 gatsby-remark-images@^3.2.1:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/gatsby-remark-images/-/gatsby-remark-images-3.2.2.tgz#0b79255af0734d38966ff34461f111adc0a2b5dc"
@@ -8074,6 +8085,14 @@ gatsby-remark-katex@^3.3.2:
     "@babel/runtime" "^7.9.6"
     remark-math "^1.0.6"
     unist-util-visit "^1.4.1"
+
+gatsby-remark-table-of-contents@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/gatsby-remark-table-of-contents/-/gatsby-remark-table-of-contents-1.0.0.tgz#c59221f6dfc3c17e4041d5a36feaf0fb8d7cc0f7"
+  integrity sha512-Ku8PXV8V1TOLDIhxd/ajq0JD/9/a17KSABpkZGBiV922pxyBWoso+6h+y6dzURfvbajw4YeCAQdpsa5s5M4Aqg==
+  dependencies:
+    js-yaml "^3.14.1"
+    mdast-util-toc "^5.1.0"
 
 gatsby-source-filesystem@^2.2.2:
   version "2.2.2"
@@ -8445,7 +8464,7 @@ github-from-package@0.0.0:
   resolved "https://registry.yarnpkg.com/github-from-package/-/github-from-package-0.0.0.tgz#97fb5d96bfde8973313f20e8288ef9a167fa64ce"
   integrity sha1-l/tdlr/eiXMxPyDoKI75oWf6ZM4=
 
-github-slugger@^1.2.1:
+github-slugger@^1.2.1, github-slugger@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/github-slugger/-/github-slugger-1.3.0.tgz#9bd0a95c5efdfc46005e82a906ef8e2a059124c9"
   integrity sha512-gwJScWVNhFYSRDvURk/8yhcFBee6aFjye2a7Lhb2bUyRulpIoek9p0I9Kt7PT67d/nUlZbFu8L9RLiA0woQN8Q==
@@ -10320,6 +10339,14 @@ js-yaml@^3.11.0, js-yaml@^3.13.1:
     argparse "^1.0.7"
     esprima "^4.0.0"
 
+js-yaml@^3.14.1:
+  version "3.14.1"
+  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.14.1.tgz#dae812fdb3825fa306609a8717383c50c36a0537"
+  integrity sha512-okMH7OXXJ7YrN9Ok3/SXrnu4iX9yOk+25nqX4imS2npuvTYDmo/QEZoqwZkYaIDk3jVvBOTOIEgEhaLOynBS9g==
+  dependencies:
+    argparse "^1.0.7"
+    esprima "^4.0.0"
+
 jsbn@~0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/jsbn/-/jsbn-0.1.1.tgz#a5e654c2e5a2deb5f201d96cefbca80c0ef2f513"
@@ -11079,6 +11106,11 @@ mdast-util-to-string@^1.0.5, mdast-util-to-string@^1.1.0:
   resolved "https://registry.yarnpkg.com/mdast-util-to-string/-/mdast-util-to-string-1.1.0.tgz#27055500103f51637bd07d01da01eb1967a43527"
   integrity sha512-jVU0Nr2B9X3MU4tSK7JP1CMkSvOj7X5l/GboG1tKRw52lLF1x2Ju92Ms9tNetCcbfX3hzlM73zYo2NKkWSfF/A==
 
+mdast-util-to-string@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/mdast-util-to-string/-/mdast-util-to-string-2.0.0.tgz#b8cfe6a713e1091cb5b728fc48885a4767f8b97b"
+  integrity sha512-AW4DRS3QbBayY/jJmD8437V1Gombjf8RSOUCMFBuo5iHi58AGEgVCKQ+ezHkZZDpAQS75hcBMpLqjpJTjtUL7w==
+
 mdast-util-toc@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/mdast-util-toc/-/mdast-util-toc-3.1.0.tgz#395eeb877f067f9d2165d990d77c7eea6f740934"
@@ -11099,6 +11131,19 @@ mdast-util-toc@^5.0:
     extend "^3.0.2"
     github-slugger "^1.2.1"
     mdast-util-to-string "^1.0.5"
+    unist-util-is "^4.0.0"
+    unist-util-visit "^2.0.0"
+
+mdast-util-toc@^5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/mdast-util-toc/-/mdast-util-toc-5.1.0.tgz#3af0f9c9a764b993538af03f1f79f4e3cec22736"
+  integrity sha512-csimbRIVkiqc+PpFeKDGQ/Ck2N4f9FYH3zzBMMJzcxoKL8m+cM0n94xXm0I9eaxHnKdY9n145SGTdyJC7i273g==
+  dependencies:
+    "@types/mdast" "^3.0.3"
+    "@types/unist" "^2.0.3"
+    extend "^3.0.2"
+    github-slugger "^1.2.1"
+    mdast-util-to-string "^2.0.0"
     unist-util-is "^4.0.0"
     unist-util-visit "^2.0.0"
 

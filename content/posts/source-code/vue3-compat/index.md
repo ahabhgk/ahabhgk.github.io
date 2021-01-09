@@ -9,6 +9,13 @@ tags:
   - Front End Framework
 ---
 
+## Table of Contents
+
+```toc
+```
+
+## 序
+
 Vue3 中内置组件和一些其他新特性的实现原理，作为上一篇的补充
 
 ## Fragment

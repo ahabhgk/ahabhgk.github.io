@@ -114,6 +114,23 @@ module.exports = {
               strict: false,
             },
           },
+          {
+            resolve: `gatsby-remark-table-of-contents`,
+            options: {
+              exclude: "Table of Contents",
+              tight: true,
+              ordered: false,
+              fromHeading: 2,
+              toHeading: 6,
+              className: "table-of-contents"
+            },
+          },
+          {
+            resolve: `gatsby-remark-autolink-headers`,
+            options: {
+              icon: false,
+            },
+          },
         ],
       },
     },

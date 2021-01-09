@@ -8,6 +8,13 @@ tags:
   - SourceCode
 ---
 
+## Table of Contents
+
+```toc
+```
+
+## 序
+
 Koa 由 express 同一个团队打造，目的是代替 express 成为下一代 Node.js 后端框架，Koa 由于十分简洁，其实更适合做一些框架的基础（egg.js、think.js），如今看来并不能代替 express，express 本身自带一些中间件支持，基于 express 编写的 nest 更是大而全，结合 TypeScript 写起来真的爽，虽然 Koa 用的人不如 express 多，但 Koa 确实有其进步的地方：支持 `async/await` 的异步中间件机制
 
 本文由创建服务开始，讲述了 `new Koa()` 到 `app.listen` Koa 所做的事，再由一条 http 请求详细介绍了 Koa 异步中间件机制，之后讲述对 ctx 的修改如何改动原生 req res，并带出一些 http 相关的知识，最后讲了 Koa 如何进行错误处理
