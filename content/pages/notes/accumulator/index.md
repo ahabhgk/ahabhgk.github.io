@@ -11,4 +11,6 @@ slug: /note/accumulator
 
 - [Browser](/note/accumulator/browser)
 
+- [Engineering](/note/accumulator/engineering)
+
 - [Net](/note/accumulator/net)

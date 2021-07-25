@@ -350,18 +350,28 @@ async 函数是对 GeneratorFunction + co 的语义化和标准化的语法糖
 
 Promise 作为 async function 中的异步最小单位通过 await 进行传递，而 Promise 又是由 callback 组成，所以 co + Generator（async / await）也是一种 callback 的形式，只不过写法更加方便规范
 
-### 3.5 RxJS
-
-// TODO: RxJS 与 async 区别，RxJS 理念等
-
 ### 3.6 🔑 the key
 
 异步的关键就在于调用 callback 的时机，因为我们不知道异步操作需要多少时间，我们自然也就不知道何时调用异步之后的操作，所以我们通过 callback 将之后操作的控制权交给异步操作，实现控制反转，在异步操作完成之后自动调用 callback，就完成了在合适的时机进行合适的操作
 
+## 💫 后记
+
+[async/await in babel](https://babeljs.io/repl#?browsers=&build=&builtIns=false&corejs=3.6&spec=false&loose=false&code_lz=IYZwngdgxgBAZgV2gFwJYHsIwOYFNkAUAlDAN4BQMM5AvkA&debug=false&forceAllTransforms=false&shippedProposals=false&circleciRepo=&evaluate=false&fileSize=false&timeTravel=true&sourceType=module&lineWrap=false&presets=env&prettier=true&targets=&version=7.14.8&externalPlugins=)
+
+可以看到 babel 的编译也是将 async/await 编译成 `_asyncToGenerator(generatorFn)` 使用 generator 实现，而 generator 则是利用了 [regenerator](https://github.com/facebook/regenerator) 这个库实现的，这个库的理论支持则是 Continuation
+
+> In computer science, a continuation is an abstract representation of the control state of a computer program. A continuation implements (reifies) the program control state, i.e. the continuation is a data structure that represents the computational process at a given point in the process's execution; the created data structure can be accessed by the programming language, instead of being hidden in the runtime environment. Continuations are useful for encoding other control mechanisms in programming languages such as exceptions, generators, coroutines, and so on. --- [wikipedia](https://en.wikipedia.org/wiki/Continuation)
+
+关于 Continuation 可以看看这些文章：
+
+- [尾递归为啥能优化？](https://zhuanlan.zhihu.com/p/36587160)
+- [通用的递归转循环方法](https://zhuanlan.zhihu.com/p/136511316)
+- [Continuation 在 JS 中的应用](https://zhuanlan.zhihu.com/p/94611888)
+- [前端中的 Monad](https://zhuanlan.zhihu.com/p/47130217)
+
+我接触到 Continuation 的起因是在刷题时又忘了二叉树的遍历用循环的方法怎么写，又觉得很多场景下递归明显更符合人的思维，背这些循环方法可能只是为了应试，于是想找一种通用的迭代转循环的方法，发现了 Continuation 的宝藏，这也是一种 [Yak Shaving](https://antfu.me/posts/about-yak-shaving-zh) 吧
+
 ## ref
 
-[Generator 函数的异步应用](https://es6.ruanyifeng.com/#docs/generator-async)
-
-[100 行代码实现 Promises/A+ 规范](https://zhuanlan.zhihu.com/p/83965949)
-
-[JAVASCRIPT GETTER-SETTER PYRAMID](https://staltz.com/javascript-getter-setter-pyramid.html)
+- [Generator 函数的异步应用](https://es6.ruanyifeng.com/#docs/generator-async)
+- [100 行代码实现 Promises/A+ 规范](https://zhuanlan.zhihu.com/p/83965949)
