@@ -260,6 +260,21 @@ function dispatch (i) {
 
 看完中间件机制再来看 http 请求从接受到响应就简单了，this.callback 返回的就是 http.createServer 的回调函数，所以 req res 从这里接收，之后 req res 进入 createContext 挂载到 ctx 对象上，之后把组合好的 fnMiddleware 和 ctx 传入 this.handleRequest，这里处理好 onerror 和 respond 之后开始把 ctx 传入 fnMiddleware，通过开发者编写的中间件对 req res 进行真正的处理，最后处理好后通过 `.then(() => respond(ctx))` 作出响应
 
+> 简化的迭代版 compose
+> 
+> ```js
+> function compose(mws) {
+>   return (context, next) => {
+>     let next = () => Promise.resolve()
+>     for (const mw of [...mws].reverse()) {
+>       const nextFn = next
+>       next = () => Promise.resolve(mw(context, nextFn))
+>     }
+>     return next()
+>   }
+> }
+> ```
+
 ## ⛅️ request response 代理原生 req res
 
 我们对 ctx 上处理一般是对 ctx.request 和 ctx.response 处理，但 request response 只是对原生 req res 通过 \_\_defineGetter\_\_ 和 \_\_defineSetter\_\_ 做的代理，最终的修改还是对 req res 的修改，我们通过几处看看这层代理有什么作用

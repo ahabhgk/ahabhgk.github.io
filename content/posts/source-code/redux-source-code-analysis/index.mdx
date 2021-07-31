@@ -256,6 +256,8 @@ compose 就是典型的函数式编程中的组合函数，用于组合多个 en
 const compose = (...fns) => fns.reduce((f, g) => (...args) => f(g(...args)))
 ```
 
+> 与本文无关，记录一个 async compose：[asyncPipe](https://twitter.com/_ericelliott/status/1243900981747867650)
+
 ### 5.4 applyMiddleware
 
 applyMiddleware 可以对特定类型的 action 进行操作
