@@ -229,7 +229,7 @@ leetcode 刷的比较多，看了看浏览器相关的，其他的之前美团�
 diffChildren（2、3 偷懒了没准备）：
 
 - Preact 和 React15 使用的方式，遍历一遍新 children
-  - 移动：遍历时遍历旧 children 找到 type 和 key 都相同的旧节点，进行 diff，并通过 lastIndex 记录找到的旧节点的 index，即记录旧节点原来的位置，这样下一轮就可以通过 index 是否小于 lastIndex 判断是否需要移动节点的情况，如果小于，就 `insertBefore(oldVNode.dom, newChildren[i - 1].dom.nextSibling)` 进行移动
+  - 移动：遍历时遍历旧 children 找到 type 和 key 都相同的旧节点，进行 diff，lastIndex 指之前遍历过的 newChild 对应的在最后面的 oldChild 的索引，也就是之前遍历过的 oldChild 的最大的索引，这样之后遍历的可以对比 index 是否小于 lastIndex 判断是否需要移动节点，如果小于，指这个 newChild 原来在 lastIndex 节点的前面，现在在后面，需要移动，就 `insertBefore(oldVNode.dom, newChildren[i - 1].dom.nextSibling)` 进行移动，如果大于，指两节点相对位置没变，不需要移动，只更新 lastIndex
   - 添加：如果没有找到，就添加新节点
   - 删除：找到的旧 VNode 会被打上标记，如果没有打上标记就说明是要移除的
 - Vue2 使用 snabbdom 的双端进行比较的方法，上一种由于从前往后进行遍历，在 `1 2 3 -> 3 1 2` 的情况下会发生两次移动，但使用双端遍历可以优化成只移动一次
