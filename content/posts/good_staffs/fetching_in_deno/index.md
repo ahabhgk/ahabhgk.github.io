@@ -13,7 +13,7 @@ tags:
 
 Deno 主要分为三个部分：
 
-第一部分是 cli，它包括所有用户使用的 API，像 fmt、repl、run、compile、doc 等，一部分功能是调用的其他项目实现的，cli 这里集成到 deno 中，比如 fmt 底层使用的 dprint，typescript 使用了官方的一份 fock 实现了 transpile with type checking，只 transpile 的话使用了 swc。另外大部分的单元测试、集成测试、benchmark 测试也放在这里，用于测试 web API 兼容性的 wpt（web platform tests）则作为一个子仓库放在 third_party 里面。
+第一部分是 cli，它包括所有用户使用的 API，像 fmt、repl、run、compile、doc 等，一部分功能是调用的其他项目实现的，cli 这里集成到 deno 中，比如 fmt 底层使用的 dprint，typescript 使用了官方的一份 fock 实现了 transpile with type checking，只 transpile 的话使用了 swc。另外大部分的单元测试、集成测试、benchmark 测试也放在这里。
 
 第二部分是 core，主要依赖了 rusty_v8，rusty_v8 是使用 Rust 对 v8 引擎做的一层 binding，基本就是直接调用 v8 的 API，并没有过多的封装，提供好用的封装则是在 core 这里做的；然后著名的事件循环也是 core 这里实现的，但并没有完全实现，熟悉 Rust Async 的同学应该知道 Rust 中的异步 API 实现分为两部分，一部分是实现 Future trait 的 poll 方法，另一部分是实现 executor，core 这里相当于只实现了 poll 方法，executor 可以使用 tokio、smol 等库，core 这里并没有作为生产依赖引入 executor，但其他使用 core 的地方都是用的 tokio 作为 executor；最后 core 实现了 Rust 侧和 JS 侧通信的方法：ops，Rust 这里将 JS 要用的 ops 注册上，JS 就可以通过 opSync 进行同步调用或 opAsync 进行异步调用，传递的数据通过 serde_v8 进行序列化与反序列化，可以理解为是一种 RPC。
 
@@ -21,7 +21,7 @@ Deno 主要分为三个部分：
 
 ## fetch
 
-Deno 中的很多 API 会根据 web 的标准进行实现，并进行 wpt 测试，所以你的有些代码即可以跑在 Deno 上也可以跑在浏览器上，当然这只是美好的愿景，web 标准并不是那么好实现的，不然 Servo 也不会到现在还是 experimental，wpt 的 TODO 只完成三分之一。
+Deno 中的很多 API 会根据 web 的标准进行实现，所以你的有些代码即可以跑在 Deno 上也可以跑在浏览器上，当然这只是美好的愿景，web 标准并不是那么好实现的，Github 上有专门的 web platform tests，简称 wpt，用来测试是否符合规范，Deno 也只通过了部分测试，Rust 编写的浏览器引擎 Servo 的 wpt 的 TODO 只完成三分之一。
 
 ![Servo wpt](./images/servo_wpt.png)
 
@@ -64,9 +64,11 @@ fetch("xxx", {
 
 我也在[知乎上提了一个问题](https://www.zhihu.com/question/489428152)，想了解更深的原因（两个 RFC 有差异的原因，为啥 fetch 规范不更新），有兴趣的大佬可以答一下～
 
+最后我修了这个 issue 并提交了[我给 Deno 的第一个 PR](https://github.com/denoland/deno/pull/12244)，PR 的内容很简单，就是去掉 unwrap 改为返回这个 Err，这样 ops 中返回的 Err 也会序列化传给 JS 侧，JS 侧则会 throw error 出来，这样用户就可以 catch 到这个 error 而不至于无法处理 panic 而导致整个 runtime 挂掉。后续再补充两个测试，更新下 wpt 的测试结果就成功被 Merge 了。
+
 ## 后记
 
-最后我修了这个 issue 并提交了[我给 Deno 的第一个 PR](https://github.com/denoland/deno/pull/12244)，修 issue 的这几天虽然一行 Rust 异步的代码都还没写，但是让我体会到了 Deno 的优良的工作流，对测试的重视，同时在 Discord 看大佬聊天也能学到很多，还有 v8 snapshot 的应用（deno compile），如何实现一个 JS 运行环境，甚至一窥未来的前端 toolchain。很多都是我在接触 Rust 后才有机会学到的，很喜欢 doodlewind 的一句话：
+修 issue 的这几天虽然一行 Rust 异步的代码都还没写，但是让我体会到了 Deno 的优良的工作流，对测试的重视，同时在 Discord 看大佬聊天也能学到很多，还有 v8 snapshot 的应用（deno compile），如何实现一个 JS 运行环境，甚至一窥未来的前端 toolchain。很多都是我在接触 Rust 后才有机会学到的，很喜欢 doodlewind 的一句话：
 
 > 只要少量的 C / C++ 配合现代的 JavaScript，就能使传统的 Web 技术栈走出浏览器
 
