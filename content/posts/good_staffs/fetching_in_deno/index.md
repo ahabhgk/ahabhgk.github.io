@@ -13,9 +13,9 @@ tags:
 
 Deno 主要分为三个部分：
 
-第一部分是 cli，它包括所有用户使用的 API，像 fmt、repl、run、compile、doc 等，一部分功能是调用的其他项目实现的，cli 这里集成到 deno 中，比如 fmt 底层使用的 dprint，typescript 使用了官方的一份 fock 实现了 transpile with type checking，只 transpile 的话使用了 swc。另外大部分的单元测试、集成测试、benchmark 测试也放在这里。
+第一部分是 cli，它包括所有用户使用的 API，像 fmt、repl、run、compile、doc 等。一部分功能是调用的其他项目实现的，cli 这里集成到 deno 中，比如 fmt 底层使用的 dprint、typescript 使用了官方的一份 fock 实现了 transpile with type checking，只 transpile 的话使用了 swc。JS 执行环境相关的 cli 相当于是一个入口，用来对模块、runtime 进行初始化。除此之外大部分的单元测试、集成测试、benchmark 测试也放在这里。
 
-第二部分是 core，主要依赖了 rusty_v8，rusty_v8 是使用 Rust 对 v8 引擎做的一层 binding，基本就是直接调用 v8 的 API，并没有过多的封装，提供好用的封装则是在 core 这里做的；然后著名的事件循环也是 core 这里实现的，但并没有完全实现，熟悉 Rust Async 的同学应该知道 Rust 中的异步 API 实现分为两部分，一部分是实现 Future trait 的 poll 方法，另一部分是实现 executor，core 这里相当于只实现了 poll 方法，executor 可以使用 tokio、smol 等库，core 这里并没有作为生产依赖引入 executor，但其他使用 core 的地方都是用的 tokio 作为 executor；最后 core 实现了 Rust 侧和 JS 侧通信的方法：ops，Rust 这里将 JS 要用的 ops 注册上，JS 就可以通过 opSync 进行同步调用或 opAsync 进行异步调用，传递的数据通过 serde_v8 进行序列化与反序列化，可以理解为是一种 RPC。
+第二部分是 core，主要依赖了 rusty_v8。rusty_v8 是使用 Rust 对 v8 引擎做的一层 binding，基本就是直接调用 v8 的 API，并没有过多的封装，提供好用的封装则是在 core 这里做的；然后著名的事件循环也是 core 这里实现的，但并没有完全实现，熟悉 Rust Async 的同学应该知道 Rust 中的异步 API 实现分为两部分：一部分是实现 Future trait 的 poll 方法，另一部分是实现 executor，core 这里相当于只实现了 poll 方法，executor 可以使用 tokio、smol 等库，core 这里并没有直接依赖 tokio，但其他调用 core 的地方都是用的 tokio 作为 executor 的；最后 core 实现了 Rust 侧和 JS 侧通信的方法：ops，Rust 这里将 JS 要用的 ops 注册上，JS 就可以通过 opSync 进行同步调用或 opAsync 进行异步调用，传递的数据通过 serde_v8 进行序列化与反序列化，可以理解为是一种 RPC。
 
 第三部分是 runtime，这里依赖 core 实现 Deno 的 JS 执行环境和所有有关操作系统的 ops 和 JS 封装，比如 os、fs、http、process 等，其他的 ops 比如 fetch、timers、net、webgpu 等则单独放到了 ext 中，Rust 代码在 cli 中进行注册，通过 JS 进行调用。
 
