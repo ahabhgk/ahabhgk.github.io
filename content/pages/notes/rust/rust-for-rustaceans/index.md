@@ -166,4 +166,145 @@ Rust 使 trait 变得 generic 的方式主要有两种：泛型参数（`trait F
 
 #### Trait Bounds
 
+这样是可以的，渐进式的确认类型很有帮助
 
+```rust
+fn foo(s: String) -> String where String: Clone  {
+  s.clone()
+}
+```
+
+HRTB：If you write F: Fn(&T) -> &U, you need to provide a lifetime for those refer- ences, but you really want to say “any lifetime as long as the output is the same as the input.” Using a higher-ranked lifetime, you can write F: for<'a> Fn(&'a T) -> &'a U to say that for any lifetime 'a, the bound must hold. The Rust compiler is smart enough that it automatically adds the for when you write Fn bounds with references like this, which covers the majority of use cases for this feature.
+
+#### Marker Traits
+
+包括 Copy、Send、Sync、Sized、Unpin，同时除了 Copy 都是 auto trait
+
+Unit Type 的一个例子，状态模式：
+
+```rust
+use std::marker::PhantomData;
+
+struct Authenticated;
+struct Unauthenticated;
+struct SshConnection<S> {
+  _marker: PhantomData<S>,
+}
+
+impl<S> SshConnection<S> {
+  pub fn new() -> SshConnection<Unauthenticated> {
+    SshConnection::<Unauthenticated> { _marker: PhantomData }
+  }
+}
+
+impl SshConnection<Unauthenticated> {
+  pub fn connect(&mut self) -> SshConnection<Authenticated> {
+    SshConnection::<Authenticated> { _marker: PhantomData }
+  }
+}
+```
+
+### Existential Types
+
+```rust
+fn foo() -> impl Future<Output = i32> {}
+```
+
+```rust
+#![feature(type_alias_impl_trait)] // see https://github.com/rust-lang/rust/issues/63063
+
+struct Foo {
+  v: Vec<i32>,
+}
+
+impl IntoIterator for Foo {
+  type Item = i32;
+  type IntoIter = impl Iterator<Item = Self::Item>;
+
+  fn into_iter(self) -> Self::IntoIter {
+    self.v.into_iter()
+  }
+}
+```
+
+## Designing Interfaces
+
+See also:
+
+- [API Guidelines](https://rust-lang.github.io/api-guidelines/)
+- [rfc#1105: API Evolution](https://rust-lang.github.io/rfcs/1105-api-evolution.html)
+- [The Cargo Book - semver](https://doc.rust-lang.org/cargo/reference/semver.html)
+
+### Unsurprising
+
+#### Naming Practices
+
+into_、as_、to_、iter、iter_mut、get、get_mut……
+
+#### Common Traits for Types
+
+1. Debug
+2. Sync、Send、Unpin、Sized auto-traits
+3. Clone、Default，如果不能实现要文档说明
+4. PartialEq 以便 assert_eq!
+5. PartialOrd、Hash 可能用于作为 key 时实现
+6. Eq、Ord 语义有额外要求，符合时实现
+7. serde 的 Serialize 和 Deserialize，不想添加必要依赖可开 feature “serde” 提供
+8. 尽量不实现 Copy，破坏 move 语义，而且去掉 Copy 是 break change
+
+#### Ergonomic Trait Implementations
+
+```rust
+trait Foo {
+  fn foo(&self);
+}
+
+impl<T> Foo for &T where T: Foo {
+  fn foo(&self) {
+    Foo::foo(*self);
+  }
+}
+
+impl<T> Foo for &mut T where T: Foo {
+  fn foo(&self) {
+    Foo::foo(*self);
+  }
+}
+
+impl<T> Foo for Box<T> where T: Foo {
+  fn foo(&self) {
+    Foo::foo(&**self);
+  }
+}
+
+struct Fo;
+
+impl Foo for Fo {
+  fn foo(&self) {
+    println!("foo");
+  }
+}
+
+fn fooo<T>(f: T) where T: Foo {
+  f.foo();
+}
+
+fn main() {
+  let f = &Fo;
+  fooo(f);
+  let f = &mut Fo;
+  fooo(f);
+  let f = Box::new(Fo);
+  fooo(f);
+}
+```
+
+#### Wrapper Types
+
+- `Deref`：方便 `.` 调用 Target 上的方法
+- `AsRef`：方便 &Wrapper 作为 &Inner 使用
+- `From<Inner>`、`From<Wrapper>`：方便添加和删除这层包装
+
+Borrow 只适用于你的类型本质上等同于另一个类型的情况，如 &String 和 &str
+
+### Flexible
