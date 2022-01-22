@@ -308,3 +308,166 @@ fn main() {
 Borrow 只适用于你的类型本质上等同于另一个类型的情况，如 &String 和 &str
 
 ### Flexible
+
+#### Generic Arguments
+
+static dispatch 容易使类型变的复杂，有时可以用 dynamic dispatch 代替以减少复杂度，不过需要考虑
+
+- dynamic dispatch 有性能损耗
+- 复杂的情况下 Rust 不知道如何构建 vtable（&dyn Hash + Eq）
+- static dispatch 的代码用户可以自己调用时传入 trait object 以 dynamic dispatch 的方式使用
+
+```rust
+fn foo<T: Debug>(f: T) {
+  dbg!(f);
+}
+
+fn main() {
+  let d: &dyn Debug = &"hah".to_owned();
+  foo(d);
+}
+```
+
+所以对 lib 来说 static dispatch 的接口更好，app 来说因为是最下游两种都可以
+
+一开始使用具体类型之后逐渐改为泛型是可行的，但并不一定都是向后兼容的：
+
+```rust
+fn foo(v: &Vec<i32>) {}
+// =>
+fn foo(v: impl AsRef<[i32]>)
+// 虽然 Vec<T> 实现了 AsRef<T>，但用户可能会这样调用：
+foo(&iter.collect()) // 导致 collect 的类型推断失效
+```
+
+#### Object Safety
+
+trait 的设计应该考虑到是否有 trait object 的场景，一般倾向于需要实现，因为增加了 dyn 的使用方式
+
+- 泛型方法上的泛型可不可以放到 trait 上，以保证 object safety
+- 可以为不需要 dyn 的方法添加 Self: Sized
+
+object safety 是 API 的一部分，需注意兼容性
+
+#### Borrowed vs. Owned
+
+API 对数据的 Owned 和 Borrowed 要仔细判断
+
+#### Fallible and Blocking Destructors
+
+一些 I/O 的 destructor 可能阻塞甚至失败，需要显式的解构，`Option::take`、`std::mem::take`、`ManuallyDrop` 可能会比较有用
+
+### Obvious
+
+有时我们的类型需要先调用 foo 然后再调用 bar，但用户并不知道
+
+#### Documentation
+
+- 会 panic 的函数写明 Panic
+- Err 返回的原因
+- 对于 unsafe 的函数写明 Safety
+- examples 质量，用户很可能复制这里的代码
+- 组织文档，文档内链接，`#[doc(hidden)]` 标记不想公开的接口
+- `#[doc(cfg(..))]` 标记某些情况下才会用到的接口，`#[doc(alias = "...")]` 方便搜索
+
+#### Type System Guidance
+
+newtype、enum…… 实现 **semantic typing**
+
+zero-sized type 表示：
+
+```rust
+struct Grounded;
+struct Launched;
+
+struct Rocket<Stage = Grounded> {
+  stage: std::marker::PhantomData<Stage>,
+}
+
+impl Default for Rocket<Grounded> {}
+
+impl Rocket<Grounded> {
+  pub fn launch(self) -> Rocket<Launched> {}
+}
+
+impl Rocket<Launched> {
+  pub fn accelerate(&mut self) {}
+  pub fn decelerate(&mut self) {}
+}
+
+impl<Stage> Rocket<Stage> {
+  pub fn color(&self) -> Color {}
+  pub fn weight(&self) -> Kilograms {}
+}
+```
+
+### Constrained
+
+向后兼容
+
+#### Type Modifications
+
+尽量少的 pub 给用户会帮助我们控制代码
+
+`#[non_exhaustive]` 可以避免用户 match、构造等可能需要枚举类型所有属性的操作，等类型稳定后请避免使用它
+
+#### Trait Implementations
+
+trait 的修改往往是 break 的
+
+```rust
+pub trait CanUseCannotImplement: sealed::Sealed {
+  // ...
+}
+
+mod sealed {
+  pub trait Sealed {}
+  impl<T> Sealed for T where T: TraitBounds {}
+}
+
+impl<T> CanUseCannotImplement for T where T: TraitBounds {}
+```
+
+## Error Handling
+
+### Representing Errors
+
+#### Enumeration
+
+1. 实现 `std::error::Error`
+2. 实现 `std::fmt::Display`
+3. 尽量实现 Send、Sync，把 Rc、RefCell 放到 Error 中时需要考虑 Error 是否需要跨线程
+
+see [std::io::Error](https://doc.rust-lang.org/src/std/io/error.rs.html#58-60)
+
+#### Opaque Errors
+
+并不是所有 lib 都适合 Enumeration 这种方案，对于错误原因并不重要的情况更适合用不透明的 Error 表示，比如：一个图像解码库，解码失败时图像头中的大小字段无效或者压缩算法未能解压一个块这种具体的原因对用户来说也许并不重要，因为即使知道了也无法恢复错误，而不透明错误使库更容易使用，大大减小 API 复杂度（内部可以细化，但没必要暴露给用户）
+
+通常是 `Box<dyn Error + ...>` 这样的，但 `Box<dyn Error + Send + Sync + 'static>` 可以使用户使用 `Error::downcast_ref` 特化 Error 进行处理
+
+### Propagating Errors
+
+`?` 其实就是 `std::Ops::Try` trait，不过目前来没有稳定
+
+`try { ... }` try block 的场景，不过也没稳定：
+
+```rust
+fn do_it() -> Result<(), Error> {
+  let t = Thing::setup();
+  t.work()?; // Err 后会直接返回，没有 cleanup
+  t.cleanup();
+  Ok(())
+}
+
+fn try_it() -> Result<(), Error> {
+  let t = Thing::setup();
+  let r = try { t.work()? };
+  t.cleanup();
+  r
+}
+```
+
+## Project Structure
+
+### Features
