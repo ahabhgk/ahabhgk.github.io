@@ -471,3 +471,53 @@ fn try_it() -> Result<(), Error> {
 ## Project Structure
 
 ### Features
+
+添加 optional 的 crate 和改变代码，以开启额外功能
+
+#### Defining and Including Features
+
+Cargo 中可以定义 features，默认使用的可以定义为 default
+
+Cargo 使每个可选依赖关系都成为与依赖关系同名的 features，所以会有命名冲突
+
+```toml
+[features]
+derive = ["syn"]
+
+[dependencies]
+syn = { version = "1", optional = true }
+```
+
+也可以开启依赖的一些 features
+
+```toml
+[features]
+derive = ["syn/derive"]
+
+[dependencies]
+syn = { version = "1", optional = true }
+```
+
+#### Using Features in Your Crate
+
+`#[cfg(feature = "some-feature")]` 和 `cfg!(feature = "some-feature))` 来控制 conditional compilation
+
+## Testing
+
+### Rust Testing Mechanisms
+
+`#[test]`, `#[should_panic]`, `#[cfg(test)]`, Integration tests (the tests in tests/), `compile_fail in doctests`, `# in doctests`...
+
+### Additional Testing Tools
+
+- clippy
+- cargo-fuzz
+- miri
+- loom
+
+
+## Marcos
+
+### Declarative Macros
+
+
