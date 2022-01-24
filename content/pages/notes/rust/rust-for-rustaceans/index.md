@@ -520,4 +520,61 @@ syn = { version = "1", optional = true }
 
 ### Declarative Macros
 
+#### When to Use Them
+
+当你发现自己反复编写相同的代码时，声明宏会很有用
+
+#### How They Work
+
+parse 的时候遇到声明宏会根据定义进行展开（定义必须在调用之前解析），由于是 Rust 编译器进行解析，所以宏的语法必须是编译器可以识别的 token
+
+#### How to Write Declarative Macros
+
+Rust 的宏是卫生的，一个声明宏（通常）不能影响那些没有明确传递给它的变量
+
+```rust
+macro_rules! let_foo {
+  ($x:expr) => {
+    let foo = $x;
+  }
+}
+
+let foo = 1;
+let_foo!(2);
+assert_eq!(foo, 1);
+```
+
+宏的调用不能受调用位置影响，`::std`、`::core`、`$crate` 进行导入
+
+宏只有声明后才存在，如果一个 mod 想用另一个 mod 中的宏，那么声明这个宏的 mod 必须放在另一个 mod 前面；或者使用 `#[macro_export]` 标记宏，这会将宏提升到 crate 的根部并标记为 pub 的，这样就可以在任何地方或其他依赖中使用
+
+### Procedural Macros
+
+`fn(TokenStream) -> TokenStream`
+
+#### Types of Procedural Macros
+
+- function-like macros, `macro_rules!`
+- attribute macros, `#[test]`
+- derive macros, `#[derive(Serialize)]`
+
+#### The Cost of Procedural Macros
+
+增加了几个大库，过程宏生成的代码，导致编译时间增加
+
+#### So You Think You Want a Macro
+
+派生宏 derive macros：实现 derive，很多类型都需要自动实现 trait 的时候使用
+
+function-like macros：已有声明宏但是越来越难维护，或者有的想在编译期计算而 const 实现不了
+
+#### How Do They Work?
+
+AST 层面进行操作
+
+## Asynchronous Programing
+
+### What’s the Deal with Asynchrony?
+
+
 
