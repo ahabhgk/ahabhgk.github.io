@@ -576,5 +576,13 @@ AST 层面进行操作
 
 ### What’s the Deal with Asynchrony?
 
+同步接口 - 多线程
+
+异步接口 - Standardized Polling (Future)
+
+### Ergonomic Futures
+
+async/await（和 generator fn）会被编译为有限状态机，以实现零成本抽象 [RustLatam 2019 - Without Boats: Zero-Cost Async IO](https://www.youtube.com/watch?v=skos4B5x7qE)
+
 
 
