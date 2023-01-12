@@ -36,7 +36,7 @@
     "cross-env": "^5.2.0",
     "gatsby-plugin-webpack-bundle-analyser-v2": "^1.1.8",
     "gatsby-remark-katex": "^3.3.2",
-    "gatsby-transformer-remark": "^2.8.13",
+    "gatsby-transformer-remark": "^5.25.1",
     "gh-pages": "^2.2.0",
     "katex": "^0.11.1"
   }
